@@ -138,6 +138,7 @@ function kanallar(): void {
   ipcMain.handle('guncellemeDurumu', () => guncelleme.guncellemeDurumu())
   ipcMain.handle('guncellemeDenetle', () => guncelleme.guncellemeDenetle())
   ipcMain.handle('guncellemeKur', () => guncelleme.guncellemeKur())
+  ipcMain.handle('planLimitleriYenile', () => motor.planLimitleriYenile())
 }
 
 /** Claude Code sohbetlerinde açılan alt ajanları 3 saniyede bir tarar. */

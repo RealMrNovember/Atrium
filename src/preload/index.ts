@@ -5,7 +5,7 @@ const KANALLAR = [
   'profil', 'profilKaydet', 'katlar', 'katOnizle', 'katDetayi', 'ajanKaydet', 'ajanSil', 'hafizaKaydet',
   'hafizaCikar', 'komutVer', 'komutIptal', 'tumRaporlar', 'canli', 'klasorAc', 'klasorSec', 'claudeDurumu',
   'claudeGiris', 'apiAnahtariKaydet', 'apiAnahtariSil', 'sohbetOzeti', 'sohbetler', 'sohbetMesajlari', 'disBaglanti',
-  'katSirala', 'durumTuru', 'sohbetDevam', 'sohbetDurdur', 'guncellemeDurumu', 'guncellemeDenetle', 'guncellemeKur'
+  'katSirala', 'durumTuru', 'sohbetDevam', 'sohbetDurdur', 'guncellemeDurumu', 'guncellemeDenetle', 'guncellemeKur', 'planLimitleriYenile'
 ] as const satisfies readonly Exclude<keyof SirketApi, 'canliDinle' | 'guncellemeDinle'>[]
 
 const api = Object.fromEntries(

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type DragEvent, type ReactElement } from 'react'
 import type { CanliDurum, GuncellemeDurumu, Kat, SirketProfili } from '@ortak/tipler'
 import { AtriumIsareti, SirketLogosu } from './bilesenler/Kimlik'
+import { PlanGostergesi } from './bilesenler/PlanGostergesi'
 import { DilSaglayici, useDil } from './dil'
 import { AnaSayfa } from './sayfalar/AnaSayfa'
 import { AyarlarSayfasi } from './sayfalar/AyarlarSayfasi'
@@ -160,11 +161,16 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
             {sayfa.tur === 'kilavuz' && <><span>›</span><b>{t('navGuide')}</b></>}
           </div>
           <div className="ust-sag">
-            <div className="harcama" title={abonelik ? t('spendInfoSub') : t('spendInfoApi')}>
-              <span>{t('spendEst', { spent: usd(canli.bugunHarcanan) })} · {t('dailyCap', { cap: usd(profil.ayarlar.gunlukTavanUsd) })} <span className="bilgi-i">ⓘ</span></span>
-              <div className="harcama-cubuk"><div style={{ width: `${harcamaOrani * 100}%` }} className={harcamaOrani > 0.8 ? 'kritik' : ''} /></div>
-              {abonelik && <small className="abonelik-notu">{t('subscriptionNote')}</small>}
-            </div>
+            {abonelik ? (
+              // abonelikte asıl ölçü plan limitleri; dolar tahmini ve Atrium'un günlük tavanı ipucunda
+              <PlanGostergesi limitler={canli.planLimitleri}
+                ipucu={`${t('planUsageTitle')}\n\n${t('spendEst', { spent: usd(canli.bugunHarcanan) })} · ${t('dailyCap', { cap: usd(profil.ayarlar.gunlukTavanUsd) })}\n${t('spendInfoSub')}`} />
+            ) : (
+              <div className="harcama" title={t('spendInfoApi')}>
+                <span>{t('spendEst', { spent: usd(canli.bugunHarcanan) })} · {t('dailyCap', { cap: usd(profil.ayarlar.gunlukTavanUsd) })} <span className="bilgi-i">ⓘ</span></span>
+                <div className="harcama-cubuk"><div style={{ width: `${harcamaOrani * 100}%` }} className={harcamaOrani > 0.8 ? 'kritik' : ''} /></div>
+              </div>
+            )}
             <button className="ikon-dugme" onClick={() => ayarDegistir({ ses: !profil.ayarlar.ses })} title={t('soundToggle')}>
               {profil.ayarlar.ses ? '🔊' : '🔇'}
             </button>

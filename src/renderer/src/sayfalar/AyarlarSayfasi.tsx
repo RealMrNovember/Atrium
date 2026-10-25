@@ -100,6 +100,11 @@ export function AyarlarSayfasi({ profil, guncelleme, onKaydet }: {
             </label>
           </div>
           <div className="form-satir">
+            <label>{t('capChat')}
+              <input type="number" step="0.5" min="0.5" value={f.ayarlar.sohbetButcesiUsd} onChange={(e) => ayar('sohbetButcesiUsd', sayi(e.target.value, 0.5))} />
+            </label>
+          </div>
+          <div className="form-satir">
             <label>{t('capTime')}
               <input type="number" min="1" value={f.ayarlar.kosuSuresiDk} onChange={(e) => ayar('kosuSuresiDk', sayi(e.target.value, 1))} />
             </label>

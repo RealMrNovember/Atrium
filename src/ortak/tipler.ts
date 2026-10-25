@@ -30,6 +30,9 @@ export interface SirketAyarlari {
   kosuButcesiUsd: number
   /** Bütün şirketin günlük tavanı (USD). */
   gunlukTavanUsd: number
+  /** Atrium'dan bir Claude Code sohbetine devam ederken tek mesajın tavanı (USD). Uzun sohbetler
+   *  geçmişi yeniden yüklediği için ajan koşusundan pahalıdır. */
+  sohbetButcesiUsd: number
   /** Tek ajan koşusunun süre tavanı (dakika). */
   kosuSuresiDk: number
   /** Aynı katta aynı anda çalışabilecek ajan sayısı (yalnız okuma modunda). */
@@ -174,6 +177,22 @@ export interface SohbetKosusu {
   satirlar: { rol: 'sen' | 'claude' | 'arac' | 'hata'; metin: string }[]
 }
 
+/** Claude aboneliğinin kullanım limitleri (Claude Code'un rate_limit_event olayından). */
+export interface PlanLimiti {
+  /** 0-100 */
+  yuzde: number
+  /** Sıfırlanma zamanı (epoch saniye). */
+  sifirlanma: number
+}
+
+export interface PlanLimitleri {
+  oturum?: PlanLimiti
+  haftalik?: PlanLimiti
+  /** allowed · allowed_warning · rejected */
+  durum?: string
+  guncelleme: string
+}
+
 /** Arayüze gönderilen canlı durum fotoğrafı. */
 export interface CanliDurum {
   ajanlar: Record<string, AjanCanli> // anahtar: `${katId}/${ajanId}`
@@ -183,6 +202,7 @@ export interface CanliDurum {
   misafirler: Record<string, MisafirAjan[]> // anahtar: katId
   aktifSohbetler: Record<string, AktifSohbet[]> // anahtar: katId
   sohbetKosulari: Record<string, SohbetKosusu> // anahtar: sohbet id
+  planLimitleri?: PlanLimitleri
 }
 
 export interface KatDetayi {
@@ -253,6 +273,8 @@ export interface SirketApi {
   guncellemeDurumu(): Promise<GuncellemeDurumu>
   guncellemeDenetle(): Promise<GuncellemeDurumu>
   guncellemeKur(): Promise<void>
+  /** Plan limitlerini anlık öğrenmek için çok küçük bir Haiku çağrısı yapar. */
+  planLimitleriYenile(): Promise<PlanLimitleri | null>
   canliDinle(cb: (d: CanliDurum) => void): () => void
   guncellemeDinle(cb: (d: GuncellemeDurumu) => void): () => void
 }

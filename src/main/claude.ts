@@ -22,6 +22,8 @@ export interface KosuSecenegi {
   etkinlik?: (satir: string) => void
   /** Claude'un yazdığı her metin parçası (sohbet görünümü için). */
   metinParcasi?: (metin: string) => void
+  /** Abonelik kullanım limitleri (rate_limit_event) geldiğinde. */
+  limitler?: (bilgi: Record<string, any>) => void
   /** Kullanıcının mevcut Claude Code oturumuna devam (oturum kimliği). O zaman oturum kaydı ve otomatik
    *  hafıza Claude Code'daki gibi açık kalır, istem Atrium işaretiyle işaretlenmez. */
   devam?: string
@@ -121,9 +123,9 @@ function kisalt(metin: string, n = 70): string {
   return tek.length > n ? tek.slice(0, n - 1) + '…' : tek
 }
 
-function hataMetni(ham: string, t: Cevirmen): string {
+function hataMetni(ham: string, t: Cevirmen, tavan?: number): string {
   if (/authenticat|oauth|log ?in|api key|not logged/i.test(ham)) return t('errLogin')
-  if (/budget/i.test(ham)) return `${t('errBudget')} (${kisalt(ham, 120)})`
+  if (/budget/i.test(ham)) return t('errBudget', { cap: tavan ?? '?' })
   return kisalt(ham, 400)
 }
 
@@ -209,13 +211,15 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
             s.metinParcasi?.(parca.text)
           }
         }
+      } else if (olay.type === 'rate_limit_event' && olay.rate_limit_info) {
+        s.limitler?.(olay.rate_limit_info)
       } else if (olay.type === 'result') {
         // hata durumunda `result` hata metnidir; rapor gibi işlenmesin
         sonuc = {
           metin: olay.is_error ? '' : String(olay.result ?? ''),
           maliyetUsd: Number(olay.total_cost_usd ?? 0),
           maliyetTahmini: false,
-          hata: olay.is_error ? hataMetni(String(olay.result || olay.subtype || 'error'), s.t) : undefined
+          hata: olay.is_error ? hataMetni(String(olay.result || olay.subtype || 'error'), s.t, s.butceUsd) : undefined
         }
       }
     }
@@ -232,7 +236,7 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
     surec.on('error', (e) => bitir({ metin: '', maliyetUsd: 0, maliyetTahmini: false, hata: s.t('errStart', { e: e.message }) }))
     surec.on('close', (kod) => {
       satirIsle(tampon)
-      if (!sonuc.metin && !sonuc.hata && kod !== 0) sonuc = { ...sonuc, hata: hataMetni(hataCiktisi || `claude exit ${kod}`, s.t) }
+      if (!sonuc.metin && !sonuc.hata && kod !== 0) sonuc = { ...sonuc, hata: hataMetni(hataCiktisi || `claude exit ${kod}`, s.t, s.butceUsd) }
       bitir(sonuc)
     })
     surec.stdin.on('error', () => { /* süreç erken kapandıysa */ })

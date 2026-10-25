@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
-import type { Ajan, Kat, Komut, SirketProfili } from '@ortak/tipler'
+import type { Ajan, Kat, Komut, PlanLimitleri, SirketProfili } from '@ortak/tipler'
 import { cevirmen, dilSec, type Cevirmen, type Dil } from '@ortak/i18n'
 
 let VERI = ''
@@ -53,6 +53,7 @@ function varsayilanProfil(): SirketProfili {
     ayarlar: {
       kosuButcesiUsd: 1,
       gunlukTavanUsd: 10,
+      sohbetButcesiUsd: 5,
       kosuSuresiDk: 15,
       esZamanli: 2,
       simulasyon: false,
@@ -275,6 +276,13 @@ export function tumKomutlar(): Komut[] {
   }
   return katlar.flatMap((k) => komutlariOku(k)).sort((a, b) => b.zaman.localeCompare(a.zaman))
 }
+
+// --- plan limitleri -----------------------------------------------------------
+
+export const planLimitleriOku = (): PlanLimitleri | undefined =>
+  jsonOku<PlanLimitleri | undefined>(join(VERI, 'limitler.json'), undefined)
+
+export const planLimitleriYaz = (l: PlanLimitleri): void => jsonYaz(join(VERI, 'limitler.json'), l)
 
 // --- maliyet ----------------------------------------------------------------
 

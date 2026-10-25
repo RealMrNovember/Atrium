@@ -382,6 +382,18 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .kenar-alt .kahve-dugmesi:hover { color: #ffe680; background: rgba(255, 221, 0, .08); }
 .bilgi-i { color: var(--vurgu-2); cursor: help; }
 .abonelik-notu { color: #f6c27a; font-size: 10.5px; }
+.plan-gostergesi { display: grid; grid-template-columns: 1fr auto; column-gap: 8px; row-gap: 3px; align-items: center; min-width: 290px; cursor: help; }
+.plan-satir { grid-column: 1; display: grid; grid-template-columns: 62px 90px 36px auto; gap: 8px; align-items: center; font-size: 11.5px; color: var(--soluk); }
+.plan-ad { color: #c4cae0; }
+.plan-yuzde { color: var(--metin); font-variant-numeric: tabular-nums; text-align: right; }
+.plan-sifir { font-size: 10.5px; white-space: nowrap; }
+.plan-gostergesi .harcama-cubuk div { background: linear-gradient(90deg, #7c5cff, #3fa9f5); }
+.plan-gostergesi .harcama-cubuk div.uyari { background: linear-gradient(90deg, #f2a33a, #f2c33a); }
+.plan-gostergesi .harcama-cubuk div.kritik { background: linear-gradient(90deg, var(--uyari), var(--kotu)); }
+.plan-yenile { grid-column: 2; grid-row: 1 / span 2; width: 26px; height: 26px; border-radius: 8px; background: var(--yuzey-2); color: var(--soluk); }
+.plan-yenile:hover:not(:disabled) { color: #fff; background: var(--yuzey-3); }
+.plan-yenile.donuyor { animation: don 1s linear infinite; }
+@keyframes don { to { transform: rotate(360deg); } }
 .ikon-dugme { width: 34px; height: 34px; border-radius: 10px; background: var(--yuzey-2); font-size: 16px; }
 .ikon-dugme:hover { background: var(--yuzey-3); }
 .kat-listesi li { position: relative; }

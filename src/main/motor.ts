@@ -1,7 +1,10 @@
 // Ajan motoru: komut → lider planı (gerekirse işe alım) → görevler → raporlar → sahibine tek rapor + hafıza.
 // Canlı durum (kim nerede, ne yapıyor) burada tutulur ve her değişiklikte arayüze yollanır.
 import { randomUUID } from 'node:crypto'
-import type { Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, MisafirAjan, SirketProfili } from '@ortak/tipler'
+import { tmpdir } from 'node:os'
+import type {
+  Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, MisafirAjan, PlanLimiti, PlanLimitleri, SirketProfili
+} from '@ortak/tipler'
 import { ajanAnahtari } from '@ortak/tipler'
 import { dilAdiIngilizce, type Cevirmen } from '@ortak/i18n'
 import { claudeKos, type KosuSonucu } from './claude'
@@ -33,6 +36,37 @@ export function motorBaslat(
   apiAnahtari = anahtar
   sohbetBaglami = baglam
   canli.bugunHarcanan = depo.bugunHarcanan()
+  canli.planLimitleri = depo.planLimitleriOku()
+}
+
+/** Claude Code'un rate_limit_event bilgisinden oturum (5 saat) ve haftalık kullanım. */
+export function limitleriIsle(bilgi: Record<string, any>): void {
+  const pencere = (ad: string): PlanLimiti | undefined => {
+    const p = bilgi.unifiedWindows?.[ad] ?? (bilgi.rateLimitType === ad ? bilgi : undefined)
+    if (!p || typeof p.utilization !== 'number') return undefined
+    return { yuzde: Math.round(p.utilization * 100), sifirlanma: Number(p.resetsAt ?? 0) }
+  }
+  const yeni: PlanLimitleri = {
+    oturum: pencere('five_hour') ?? canli.planLimitleri?.oturum,
+    haftalik: pencere('seven_day') ?? canli.planLimitleri?.haftalik,
+    durum: bilgi.status,
+    guncelleme: new Date().toISOString()
+  }
+  if (!yeni.oturum && !yeni.haftalik) return
+  canli.planLimitleri = yeni
+  depo.planLimitleriYaz(yeni)
+  yayinla()
+}
+
+/** Plan limitlerini anlık öğrenmek için araçsız, çok kısa bir Haiku çağrısı. */
+export async function planLimitleriYenile(): Promise<PlanLimitleri | null> {
+  const { ayarlar } = depo.profilOku()
+  const sonuc = await claudeKos({
+    cwd: tmpdir(), istem: 'Reply with just: ok', model: 'haiku', butceUsd: 0.2, araclar: [], yazma: false,
+    sureMs: 60_000, claudeYolu: ayarlar.claudeYolu, apiAnahtari: apiAnahtari(), t: depo.ceviri(), limitler: limitleriIsle
+  })
+  harcamaYaz(sonuc.maliyetUsd)
+  return canli.planLimitleri ?? null
 }
 
 export const canliDurum = (): CanliDurum => canli
@@ -123,7 +157,7 @@ async function ajaniKostur(k: AjanKosusu): Promise<KosuSonucu> {
     : await claudeKos({
         cwd: k.kat.yol, istem: k.istem, model: k.ajan.model, butceUsd: k.butceUsd, araclar: k.araclar,
         yazma: k.yazma, sureMs: ayarlar.kosuSuresiDk * 60_000, claudeYolu: ayarlar.claudeYolu,
-        apiAnahtari: apiAnahtari(), t, sinyal: k.sinyal, etkinlik
+        apiAnahtari: apiAnahtari(), t, sinyal: k.sinyal, etkinlik, limitler: limitleriIsle
       })
   harcamaYaz(sonuc.maliyetUsd)
   return sonuc
@@ -418,7 +452,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
       const bosOdalar = Array.from({ length: ODA_SAYISI }, (_, i) => i).filter((i) => !ekip.some((a) => a.oda === i))
       const plan = await ajaniKostur({
         kat, ajan: lider, istem: planIstemi(sirket, kat, lider, ekipUyeleri, komut, bosOdalar.length), araclar: ['Read', 'Glob', 'Grep'],
-        yazma: false, butceUsd: Math.min(0.5, sirket.ayarlar.kosuButcesiUsd), tur: 'plan', sinyal
+        yazma: false, butceUsd: sirket.ayarlar.kosuButcesiUsd, tur: 'plan', sinyal
       })
       ekleMaliyet(plan.maliyetUsd)
       if (sinyal.aborted) throw new Error(t('errCancelled'))
@@ -453,7 +487,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
       tur: 'tur', plan: planMetni, durum: 'yurutuluyor',
       gorevler: ziyaret.map((a) => ({ id: randomUUID(), ajanId: a.id, baslik: t('tourTaskTitle'), talimat: komut.metin, durum: 'bekliyor' }))
     })
-    const butce = Math.min(0.3, sirket.ayarlar.kosuButcesiUsd)
+    const butce = sirket.ayarlar.kosuButcesiUsd
     let bosYer = Math.max(3, sirket.ayarlar.esZamanli)
     const bekleyenler: (() => void)[] = []
     const yerAl = async (): Promise<void> => {
@@ -568,7 +602,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
     ajanGuncelle(kat.id, lider.id, { durum: 'calisiyor', hedef: 'masa' }, t('evMerging'))
     const rapor = await ajaniKostur({
       kat, ajan: lider, istem: raporIstemi(sirket, kat, lider, komut, ekip), araclar: [], yazma: false,
-      butceUsd: Math.min(0.3, sirket.ayarlar.kosuButcesiUsd), tur: 'rapor', sinyal
+      butceUsd: Math.min(1, sirket.ayarlar.kosuButcesiUsd), tur: 'rapor', sinyal
     })
     ekleMaliyet(rapor.maliyetUsd)
     const sonRapor = rapor.metin ||
@@ -592,8 +626,8 @@ export async function sohbetDevam(id: string, hedef: SohbetHedefi, mesaj: string
   if (canli.sohbetKosulari[id]?.calisiyor) throw new Error(t('errChatBusy'))
   const { ayarlar } = depo.profilOku()
   // devam edilen oturum önceki konuşmanın tamamını bağlam olarak yükler; uzun sohbetlerde ilk yanıt bile
-  // ajan başına tavanı aşabilir, bu yüzden en az 2 USD (günlük tavan yine geçerli)
-  const butce = Math.max(ayarlar.kosuButcesiUsd, 2)
+  // ajan başına tavanı aşabilir, bu yüzden ayrı bir tavanı var (günlük tavan yine geçerli)
+  const butce = Math.max(0.5, ayarlar.sohbetButcesiUsd ?? 5)
   if (depo.bugunHarcanan() + butce > ayarlar.gunlukTavanUsd + 1e-9) {
     throw new Error(t('errDailyCap', { spent: depo.bugunHarcanan().toFixed(2), run: butce, cap: ayarlar.gunlukTavanUsd }))
   }
@@ -613,7 +647,7 @@ export async function sohbetDevam(id: string, hedef: SohbetHedefi, mesaj: string
       cwd: hedef.cwd, istem: mesaj, model: 'sonnet', butceUsd: butce,
       araclar: ['Read', 'Glob', 'Grep', 'TodoWrite', 'WebSearch', 'WebFetch', ...(yazma ? ['Edit', 'Write', 'MultiEdit'] : [])],
       yazma, sureMs: ayarlar.kosuSuresiDk * 60_000, claudeYolu: ayarlar.claudeYolu, apiAnahtari: apiAnahtari(), t,
-      sinyal: iptal.signal, devam: id,
+      sinyal: iptal.signal, devam: id, limitler: limitleriIsle,
       etkinlik: (s) => { if (!s.startsWith('💬')) ekle('arac', s) },
       metinParcasi: (m) => ekle('claude', m)
     })
