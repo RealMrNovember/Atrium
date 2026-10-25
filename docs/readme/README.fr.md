@@ -14,6 +14,7 @@ tous tes projets, tous tes chats Claude Code, un seul immeuble.
 [![Downloads](https://img.shields.io/github/downloads/RealMrNovember/Atrium/total?color=3fbf7f&label=downloads)](https://github.com/RealMrNovember/Atrium/releases)
 [![Platforms](https://img.shields.io/badge/Windows%20·%20macOS%20·%20Linux-3fa9f5)](https://github.com/RealMrNovember/Atrium/releases/latest)
 [![AI tools](https://img.shields.io/badge/Claude%20·%20Codex%20·%20Gemini%20·%20Ollama-9d8bff)](#-fonctionne-avec-ton-ia)
+[![Privacy](https://img.shields.io/badge/privacy-your%20code%20never%20leaves%20your%20PC-3fbf7f)](#-confidentialité)
 [![Languages](https://img.shields.io/badge/languages-6-2f9e6e)](#-six-langues)
 [![License](https://img.shields.io/badge/license-Atrium%20License-orange)](../../LICENSE)
 [![Stars](https://img.shields.io/github/stars/RealMrNovember/Atrium?style=flat&color=ffd76a)](https://github.com/RealMrNovember/Atrium/stargazers)
@@ -46,6 +47,9 @@ Atrium en fait une entreprise que tu peux **voir** :
 - 🤝 **Pas seulement Claude.** Chaque agent peut tourner avec Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ou tout serveur compatible OpenAI — mélangés sur le même étage.
 - 🦙 **IA locale intégrée.** Atrium mesure ton ordinateur, montre quels modèles ouverts vont tourner, télécharge et installe Ollama et les modèles pour toi, et n'importe quel agent peut les utiliser — gratuit, hors ligne et privé.
 - 💬 **Tes chats Claude Code emménagent.** Atrium lit tes conversations Claude Code existantes et les range par projet. Les chats ouverts illuminent leur étage, et quand un chat attend ta décision, un agent se penche à la fenêtre pour t'appeler.
+- 🏙️ **Plusieurs entreprises, une seule app.** Gère ton studio et tes clients côte à côte — chaque entreprise avec ses propres projets, son équipe, sa mémoire et son IA.
+- 🔒 **Privé par conception.** Ton code, tes chats, ta mémoire et tes clés ne quittent jamais ton ordinateur. Nous ne pouvons pas les voir — ils ne nous parviennent jamais.
+- 🛟 **Assistance intégrée.** Envoie un souhait, une demande, une réclamation ou un rapport de bug depuis l'app et lis la réponse sur place.
 - 🛡️ **Tu gardes la main.** Lecture seule par défaut, secrets interdits d'accès, plafonds de dépenses partout, et rien n'est jamais publié ni poussé. Le dernier mot est le tien.
 
 ## 🤖 Fonctionne avec ton IA
@@ -86,6 +90,18 @@ Les modèles marqués **Peut être un agent** ouvrent et lisent les fichiers du 
 <td align="center"><b>Ton ordinateur, mesuré</b> — état du moteur et tes modèles.</td>
 <td align="center"><b>Un catalogue qui connaît ton matériel</b> — téléchargement en un clic.</td>
 </tr></table>
+
+## 🔒 Confidentialité
+
+Atrium est conçu pour que **ton travail ne nous parvienne jamais**.
+
+| | Quoi | Où ça va |
+|---|---|---|
+| 🚫 **Jamais** | Tes projets, ton code, tes fichiers, tes chats, la mémoire de projet, tes prompts, les résultats des agents, tes clés API | Reste sur ton ordinateur. Les requêtes d'IA vont directement à l'outil d'IA que tu as choisi — ou nulle part avec les modèles locaux. |
+| ✋ **Seulement si tu le choisis** | Un compte gratuit (e-mail, nom, version de l'app — le mot de passe uniquement sous forme de hachage irréversible), les messages et rapports de bug que tu écris et envoies | Le serveur d'assistance d'Atrium. Les infos de diagnostic ne sont ajoutées que si tu coches la case, et tu vois exactement ce qui est envoyé. |
+| 🔄 **Vérification des mises à jour** | La version de l'app | GitHub et atrium.cicibyte.com, pour proposer les mises à jour et afficher les notes de version. |
+
+Tu peux supprimer ton compte à tout moment — ton compte et tous tes messages sont définitivement effacés.
 
 ## 🪙 Comment Atrium économise des tokens
 
@@ -136,9 +152,25 @@ flowchart LR
 | <img src="../screenshots/chats.png" alt="Chats Claude Code" /> **Tes chats Claude Code** — rangés par projet, à continuer directement dans Atrium. | <img src="../screenshots/report.png" alt="Rapport du chef" /> **Un seul rapport** — le chef fusionne le travail de l'équipe. |
 | <img src="../screenshots/setup-language.png" alt="Configuration : langue" /> **Configuration au premier lancement** — six langues. | <img src="../screenshots/setup-claude.png" alt="Configuration : connexion à Claude" /> **Connecter Claude** — Atrium vérifie Claude Code et la connexion pour toi. |
 
+## 🏙️ Entreprises, projets et discussions
+
+- **Plusieurs entreprises.** Le menu ▾ à côté du nom de ton entreprise permet de changer d'entreprise ou d'en ajouter une. Chaque entreprise garde ses propres projets, son équipe, sa mémoire, ses rapports et son outil d'IA par défaut — une entreprise peut tourner sur Claude, une autre sur des modèles locaux.
+- **Partir de zéro.** Pas encore de projets ? Crée le premier directement dans l'assistant de configuration, ou avec **＋** à côté de *Étages*.
+- **Nouvelles discussions.** Lance une nouvelle discussion Claude Code dans n'importe quel projet depuis son onglet *Discussions* ; elle est enregistrée et peut être reprise n'importe où.
+- **Joindre des fichiers.** Dépose des images, des PDF ou des fichiers texte sur le champ de commande — l'équipe les reçoit avec la commande.
+
+<table><tr>
+<td width="50%"><img src="../screenshots/companies.png" alt="Passer d'une entreprise à l'autre" /></td>
+<td width="50%"><img src="../screenshots/support.png" alt="Page Assistance avec l'avis de confidentialité et le compte" /></td>
+</tr><tr>
+<td align="center"><b>Plusieurs entreprises</b> — chacune avec son équipe et son IA.</td>
+<td align="center"><b>Assistance intégrée</b> — et une promesse de confidentialité que tu peux lire.</td>
+</tr></table>
+
 ## ✨ Et aussi
 
-- 📊 **Compteur d'utilisation du forfait** — tes limites de session et hebdomadaires Claude, en direct dans la barre du haut.
+- 📊 **Une carte d'utilisation par outil d'IA** — limites de session et hebdomadaires de Claude, limites de Codex, exécutions et tokens du jour pour les autres, *local · gratuit* pour Ollama.
+- ⚡ **Connexion en un clic** — *Se connecter avec ChatGPT*, *Se connecter avec Google* et *Connecter Claude* installent l'outil si besoin et ouvrent sa page de connexion.
 - 🔔 **Un étage qui t'appelle** — quand un chat Claude Code attend ta décision, un agent fait signe depuis la fenêtre de cet étage.
 - 🎁 **Nouveautés** — les notes de version dans ta langue, affichées avant même le téléchargement d'une mise à jour ; l'historique complet des versions dans les réglages.
 - 🔄 **Mises à jour automatiques** — Atrium vérifie au lancement et toutes les quelques minutes, télécharge en arrière-plan et installe au redémarrage.
@@ -169,7 +201,7 @@ Simple curiosité ? Active la **Simulation** et explore tout gratuitement.
 
 ### Premier lancement
 
-L'assistant de configuration te guide en six étapes : **langue → entreprise (nom, slogan, logo) → dossier des projets → connexion à Claude → tes chats Claude Code → limites de dépenses.** Ensuite, ton immeuble sort de terre. Les autres outils d'IA se connectent dans **Profil et réglages → Outils d’IA**.
+L'assistant de configuration te guide en six étapes : **langue → entreprise (nom, slogan, logo) → projets (choisis un dossier ou crée ton premier projet) → IA (Claude, ChatGPT/Codex, Gemini, Ollama — un clic chacun) → tes chats Claude Code → limites de dépenses.** Ensuite, ton immeuble sort de terre.
 
 ### Compiler depuis les sources
 
@@ -200,7 +232,17 @@ Consulte [SECURITY.md](../../SECURITY.md) pour signaler une vulnérabilité.
 
 <details><summary><b>Atrium envoie-t-il mon code ou mes chats quelque part ?</b></summary>
 
-Non. Ton code, tes chats et la mémoire de tes projets restent sur ton ordinateur. Les agents passent par l'outil d'IA que tu choisis (Claude Code, Codex, Gemini — ou un modèle local, avec lequel rien ne quitte la machine). Atrium lui-même ne consulte que GitHub et atrium.cicibyte.com pour les mises à jour et les notes de version.
+Non. Ton code, tes chats et la mémoire de tes projets restent sur ton ordinateur. Les agents passent par l'outil d'IA que tu choisis (Claude Code, Codex, Gemini — ou un modèle local, avec lequel rien ne quitte la machine). Atrium lui-même ne consulte que GitHub et atrium.cicibyte.com pour les mises à jour et les notes de version — et, seulement si tu les utilises, envoie les infos de ton compte et les messages que tu écris. Voir [Confidentialité](#-confidentialité).
+</details>
+
+<details><summary><b>Ai-je besoin d'un compte ?</b></summary>
+
+Non. Atrium fonctionne entièrement sans. Un compte gratuit sert uniquement à nous envoyer des retours ou des rapports de bug et à lire nos réponses — tu peux t'inscrire avec un e-mail ou Google, et le supprimer à tout moment.
+</details>
+
+<details><summary><b>Puis-je gérer plusieurs entreprises ?</b></summary>
+
+Oui. Ajoute autant d'entreprises que tu veux ; chacune a ses propres projets, son équipe, sa mémoire, ses rapports et son outil d'IA par défaut. Change d'entreprise depuis le menu ▾ à côté de son nom.
 </details>
 
 <details><summary><b>Puis-je utiliser Atrium sans Claude ?</b></summary>
@@ -239,7 +281,7 @@ Si Atrium te fait gagner du temps :
 
 - ⭐ **Mets une étoile à ce dépôt** — ça aide vraiment.
 - 📣 **Partage-le** avec un ami ou ton équipe.
-- 🐛 **Signale des bugs** et suggère des fonctionnalités dans les [Issues](https://github.com/RealMrNovember/Atrium/issues).
+- 🐛 **Signale des bugs** et suggère des fonctionnalités — depuis la page **🛟 Assistance** de l'app ou dans les [Issues](https://github.com/RealMrNovember/Atrium/issues).
 - ☕ **Offre-moi un café** — [buymeacoffee.com/mikeross](https://buymeacoffee.com/mikeross).
 
 ## Licence

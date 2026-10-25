@@ -20,13 +20,15 @@ export function SohbetListesi({ katId, aciklama, katlar, onKatSec, acik: ilkAcik
   const { t, dil } = useDil()
   const [liste, setListe] = useState<Sohbet[] | null>(null)
   const [acik, setAcik] = useState<Sohbet | null>(null)
+  const [tazele, setTazele] = useState(0)
+  const [hedef, setHedef] = useState<string | undefined>(ilkAcik)
   useEffect(() => {
-    setListe(null)
+    if (!tazele) setListe(null)
     void window.sirket.sohbetler(katId).then((l) => {
       setListe(l)
-      if (ilkAcik) setAcik(l.find((s) => s.id === ilkAcik) ?? null)
+      if (hedef) setAcik(l.find((s) => s.id === hedef) ?? null)
     })
-  }, [katId, ilkAcik])
+  }, [katId, hedef, tazele])
 
   if (acik) return <SohbetOkuyucu sohbet={acik} canli={canli} onGeri={() => setAcik(null)} />
   const katAdi = (id: string | null): string => (id ? katlar?.find((k) => k.id === id)?.ad ?? id : t('otherChats'))
@@ -35,6 +37,9 @@ export function SohbetListesi({ katId, aciklama, katlar, onKatSec, acik: ilkAcik
   return (
     <div className="sohbet-listesi">
       {aciklama && <p className="kucuk">{aciklama}</p>}
+      {typeof katId === 'string' && canli && (
+        <YeniSohbet katId={katId} canli={canli} onBitti={(id) => { setHedef(id); setTazele((n) => n + 1) }} />
+      )}
       {liste === null && <p className="bos">{t('loadingChat')}</p>}
       {liste?.length === 0 && <p className="bos">{t('noChats')}</p>}
       {liste?.map((s) => (
@@ -149,6 +154,55 @@ function SohbetOkuyucu({ sohbet, canli, onGeri }: { sohbet: Sohbet; canli?: Canl
         <p className="kucuk">{t('continueChatHint')}</p>
         {hata && <p className="hata-metni">{hata}</p>}
       </div>
+    </div>
+  )
+}
+
+/** Katın klasöründe yeni bir Claude Code sohbeti başlatır; bitince listede açılır. */
+function YeniSohbet({ katId, canli, onBitti }: { katId: string; canli: CanliDurum; onBitti: (oturum?: string) => void }): ReactElement {
+  const { t } = useDil()
+  const [acik, setAcik] = useState(false)
+  const [yazi, setYazi] = useState('')
+  const [yazma, setYazma] = useState(false)
+  const [hata, setHata] = useState('')
+  const kosu = canli.sohbetKosulari[`yeni-${katId}`]
+  const onceki = useRef(kosu?.calisiyor)
+  useEffect(() => {
+    // çalışırken bittiyse: kayıt diske yazılsın diye kısa bir an bekleyip listede aç
+    if (onceki.current && kosu && !kosu.calisiyor) setTimeout(() => onBitti(kosu.oturum), 1200)
+    onceki.current = kosu?.calisiyor
+  }, [kosu?.calisiyor])
+  if (!acik && !kosu?.calisiyor) return <button className="ikincil genis yeni-sohbet-dugme" onClick={() => setAcik(true)}>＋ {t('newChat')}</button>
+  return (
+    <div className="yeni-sohbet">
+      <b>💬 {t('newChat')}</b>
+      {kosu && (
+        <div className="canli-sohbet">
+          {kosu.satirlar.map((s, i) => s.rol === 'arac'
+            ? <div key={i} className="arac-satiri">{s.metin}</div>
+            : s.rol === 'hata'
+              ? <p key={i} className="hata-metni">{s.metin}</p>
+              : <div key={i} className={`mesaj ${s.rol}`}><span className="mesaj-kim">{s.rol === 'sen' ? t('you') : t('claude')}</span><Markdown metin={s.metin} /></div>)}
+          {kosu.calisiyor && <div className="yaziyor-gosterge"><span /><span /><span /></div>}
+        </div>
+      )}
+      {!kosu?.calisiyor && (
+        <>
+          <textarea rows={3} value={yazi} placeholder={t('newChatPh')} onChange={(e) => setYazi(e.target.value)} />
+          <div className="form-dugmeler">
+            <label className="onay"><input type="checkbox" checked={yazma} onChange={(e) => setYazma(e.target.checked)} /><span>{t('allowWrite')}</span></label>
+            <span />
+            <button className="ikincil" onClick={() => setAcik(false)}>{t('cancel')}</button>
+            <button className="birincil" disabled={!yazi.trim()} onClick={() => {
+              setHata('')
+              void window.sirket.yeniSohbet(katId, yazi, yazma).then(() => setYazi('')).catch((e) => setHata(hataMetni(e)))
+            }}>{t('newChatStart')}</button>
+          </div>
+          <p className="kucuk">{t('newChatHint')}</p>
+        </>
+      )}
+      {kosu?.calisiyor && <button className="ikincil" onClick={() => void window.sirket.sohbetDurdur(`yeni-${katId}`)}>{t('stop')}</button>}
+      {hata && <p className="hata-metni">{hata}</p>}
     </div>
   )
 }

@@ -14,6 +14,7 @@ tüm projelerin, tüm Claude Code sohbetlerin, tek bir binada.
 [![Downloads](https://img.shields.io/github/downloads/RealMrNovember/Atrium/total?color=3fbf7f&label=downloads)](https://github.com/RealMrNovember/Atrium/releases)
 [![Platforms](https://img.shields.io/badge/Windows%20·%20macOS%20·%20Linux-3fa9f5)](https://github.com/RealMrNovember/Atrium/releases/latest)
 [![AI tools](https://img.shields.io/badge/Claude%20·%20Codex%20·%20Gemini%20·%20Ollama-9d8bff)](#-senin-yapay-zekânla-çalışır)
+[![Privacy](https://img.shields.io/badge/privacy-your%20code%20never%20leaves%20your%20PC-3fbf7f)](#-gizlilik)
 [![Languages](https://img.shields.io/badge/languages-6-2f9e6e)](#-altı-dil)
 [![License](https://img.shields.io/badge/license-Atrium%20License-orange)](../../LICENSE)
 [![Stars](https://img.shields.io/github/stars/RealMrNovember/Atrium?style=flat&color=ffd76a)](https://github.com/RealMrNovember/Atrium/stargazers)
@@ -46,6 +47,9 @@ Atrium bunu **görebildiğin** bir şirkete dönüştürür:
 - 🤝 **Yalnız Claude değil.** Her ajan Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ya da OpenAI uyumlu herhangi bir sunucuyla çalışabilir — aynı katta karışık.
 - 🦙 **Yerleşik yerel YZ.** Atrium bilgisayarını ölçer, hangi açık modellerin çalışacağını gösterir, Ollama'yı ve modelleri senin için indirip kurar ve her ajanın kullanmasını sağlar — ücretsiz, internetsiz ve gizli.
 - 💬 **Claude Code sohbetlerin de taşınır.** Atrium mevcut Claude Code konuşmalarını okur ve projeye göre dosyalar. Açık sohbetler katlarını aydınlatır; bir sohbet senin kararını beklediğinde bir ajan pencereden sarkıp sana seslenir.
+- 🏙️ **Birçok şirket, tek uygulama.** Stüdyonu ve müşterilerini yan yana yönet — her şirketin kendi projeleri, ekibi, hafızası ve yapay zekâsı olur.
+- 🔒 **Tasarımdan gizli.** Kodun, sohbetlerin, hafızan ve anahtarların bilgisayarından hiç çıkmaz. Onları göremeyiz — bize hiç ulaşmazlar.
+- 🛟 **Destek içinde.** Uygulamadan dilek, istek, şikayet ya da hata raporu gönder ve cevabı orada oku.
 - 🛡️ **Kontrol sende kalır.** Varsayılan olarak salt okunur, gizli bilgiler erişime kapalı, her yerde harcama limitleri var ve hiçbir şey yayımlanmaz ya da push'lanmaz. Son karar senin.
 
 ## 🤖 Senin yapay zekânla çalışır
@@ -86,6 +90,18 @@ Ajanları kendi bilgisayarında yaşayan açık modellerle çalıştır — hesa
 <td align="center"><b>Bilgisayarın ölçüldü</b> — motor durumu ve modellerin.</td>
 <td align="center"><b>Donanımını tanıyan bir katalog</b> — tek tıkla indirme.</td>
 </tr></table>
+
+## 🔒 Gizlilik
+
+Atrium, **işinin bize hiç ulaşmayacağı** şekilde tasarlandı.
+
+| | Ne | Nereye gider |
+|---|---|---|
+| 🚫 **Asla** | Projelerin, kodun, dosyaların, sohbetlerin, proje hafızan, komutların, ajan sonuçların, API anahtarların | Bilgisayarında kalır. Yapay zekâ istekleri doğrudan seçtiğin araca gider — yerel modellerde hiçbir yere gitmez. |
+| ✋ **Yalnızca sen seçersen** | Ücretsiz bir hesap (e-posta, ad, uygulama sürümü — şifre yalnızca geri çevrilemez bir özet olarak), yazıp gönderdiğin mesajlar ve hata raporları | Atrium'un destek sunucusu. Tanılama bilgisi yalnız kutuyu işaretlersen eklenir ve ne gönderildiğini birebir görürsün. |
+| 🔄 **Güncelleme kontrolü** | Uygulama sürümü | Güncellemeleri sunmak ve sürüm notlarını göstermek için GitHub ve atrium.cicibyte.com. |
+
+Hesabını istediğin an silebilirsin — hesabın ve tüm mesajların kalıcı olarak silinir.
 
 ## 🪙 Atrium token'dan nasıl tasarruf eder?
 
@@ -136,9 +152,25 @@ flowchart LR
 | <img src="../screenshots/chats.png" alt="Claude Code sohbetleri" /> **Claude Code sohbetlerin** — projeye göre dosyalanmış; onlara doğrudan Atrium'da devam et. | <img src="../screenshots/report.png" alt="Lider raporu" /> **Tek rapor** — lider ekibin çalışmasını birleştirir. |
 | <img src="../screenshots/setup-language.png" alt="Kurulum: dil" /> **İlk çalıştırma kurulumu** — altı dil. | <img src="../screenshots/setup-claude.png" alt="Kurulum: Claude bağlantısı" /> **Claude'u bağla** — Atrium, Claude Code'u ve oturum açmayı senin için kontrol eder. |
 
+## 🏙️ Şirketler, projeler ve sohbetler
+
+- **Birçok şirket.** Şirket adının yanındaki ▾ menüsü şirket değiştirir ya da yenisini ekler. Her şirket kendi projelerini, ekibini, hafızasını, raporlarını ve varsayılan yapay zekâ aracını tutar — bir şirket Claude'la, bir diğeri yerel modellerle çalışabilir.
+- **Sıfırdan başla.** Henüz proje yok mu? İlk projeni doğrudan kurulum sihirbazında ya da *Katlar* yanındaki **＋** ile oluştur.
+- **Yeni sohbetler.** Herhangi bir projede *Sohbetler* sekmesinden yeni bir Claude Code sohbeti başlat; kaydedilir ve her yerden devam ettirilebilir.
+- **Dosya ekle.** Görsel, PDF ya da metin dosyalarını komut kutusuna bırak — ekip onları komutla birlikte alır.
+
+<table><tr>
+<td width="50%"><img src="../screenshots/companies.png" alt="Şirketler arasında geçiş" /></td>
+<td width="50%"><img src="../screenshots/support.png" alt="Gizlilik notu ve hesapla Destek sayfası" /></td>
+</tr><tr>
+<td align="center"><b>Birçok şirket</b> — her birinin kendi ekibi ve yapay zekâsı.</td>
+<td align="center"><b>Yerleşik destek</b> — ve okuyabileceğin bir gizlilik sözü.</td>
+</tr></table>
+
 ## ✨ İçinde başka neler var?
 
-- 📊 **Plan kullanım göstergesi** — Claude oturum ve haftalık limitlerin, üst çubukta canlı.
+- 📊 **Her yapay zekâ aracı için bir kullanım kartı** — Claude oturum ve haftalık limitleri, Codex limitleri, diğerleri için bugünkü koşular ve token'lar, Ollama için *yerel · ücretsiz*.
+- ⚡ **Tek tıkla bağlan** — *ChatGPT ile bağlan*, *Google ile bağlan* ve *Claude’u bağla* gerekirse aracı kurar ve giriş sayfasını açar.
 - 🔔 **Sana seslenen bir kat** — bir Claude Code sohbeti kararını beklediğinde, o katın penceresinden bir ajan el sallar.
 - 🎁 **Yenilikler** — sürüm notları senin dilinde, güncelleme daha inmeden gösterilir; tüm sürüm geçmişi Ayarlar'da.
 - 🔄 **Otomatik güncellemeler** — Atrium açılışta ve birkaç dakikada bir kontrol eder, arka planda indirir ve yeniden başlatınca kurar.
@@ -169,7 +201,7 @@ Sadece merak mı ediyorsun? **Simülasyon**'u aç ve her şeyi ücretsiz keşfet
 
 ### İlk çalıştırma
 
-Kurulum sihirbazı seni altı adımda yönlendirir: **dil → şirket (ad, slogan, logo) → projeler klasörü → Claude bağlantısı → Claude Code sohbetlerin → harcama limitleri.** Ardından binan yükselir. Diğer yapay zekâ araçları **Profil & Ayarlar → Yapay zeka araçları** altından bağlanır.
+Kurulum sihirbazı seni altı adımda yönlendirir: **dil → şirket (ad, slogan, logo) → projeler (bir klasör seç ya da ilk projeni oluştur) → yapay zeka (Claude, ChatGPT/Codex, Gemini, Ollama — her biri tek tık) → Claude Code sohbetlerin → harcama limitleri.** Ardından binan yükselir.
 
 ### Kaynaktan derleme
 
@@ -200,7 +232,17 @@ Bir güvenlik açığını bildirmek için [SECURITY.md](../../SECURITY.md) dosy
 
 <details><summary><b>Atrium kodumu veya sohbetlerimi bir yere gönderiyor mu?</b></summary>
 
-Hayır. Kodun, sohbetlerin ve proje hafızan bilgisayarında kalır. Ajanlar seçtiğin yapay zekâ aracı üzerinden çalışır (Claude Code, Codex, Gemini — ya da makineden hiçbir şeyin çıkmadığı yerel bir model). Atrium'un kendisi yalnızca güncellemeler ve sürüm notları için GitHub'ı ve atrium.cicibyte.com'u kontrol eder.
+Hayır. Kodun, sohbetlerin ve proje hafızan bilgisayarında kalır. Ajanlar seçtiğin yapay zekâ aracı üzerinden çalışır (Claude Code, Codex, Gemini — ya da makineden hiçbir şeyin çıkmadığı yerel bir model). Atrium'un kendisi yalnızca güncellemeler ve sürüm notları için GitHub'ı ve atrium.cicibyte.com'u kontrol eder — ve yalnızca kullanırsan hesap bilgilerini ve yazdığın mesajları gönderir. Bkz. [Gizlilik](#-gizlilik).
+</details>
+
+<details><summary><b>Hesap gerekli mi?</b></summary>
+
+Hayır. Atrium hesap olmadan da tam olarak çalışır. Ücretsiz hesap yalnızca bize geri bildirim ya da hata raporu göndermek ve cevaplarımızı okumak için gerekir — e-posta ya da Google ile kaydolabilir, istediğin an silebilirsin.
+</details>
+
+<details><summary><b>Birden fazla şirket yönetebilir miyim?</b></summary>
+
+Evet. İstediğin kadar şirket ekle; her birinin kendi projeleri, ekibi, hafızası, raporları ve varsayılan yapay zekâ aracı olur. Şirket adının yanındaki ▾ menüsünden geçiş yap.
 </details>
 
 <details><summary><b>Atrium'u Claude olmadan kullanabilir miyim?</b></summary>
@@ -239,7 +281,7 @@ Atrium sana zaman kazandırıyorsa:
 
 - ⭐ **Bu depoyu yıldızla** — gerçekten çok yardımı olur.
 - 📣 Bir arkadaşınla veya ekibinle **paylaş**.
-- 🐛 [Issues](https://github.com/RealMrNovember/Atrium/issues) bölümünde **hata bildir** ve özellik öner.
+- 🐛 Uygulamanın **🛟 Destek** sayfasından ya da [Issues](https://github.com/RealMrNovember/Atrium/issues) bölümünde **hata bildir** ve özellik öner.
 - ☕ **Bir kahve ısmarla** — [buymeacoffee.com/mikeross](https://buymeacoffee.com/mikeross).
 
 ## Lisans

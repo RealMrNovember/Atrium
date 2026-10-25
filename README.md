@@ -14,6 +14,7 @@ all your projects, all your Claude Code chats, one building.
 [![Downloads](https://img.shields.io/github/downloads/RealMrNovember/Atrium/total?color=3fbf7f&label=downloads)](https://github.com/RealMrNovember/Atrium/releases)
 [![Platforms](https://img.shields.io/badge/Windows%20·%20macOS%20·%20Linux-3fa9f5)](https://github.com/RealMrNovember/Atrium/releases/latest)
 [![AI tools](https://img.shields.io/badge/Claude%20·%20Codex%20·%20Gemini%20·%20Ollama-9d8bff)](#-works-with-your-ai)
+[![Privacy](https://img.shields.io/badge/privacy-your%20code%20never%20leaves%20your%20PC-3fbf7f)](#-privacy)
 [![Languages](https://img.shields.io/badge/languages-6-2f9e6e)](#-six-languages)
 [![License](https://img.shields.io/badge/license-Atrium%20License-orange)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/RealMrNovember/Atrium?style=flat&color=ffd76a)](https://github.com/RealMrNovember/Atrium/stargazers)
@@ -46,6 +47,9 @@ Atrium turns that into a company you can **see**:
 - 🤝 **Not just Claude.** Each agent can run on Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama or any OpenAI-compatible server — mixed on the same floor.
 - 🦙 **Local AI, built in.** Atrium measures your computer, shows which open models will run, downloads and installs Ollama and the models for you, and lets any agent use them — free, offline and private.
 - 💬 **Your Claude Code chats move in.** Atrium reads your existing Claude Code conversations and files them by project. Open chats light up their floor, and when a chat waits for your decision an agent leans out of the window and calls you.
+- 🏙️ **Many companies, one app.** Run your studio and your clients side by side — each company with its own projects, team, memory and AI.
+- 🔒 **Private by design.** Your code, chats, memory and keys never leave your computer. We can't see them — they never reach us.
+- 🛟 **Support built in.** Send a wish, a request, a complaint or a bug report from the app and read the answer right there.
 - 🛡️ **You stay in charge.** Read-only by default, secrets are off-limits, spending caps everywhere, and nothing is ever published or pushed. The final call is yours.
 
 ## 🤖 Works with your AI
@@ -86,6 +90,18 @@ Models marked **Can be an agent** open and read project files through Atrium's o
 <td align="center"><b>Your computer, measured</b> — engine status and your models.</td>
 <td align="center"><b>A catalog that knows your hardware</b> — one-click download.</td>
 </tr></table>
+
+## 🔒 Privacy
+
+Atrium is built so that **your work never reaches us**.
+
+| | What | Where it goes |
+|---|---|---|
+| 🚫 **Never** | Your projects, code, files, chats, project memory, prompts, agent results, API keys | Stays on your computer. AI requests go straight to the AI tool you chose — or nowhere at all with local models. |
+| ✋ **Only if you choose** | A free account (email, name, app version — the password only as a one-way hash), messages and bug reports you write and send | Atrium's support server. Diagnostic info is added only if you tick the box, and you see exactly what is sent. |
+| 🔄 **Update check** | The app version | GitHub and atrium.cicibyte.com, to offer updates and show release notes. |
+
+You can delete your account at any time — your account and all your messages are removed permanently.
 
 ## 🪙 How Atrium saves tokens
 
@@ -136,9 +152,25 @@ flowchart LR
 | <img src="docs/screenshots/chats.png" alt="Claude Code chats" /> **Your Claude Code chats** — filed by project, continue them right in Atrium. | <img src="docs/screenshots/report.png" alt="Lead report" /> **One report** — the lead merges the team's work. |
 | <img src="docs/screenshots/setup-language.png" alt="Setup: language" /> **First-run setup** — six languages. | <img src="docs/screenshots/setup-claude.png" alt="Setup: Claude connection" /> **Connect Claude** — Atrium checks Claude Code and sign-in for you. |
 
+## 🏙️ Companies, projects and chats
+
+- **Many companies.** The ▾ menu next to your company name switches companies or adds a new one. Each company keeps its own projects, team, memory, reports and default AI tool — one company can run on Claude, another on local models.
+- **Start from zero.** No projects yet? Create your first one right in the setup wizard, or with **＋** next to *Floors*.
+- **New chats.** Start a new Claude Code chat inside any project from its *Chats* tab; it is saved and can be continued anywhere.
+- **Attach files.** Drop images, PDFs or text files onto the command box — the team gets them with the command.
+
+<table><tr>
+<td width="50%"><img src="docs/screenshots/companies.png" alt="Switching between companies" /></td>
+<td width="50%"><img src="docs/screenshots/support.png" alt="Support page with privacy notice and account" /></td>
+</tr><tr>
+<td align="center"><b>Many companies</b> — each with its own team and AI.</td>
+<td align="center"><b>Support, built in</b> — and a privacy promise you can read.</td>
+</tr></table>
+
 ## ✨ Also inside
 
-- 📊 **Plan usage meter** — your Claude session and weekly limits, live in the top bar.
+- 📊 **One usage card per AI tool** — Claude session and weekly limits, Codex limits, today's runs and tokens for the others, *local · free* for Ollama.
+- ⚡ **One-click connect** — *Connect with ChatGPT*, *Connect with Google* and *Connect Claude* install the tool if needed and open its sign-in page.
 - 🔔 **A floor that calls you** — when a Claude Code chat waits for your decision, an agent waves from that floor's window.
 - 🎁 **What's new** — release notes in your language, shown before an update even downloads; full version history in Settings.
 - 🔄 **Automatic updates** — Atrium checks at launch and every few minutes, downloads in the background and installs on restart.
@@ -169,7 +201,7 @@ Just curious? Turn on **Simulation** and explore everything for free.
 
 ### First run
 
-The setup wizard walks you through six steps: **language → company (name, slogan, logo) → projects folder → Claude connection → your Claude Code chats → spending limits.** Then your building rises. Other AI tools are connected under **Profile & Settings → AI tools**.
+The setup wizard walks you through six steps: **language → company (name, slogan, logo) → projects (pick a folder or create your first project) → AI (Claude, ChatGPT/Codex, Gemini, Ollama — one click each) → your Claude Code chats → spending limits.** Then your building rises.
 
 ### Build from source
 
@@ -200,7 +232,17 @@ See [SECURITY.md](SECURITY.md) to report a vulnerability.
 
 <details><summary><b>Does Atrium send my code or chats anywhere?</b></summary>
 
-No. Your code, chats and project memory stay on your computer. Agents run through the AI tool you choose (Claude Code, Codex, Gemini — or a local model, where nothing leaves the machine). Atrium itself only checks GitHub and atrium.cicibyte.com for updates and release notes.
+No. Your code, chats and project memory stay on your computer. Agents run through the AI tool you choose (Claude Code, Codex, Gemini — or a local model, where nothing leaves the machine). Atrium itself only checks GitHub and atrium.cicibyte.com for updates and release notes — and, only if you use them, sends your account details and the messages you write. See [Privacy](#-privacy).
+</details>
+
+<details><summary><b>Do I need an account?</b></summary>
+
+No. Atrium works fully without one. A free account is only needed to send us feedback or bug reports and read our answers — you can sign up with email or Google, and delete it any time.
+</details>
+
+<details><summary><b>Can I manage several companies?</b></summary>
+
+Yes. Add as many companies as you like; each has its own projects, team, memory, reports and default AI tool. Switch from the ▾ menu next to the company name.
 </details>
 
 <details><summary><b>Can I use Atrium without Claude?</b></summary>
@@ -239,7 +281,7 @@ If Atrium saves you time:
 
 - ⭐ **Star this repository** — it really helps.
 - 📣 **Share it** with a friend or your team.
-- 🐛 **Report bugs** and suggest features in [Issues](https://github.com/RealMrNovember/Atrium/issues).
+- 🐛 **Report bugs** and suggest features — from the app's **🛟 Support** page or in [Issues](https://github.com/RealMrNovember/Atrium/issues).
 - ☕ **Buy me a coffee** — [buymeacoffee.com/mikeross](https://buymeacoffee.com/mikeross).
 
 ## License

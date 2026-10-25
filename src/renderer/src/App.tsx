@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent, type ReactElement } from 'react'
-import type { CanliDurum, ErisimDurumu, GuncellemeDurumu, Kat, SirketProfili } from '@ortak/tipler'
+import type { CanliDurum, ErisimDurumu, GuncellemeDurumu, HesapDurumu, Kat, SirketProfili } from '@ortak/tipler'
+import { DestekSayfasi, type DestekTaslagi } from './sayfalar/DestekSayfasi'
+import { SirketMenusu } from './bilesenler/SirketSecici'
+import { hataMetni } from './yardimci'
 import { KilitEkrani } from './bilesenler/KilitEkrani'
 import { AtriumIsareti, SirketLogosu } from './bilesenler/Kimlik'
-import { PlanGostergesi } from './bilesenler/PlanGostergesi'
+import { KullanimGostergesi } from './bilesenler/KullanimGostergesi'
 import { YeniliklerPenceresi } from './bilesenler/YeniliklerPenceresi'
 import { acikSayisi, calisanSayisi, katCagrisi } from './sahne/Bina'
 import { DilSaglayici, useDil } from './dil'
@@ -15,14 +18,15 @@ import { Kurulum } from './sayfalar/Kurulum'
 import { RaporlarSayfasi } from './sayfalar/RaporlarSayfasi'
 import { SohbetlerSayfasi } from './sayfalar/SohbetlerSayfasi'
 import { useSesler } from './ses'
-import { CICIBYTE, GITHUB, KAHVE, SURUM, usd } from './yardimci'
+import { CICIBYTE, GITHUB, KAHVE, SURUM } from './yardimci'
 
 export type Sayfa =
   | { tur: 'ana' } | { tur: 'kat'; id: string; sohbet?: string } | { tur: 'raporlar' } | { tur: 'sohbetler' }
-  | { tur: 'ayarlar' } | { tur: 'kilavuz' } | { tur: 'yerel' }
+  | { tur: 'ayarlar' } | { tur: 'kilavuz' } | { tur: 'yerel' } | { tur: 'destek'; taslak?: DestekTaslagi }
 
 const BOS_CANLI: CanliDurum = {
-  ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {}
+  ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {},
+  kullanim: {}, saglayiciLimitleri: {}, aktifSaglayicilar: []
 }
 
 export function App(): ReactElement {
@@ -53,6 +57,7 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
   const [abonelik, setAbonelik] = useState(false)
   const [guncelleme, setGuncelleme] = useState<GuncellemeDurumu | null>(null)
   const [surukle, setSurukle] = useState<string | null>(null)
+  const [hesap, setHesap] = useState<HesapDurumu>({ girisli: false, okunmamis: 0, googleEtkin: false })
   // "Neler yeni?": kurulu sürüm için (güncellemeden sonra ilk açılış) ya da kurulmayı bekleyen sürüm için
   const [yenilik, setYenilik] = useState<{ surum: string; bekleyen: boolean } | null>(
     profil.sonGorulenSurum !== SURUM ? { surum: SURUM, bekleyen: false } : null)
@@ -76,9 +81,11 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
     void window.sirket.canli().then(setCanli)
     void window.sirket.claudeDurumu().then((d) => setAbonelik(d.girisli && /claude\.ai|subscription|oauth/i.test(d.yontem ?? '')))
     void window.sirket.guncellemeDurumu().then(setGuncelleme)
+    void window.sirket.hesapDurumu().then(setHesap)
     const kapat1 = window.sirket.canliDinle(setCanli)
     const kapat2 = window.sirket.guncellemeDinle(setGuncelleme)
-    return () => { kapat1(); kapat2() }
+    const kapat3 = window.sirket.hesapDinle(setHesap)
+    return () => { kapat1(); kapat2(); kapat3() }
   }, [])
   useSesler(canli, profil.ayarlar.ses, sayfa.tur === 'kat' ? sayfa.id : null)
 
@@ -99,7 +106,6 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
   }, [ara, katlar])
 
   const ayarDegistir = (yama: Partial<SirketProfili['ayarlar']>): void => { void onKaydet({ ...profil, ayarlar: { ...profil.ayarlar, ...yama } }) }
-  const harcamaOrani = Math.min(1, canli.bugunHarcanan / Math.max(0.01, profil.ayarlar.gunlukTavanUsd))
   const seciliKat = sayfa.tur === 'kat' ? katlar.find((k) => k.id === sayfa.id) : undefined
   const calisanAjan = katlar.reduce((n, k) => n + calisanSayisi(canli, k.id), 0)
   const katSec = (id: string, sohbet?: string): void => setSayfa({ tur: 'kat', id, sohbet })
@@ -127,13 +133,16 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
   return (
     <div className="uygulama">
       <aside className="kenar">
-        <button className="logo" onClick={() => setSayfa({ tur: 'ana' })}>
-          <SirketLogosu ad={profil.ad} logo={profil.logo} />
-          <span>
-            <strong>{profil.ad}</strong>
-            <small>{t('sidebarSummary', { floors: katlar.length, agents: calisanAjan })}</small>
-          </span>
-        </button>
+        <div className="logo-satiri">
+          <button className="logo" onClick={() => setSayfa({ tur: 'ana' })}>
+            <SirketLogosu ad={profil.ad} logo={profil.logo} />
+            <span>
+              <strong>{profil.ad}</strong>
+              <small>{t('sidebarSummary', { floors: katlar.length, agents: calisanAjan })}</small>
+            </span>
+          </button>
+          <SirketMenusu />
+        </div>
         <nav className="ana-menu">
           <button className={sayfa.tur === 'ana' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'ana' })}>🏢 {t('navCompany')}</button>
           <button className={sayfa.tur === 'raporlar' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'raporlar' })}>📨 {t('navReports')}</button>
@@ -141,10 +150,23 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
           <button className={sayfa.tur === 'ayarlar' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'ayarlar' })}>⚙️ {t('navSettings')}</button>
           <button className={sayfa.tur === 'yerel' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'yerel' })}>🦙 {t('navLocal')}</button>
           <button className={sayfa.tur === 'kilavuz' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'kilavuz' })}>📖 {t('navGuide')}</button>
+          <button className={sayfa.tur === 'destek' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'destek' })}>
+            🛟 {t('navHelp')}{hesap.okunmamis > 0 && <span className="menu-rozet">{hesap.okunmamis}</span>}
+          </button>
         </nav>
         <div className="kat-baslik">
           <span title={t('reorderHint')}>{t('floors')}</span>
-          <button className="mini" title={t('rescan')} onClick={katlariYenile}>↻</button>
+          <span>
+            <button className="mini" title={t('newProject')} onClick={() => {
+              const ad = prompt(t('newProjectName'))
+              if (!ad?.trim()) return
+              void window.sirket.projeOlustur(profil.projeKlasoru, ad).then(async ({ kok }) => {
+                if (kok !== profil.projeKlasoru) await onKaydet({ ...profil, projeKlasoru: kok })
+                katlariYenile()
+              }).catch((e) => alert(hataMetni(e)))
+            }}>＋</button>
+            <button className="mini" title={t('rescan')} onClick={katlariYenile}>↻</button>
+          </span>
         </div>
         <input className="ara" placeholder={t('searchProjects')} value={ara} onChange={(e) => setAra(e.target.value)} />
         <ul className="kat-listesi">
@@ -195,18 +217,10 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
             {sayfa.tur === 'ayarlar' && <><span>›</span><b>{t('navSettings')}</b></>}
             {sayfa.tur === 'kilavuz' && <><span>›</span><b>{t('navGuide')}</b></>}
             {sayfa.tur === 'yerel' && <><span>›</span><b>{t('navLocal')}</b></>}
+            {sayfa.tur === 'destek' && <><span>›</span><b>{t('navHelp')}</b></>}
           </div>
           <div className="ust-sag">
-            {abonelik ? (
-              // abonelikte asıl ölçü plan limitleri; dolar tahmini ve Atrium'un günlük tavanı ipucunda
-              <PlanGostergesi limitler={canli.planLimitleri}
-                ipucu={`${t('planUsageTitle')}\n\n${t('spendEst', { spent: usd(canli.bugunHarcanan) })} · ${t('dailyCap', { cap: usd(profil.ayarlar.gunlukTavanUsd) })}\n${t('spendInfoSub')}`} />
-            ) : (
-              <div className="harcama" title={t('spendInfoApi')}>
-                <span>{t('spendEst', { spent: usd(canli.bugunHarcanan) })} · {t('dailyCap', { cap: usd(profil.ayarlar.gunlukTavanUsd) })} <span className="bilgi-i">ⓘ</span></span>
-                <div className="harcama-cubuk"><div style={{ width: `${harcamaOrani * 100}%` }} className={harcamaOrani > 0.8 ? 'kritik' : ''} /></div>
-              </div>
-            )}
+            <KullanimGostergesi canli={canli} profil={profil} abonelik={abonelik} />
             <button className="ikon-dugme" onClick={() => ayarDegistir({ ses: !profil.ayarlar.ses })} title={t('soundToggle')}>
               {profil.ayarlar.ses ? '🔊' : '🔇'}
             </button>
@@ -217,12 +231,14 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
         </header>
 
         {sayfa.tur === 'ana' && <AnaSayfa profil={profil} katlar={katlar} canli={canli} onKatSec={katSec} />}
-        {sayfa.tur === 'kat' && <KatSayfasi key={sayfa.id} katId={sayfa.id} acilacakSohbet={sayfa.sohbet} profil={profil} canli={canli} onDegisti={katlariYenile} />}
+        {sayfa.tur === 'kat' && <KatSayfasi key={sayfa.id} katId={sayfa.id} acilacakSohbet={sayfa.sohbet} profil={profil} canli={canli} onDegisti={katlariYenile}
+          onHataBildir={(konu, metin) => setSayfa({ tur: 'destek', taslak: { tur: 'hata', konu, metin } })} />}
         {sayfa.tur === 'raporlar' && <RaporlarSayfasi katlar={katlar} onKatSec={katSec} />}
         {sayfa.tur === 'sohbetler' && <SohbetlerSayfasi katlar={katlar} canli={canli} onKatSec={katSec} />}
         {sayfa.tur === 'ayarlar' && <AyarlarSayfasi profil={profil} guncelleme={guncelleme} onKaydet={onKaydet} onYerelYz={() => setSayfa({ tur: 'yerel' })} />}
         {sayfa.tur === 'kilavuz' && <KilavuzSayfasi />}
         {sayfa.tur === 'yerel' && <YerelYzSayfasi />}
+        {sayfa.tur === 'destek' && <DestekSayfasi key={JSON.stringify(sayfa.taslak ?? '')} hesap={hesap} taslak={sayfa.taslak} />}
       </main>
       {yenilik && (
         <YeniliklerPenceresi surum={yenilik.surum} bekleyen={yenilik.bekleyen}

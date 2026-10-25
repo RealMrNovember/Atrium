@@ -12,7 +12,7 @@ L'assistant de configuration te guide en six étapes :
 5. **Discussions** — Atrium trouve tes conversations Claude Code et les range par projet.
 6. **Limites** — les plafonds de dépenses par agent et par jour.
 
-Tu peux relancer l'assistant à tout moment depuis **Profil et paramètres**.
+Tu peux relancer l'assistant à tout moment depuis **Profil et réglages**.
 
 ## L'immeuble
 - La page d'accueil affiche la carte de ton entreprise et l'immeuble. **Clique sur un étage** pour y entrer.
@@ -81,7 +81,37 @@ La page **Rapports** rassemble chaque commande de chaque étage avec le rapport 
   - Si tu t'es connecté avec un **abonnement Claude** (Pro / Max), c'est une **estimation équivalente API** : elle n'est pas facturée séparément et compte à la place dans les limites d'utilisation de ton forfait.
   - Si tu utilises une **clé API**, ce sont de vraies dépenses d'API.
 - **Plafond** est la propre **limite de sécurité quotidienne** d'Atrium. Les agents ne démarrent jamais un travail qui pourrait la dépasser. Si une exécution expire ou est annulée et que son coût ne peut pas être lu, le plafond complet par agent est comptabilisé, de sorte que le plafond quotidien n'est jamais sous-estimé.
-- Modifie les deux plafonds dans **Profil et paramètres → Limites et sécurité**.
+- Modifie les deux plafonds dans **Profil et réglages → Limites et sécurité**.
+
+## Plusieurs entreprises
+Gère plus d’une entreprise dans Atrium — par exemple ton propre studio et un client. Chaque entreprise a **ses propres projets, son équipe, sa mémoire, ses rapports et son outil d’IA par défaut**.
+- Ouvre le menu **▾** à côté du nom de ton entreprise, en haut à gauche, pour changer d’entreprise ou ajouter une **Nouvelle entreprise**. Une nouvelle entreprise commence par l’assistant de configuration ; si tu changes d’avis, utilise **Retour à …** dans l’assistant.
+- **Profil et réglages → Mes entreprises** les liste toutes ; tu peux y ouvrir ou retirer une entreprise. Le retrait supprime uniquement les données d’Atrium (équipe, mémoire, rapports) — jamais tes dossiers de projets.
+- Dans **Profil et réglages → Outils d’IA**, **Passer toute l’équipe à l’outil par défaut** bascule d’un coup tous les agents de l’entreprise actuelle.
+
+## Nouveaux projets et nouvelles discussions
+- Pas encore de projets ? Dans l’assistant de configuration (ou avec **＋** à côté de *Étages*), saisis un nom et clique sur **Nouveau projet** — Atrium crée le dossier avec un court README. Sans dossier choisi, il va dans *Atrium Projects* dans ton dossier personnel.
+- Dans un étage, l’onglet **Discussions** propose **＋ Nouvelle discussion** : elle lance une vraie discussion Claude Code dans ce dossier de projet. Elle est enregistrée, apparaît dans ta liste de discussions et peut être reprise plus tard — dans Atrium ou dans Claude Code.
+
+## Joindre des fichiers à une commande
+Clique sur **📎 Joindre** sous le champ de commande, ou dépose des fichiers dessus — images, PDF et fichiers texte, jusqu’à 10 fichiers de 10 Mo chacun. Les petits fichiers texte sont transmis directement aux agents ; les images et les PDF sont ouverts par les agents avec leurs outils de fichiers. Les pièces jointes sont stockées dans le dossier de données d’Atrium, jamais dans ton projet.
+
+## Connecter les outils d’IA en un clic
+- **Se connecter avec ChatGPT** (Codex), **Se connecter avec Google** (Gemini) et **Connecter Claude** : si l’outil manque, Atrium l’installe dans son propre dossier (sans droits d’administrateur ; Node.js est nécessaire), puis ouvre la page de connexion de l’outil dans ton navigateur. Une fois la connexion terminée, le statut passe tout seul à **Prêt**.
+- L’étape **IA** de l’assistant de configuration propose tous les outils — connectes-en un ou plusieurs.
+- La barre du haut affiche **une carte d’utilisation par outil d’IA utilisé** : les limites de session et hebdomadaires de Claude (ou les dollars du jour avec une clé API), les limites de Codex quand il les indique, les exécutions et tokens du jour pour les autres, et *local · gratuit* pour Ollama.
+
+## Assistance et ton compte
+La page **🛟 Assistance** te permet de nous envoyer un **souhait**, une **demande**, une **réclamation** ou un **rapport de bug**, et de lire nos réponses directement sur place (un badge signale les nouvelles réponses).
+- Pour envoyer des messages, il te faut un compte gratuit et facultatif : e-mail + mot de passe, ou **Continuer avec Google**.
+- À côté d’une commande qui a échoué, tu trouves **🐞 Signaler** ; cela ouvre un rapport de bug avec le message d’erreur. Coche **Ajouter des infos de diagnostic** seulement si tu le veux — tu vois exactement ce qui est ajouté (version de l’app, système, erreurs récentes, sans chemins personnels ni clés).
+- Tu peux te déconnecter ou **supprimer ton compte** à tout moment ; ton compte et tous tes messages sont définitivement supprimés.
+
+## Confidentialité
+- Tes projets, ton code, tes fichiers, tes discussions, la mémoire de projet, tes prompts, les résultats des agents et tes clés API **ne quittent jamais ton ordinateur**. Nous ne pouvons ni les voir ni les lire — ils ne nous parviennent jamais.
+- Les requêtes d’IA vont directement de ton ordinateur à l’outil d’IA que tu as choisi (ou restent sur ton ordinateur avec les modèles locaux). Il n’y a aucun serveur Atrium entre les deux.
+- Atrium lui-même ne contacte Internet que pour vérifier les mises à jour et les notes de version, et — seulement si tu les utilises — pour ton compte et les messages que tu envoies.
+- Avec un compte, nous ne conservons que ton e-mail, ton nom et la version de ton app ; ton mot de passe n’est conservé que sous forme de hachage irréversible.
 
 ## Sécurité
 - Les agents ne peuvent pas lire les fichiers \`.env\`, de clés ou de mots de passe, ne peuvent pas exécuter de commandes shell et ne peuvent pas lancer leurs propres sous-agents.
@@ -95,7 +125,7 @@ Active **Simulation** dans la barre du haut pour tout essayer — commandes, rec
 Pas, clics de clavier, sonnette de l'ascenseur, jingle de recrutement et carillon quand un rapport est prêt. Active-les ou désactive-les avec le bouton 🔊 de la barre du haut ou dans les paramètres.
 
 ## Mises à jour
-Atrium cherche des mises à jour au démarrage et toutes les quelques heures. Quand une nouvelle version est prête, une bannière apparaît — appuie sur **Redémarrer et mettre à jour**. Tu peux aussi vérifier manuellement dans **Profil et paramètres → Mises à jour**. Sur macOS, la mise à jour ouvre la page de téléchargement.
+Atrium cherche des mises à jour au démarrage et toutes les quelques heures. Quand une nouvelle version est prête, une bannière apparaît — appuie sur **Redémarrer et mettre à jour**. Tu peux aussi vérifier manuellement dans **Profil et réglages → Mises à jour**. Sur macOS, la mise à jour ouvre la page de téléchargement.
 
 ## Dépannage
 - **« Claude Code est introuvable »** — installe-le avec \`npm install -g @anthropic-ai/claude-code\`, ou indique son chemin dans les paramètres.

@@ -97,6 +97,35 @@ export interface Donanim {
   birlesikBellek: boolean
 }
 
+/** Komuta eklenen dosya (arayüzden ana sürece). */
+export interface KomutEki { ad: string; veri: Uint8Array }
+
+/** Şirket seçicide görünen özet. */
+export interface SirketOzeti { id: string; ad: string; logo: string; saglayici: SaglayiciId; kurulumTamam: boolean }
+
+/** İsteğe bağlı ücretsiz Atrium hesabı. */
+export interface HesapDurumu {
+  girisli: boolean
+  kullanici?: { id: number; eposta: string; ad: string; olusturma: string; google?: boolean }
+  /** Cevabı okunmamış destek mesajı sayısı. */
+  okunmamis: number
+  /** Sunucuda Google ile giriş açık mı. */
+  googleEtkin: boolean
+}
+
+export type DestekTuru = 'dilek' | 'istek' | 'sikayet' | 'hata'
+
+export interface DestekBildirimi {
+  id: number
+  tur: DestekTuru
+  konu: string
+  durum: 'acik' | 'yanitlandi' | 'kapali'
+  olusturma: string
+  guncelleme: string
+  okunmamis: number
+  mesajlar: { yazan: 'kullanici' | 'admin'; metin: string; olusturma: string }[]
+}
+
 /** Açılışta sunucudan alınan erişim kararı. */
 export interface ErisimDurumu {
   durum: 'acik' | 'kilitli' | 'guncelleme-gerekli'
@@ -203,6 +232,8 @@ export interface Komut {
   durum: KomutDurumu
   /** 'gorev': lider işi böler · 'tur': lider masa masa dolaşıp durum raporu toplar. */
   tur?: 'gorev' | 'tur'
+  /** Sahibinin komuta eklediği dosyaların adları. */
+  ekler?: string[]
   zaman: string
   plan?: string
   gorevler: Gorev[]
@@ -258,6 +289,8 @@ export interface SohbetKosusu {
   calisiyor: boolean
   /** Bu turda gönderilen mesaj ve gelen yanıtlar (araç satırları dahil). */
   satirlar: { rol: 'sen' | 'claude' | 'arac' | 'hata'; metin: string }[]
+  /** Yeni açılan sohbetin Claude oturum kimliği (bitince listede açmak için). */
+  oturum?: string
 }
 
 /** Claude aboneliğinin kullanım limitleri (Claude Code'un rate_limit_event olayından). */
@@ -286,6 +319,12 @@ export interface CanliDurum {
   aktifSohbetler: Record<string, AktifSohbet[]> // anahtar: katId
   sohbetKosulari: Record<string, SohbetKosusu> // anahtar: sohbet id
   planLimitleri?: PlanLimitleri
+  /** Bugünkü kullanım, araç başına (koşu ve token). */
+  kullanim: Partial<Record<SaglayiciId, { kosu: number; token: number }>>
+  /** Claude dışındaki araçların bildirdiği kullanım limitleri (ör. Codex). */
+  saglayiciLimitleri: Partial<Record<SaglayiciId, PlanLimitleri>>
+  /** Etkin şirkette kullanılan araçlar (sağ üstteki göstergeler). */
+  aktifSaglayicilar: SaglayiciId[]
 }
 
 export interface KatDetayi {
@@ -343,7 +382,7 @@ export interface SirketApi {
   ajanSil(katId: string, ajanId: string): Promise<Ajan[]>
   hafizaKaydet(katId: string, metin: string): Promise<void>
   hafizaCikar(katId: string): Promise<void>
-  komutVer(katId: string, metin: string, yazmaIzni: boolean): Promise<Komut>
+  komutVer(katId: string, metin: string, yazmaIzni: boolean, ekler?: KomutEki[]): Promise<Komut>
   komutIptal(komutId: string): Promise<void>
   tumRaporlar(): Promise<Komut[]>
   canli(): Promise<CanliDurum>
@@ -370,6 +409,8 @@ export interface SirketApi {
   planLimitleriYenile(): Promise<PlanLimitleri | null>
   saglayiciDurumlari(): Promise<SaglayiciDurumu[]>
   saglayiciGiris(id: SaglayiciId): Promise<void>
+  /** Tek tıkla bağlan: gerekirse aracı Atrium'un klasörüne kurar, sonra giriş akışını açar (ilerleme: indirmeDinle 'cli-<id>'). */
+  tekTiklaBagla(id: SaglayiciId): Promise<void>
   saglayiciAnahtari(id: SaglayiciId, anahtar: string | null): Promise<SaglayiciDurumu[]>
   donanim(): Promise<Donanim>
   /** Ollama'yı uygulamanın içinden indirip kurar. */
@@ -381,10 +422,36 @@ export interface SirketApi {
   /** Yerel modelle tek mesajlık deneme sohbeti; yanıt metnini döndürür. */
   yerelDene(model: string, mesajlar: { rol: 'sen' | 'model'; metin: string }[]): Promise<string>
   erisimDurumu(): Promise<ErisimDurumu>
+  sirketler(): Promise<{ aktif: string; liste: SirketOzeti[] }>
+  /** Proje klasöründe yeni bir proje klasörü açar (kök boşsa ~/Atrium Projects). Kök ve ad döner. */
+  projeOlustur(kok: string, ad: string): Promise<{ kok: string; ad: string }>
+  /** Katın klasöründe yeni bir Claude Code sohbeti başlatır (canlı çıktı: sohbetKosulari['yeni-<katId>']). */
+  yeniSohbet(katId: string, mesaj: string, yazma: boolean): Promise<void>
+  /** Yeni şirket açar ve ona geçer (kurulum sihirbazıyla başlar). */
+  sirketEkle(): Promise<void>
+  sirketSec(id: string): Promise<void>
+  sirketSil(id: string): Promise<void>
+  /** Etkin şirketteki bütün ajanları tek yapay zeka aracına geçirir; geçirilen ajan sayısı. */
+  ekibiGecir(saglayici: SaglayiciId, model: string): Promise<number>
+  hesapDurumu(): Promise<HesapDurumu>
+  hesapDenetle(): Promise<HesapDurumu>
+  hesapKayit(eposta: string, ad: string, sifre: string): Promise<HesapDurumu>
+  hesapGiris(eposta: string, sifre: string): Promise<HesapDurumu>
+  hesapGoogle(): Promise<HesapDurumu>
+  hesapCikis(): Promise<HesapDurumu>
+  /** onay: şifre (Google hesabında e-posta) */
+  hesapSil(onay: string): Promise<HesapDurumu>
+  destekListe(): Promise<DestekBildirimi[]>
+  destekGonder(tur: DestekTuru, konu: string, metin: string, tanilama: boolean): Promise<number>
+  destekYanit(id: number, metin: string): Promise<void>
+  destekOkundu(id: number): Promise<void>
+  /** Hata raporuna eklenecek tanılama bilgisinin birebir önizlemesi. */
+  tanilama(): Promise<Record<string, unknown>>
   erisimDenetle(): Promise<ErisimDurumu>
   lisansEtkinlestir(anahtar: string): Promise<{ basarili: boolean; durum: ErisimDurumu; neden?: string; sinir?: number }>
   canliDinle(cb: (d: CanliDurum) => void): () => void
   guncellemeDinle(cb: (d: GuncellemeDurumu) => void): () => void
   indirmeDinle(cb: (d: Record<string, Indirme>) => void): () => void
   erisimDinle(cb: (d: ErisimDurumu) => void): () => void
+  hesapDinle(cb: (d: HesapDurumu) => void): () => void
 }

@@ -1,23 +1,126 @@
 // Kalıcı veri: şirket profili, katlar (projeler), ajanlar, hafıza, komut geçmişi, maliyet.
 // Her şey kullanıcının uygulama veri klasöründe düz JSON / Markdown dosyası olarak durur.
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
-import type { Ajan, Kat, Komut, PlanLimitleri, SirketProfili } from '@ortak/tipler'
+import type { Ajan, Kat, Komut, PlanLimitleri, SaglayiciId, SirketOzeti, SirketProfili } from '@ortak/tipler'
 import { cevirmen, dilSec, type Cevirmen, type Dil } from '@ortak/i18n'
 
+/** Uygulama geneli veri (anahtarlar, hesap, maliyet, plan limitleri). */
 let VERI = ''
+/** Etkin şirketin klasörü: sirket.json + katlar/ (her şirketin kendi projeleri, ekibi, hafızası, varsayılan aracı). */
+let SIRKET = ''
 let UYGULAMA = ''
 let YEREL: string | undefined
+
+interface SirketKaydi { aktif: string; liste: { id: string }[] }
+const kayitDosyasi = (): string => join(VERI, 'sirketler.json')
 
 export function depoBaslat(veriKlasoru: string, uygulamaKoku: string, yerel?: string): void {
   VERI = veriKlasoru
   UYGULAMA = resolve(uygulamaKoku).toLowerCase()
   YEREL = yerel
-  mkdirSync(join(VERI, 'katlar'), { recursive: true })
+  mkdirSync(join(VERI, 'sirketler'), { recursive: true })
+  // tek şirketli eski düzen → sirketler/ana (bir kez)
+  if (!existsSync(kayitDosyasi())) {
+    const ana = join(VERI, 'sirketler', 'ana')
+    mkdirSync(ana, { recursive: true })
+    for (const ad of ['sirket.json', 'katlar']) if (existsSync(join(VERI, ad))) renameSync(join(VERI, ad), join(ana, ad))
+    jsonYaz(kayitDosyasi(), { aktif: 'ana', liste: [{ id: 'ana' }] } satisfies SirketKaydi)
+  }
+  const kayit = jsonOku<SirketKaydi>(kayitDosyasi(), { aktif: 'ana', liste: [{ id: 'ana' }] })
+  SIRKET = join(VERI, 'sirketler', kayit.liste.some((k) => k.id === kayit.aktif) ? kayit.aktif : kayit.liste[0]?.id ?? 'ana')
+  mkdirSync(join(SIRKET, 'katlar'), { recursive: true })
 }
 
 export const veriKlasoru = (): string => VERI
+export const sirketKlasoru = (): string => SIRKET
+
+// --- şirketler -------------------------------------------------------------------
+
+export function sirketler(): { aktif: string; liste: SirketOzeti[] } {
+  const kayit = jsonOku<SirketKaydi>(kayitDosyasi(), { aktif: 'ana', liste: [{ id: 'ana' }] })
+  return {
+    aktif: kayit.aktif,
+    liste: kayit.liste.map(({ id }) => {
+      const p = jsonOku<Partial<SirketProfili>>(join(VERI, 'sirketler', id, 'sirket.json'), {})
+      return { id, ad: p.ad || '—', logo: p.logo ?? '', saglayici: (p.ayarlar?.varsayilanSaglayici ?? 'claude') as SaglayiciId, kurulumTamam: !!p.kurulumTamam }
+    })
+  }
+}
+
+/** Yeni şirket: kurulum sihirbazıyla başlar; dil, sohbet klasörü ve tavanlar etkin şirketten devralınır. */
+export function sirketEkle(): string {
+  const simdiki = profilOku()
+  const kayit = jsonOku<SirketKaydi>(kayitDosyasi(), { aktif: 'ana', liste: [{ id: 'ana' }] })
+  let id = `s-${Date.now().toString(36)}`
+  while (kayit.liste.some((k) => k.id === id)) id += 'x'
+  const yeni: SirketProfili = { ...varsayilanProfil(), dil: simdiki.dil, sohbetKlasoru: simdiki.sohbetKlasoru, ayarlar: { ...simdiki.ayarlar } }
+  jsonYaz(join(VERI, 'sirketler', id, 'sirket.json'), yeni)
+  jsonYaz(kayitDosyasi(), { aktif: id, liste: [...kayit.liste, { id }] } satisfies SirketKaydi)
+  SIRKET = join(VERI, 'sirketler', id)
+  mkdirSync(join(SIRKET, 'katlar'), { recursive: true })
+  return id
+}
+
+export function sirketSec(id: string): void {
+  const kayit = jsonOku<SirketKaydi>(kayitDosyasi(), { aktif: 'ana', liste: [{ id: 'ana' }] })
+  if (!kayit.liste.some((k) => k.id === id)) throw new Error('company')
+  jsonYaz(kayitDosyasi(), { ...kayit, aktif: id })
+  SIRKET = join(VERI, 'sirketler', id)
+  mkdirSync(join(SIRKET, 'katlar'), { recursive: true })
+}
+
+/** Şirketi Atrium'dan kaldırır (yalnız Atrium verisi: ekip, hafıza, raporlar — proje klasörlerine dokunulmaz). */
+export function sirketSil(id: string): void {
+  const kayit = jsonOku<SirketKaydi>(kayitDosyasi(), { aktif: 'ana', liste: [{ id: 'ana' }] })
+  if (kayit.aktif === id || kayit.liste.length < 2 || !/^[a-z0-9-]+$/i.test(id)) throw new Error('company')
+  jsonYaz(kayitDosyasi(), { ...kayit, liste: kayit.liste.filter((k) => k.id !== id) })
+  rmSync(join(VERI, 'sirketler', id), { recursive: true, force: true })
+}
+
+/** Komut eklerinin klasörü (Atrium verisinde; proje klasörüne hiçbir şey yazılmaz). */
+export const ekKlasoru = (katId: string, komutId: string): string => join(SIRKET, 'katlar', katId, 'ekler', komutId)
+
+export function ekleriKaydet(katId: string, komutId: string, ekler: { ad: string; veri: Uint8Array }[]): string[] {
+  const klasor = ekKlasoru(katId, komutId)
+  mkdirSync(klasor, { recursive: true })
+  const adlar: string[] = []
+  for (const e of ekler.slice(0, 10)) {
+    if (!e?.veri || e.veri.byteLength > 10 * 1024 * 1024) continue
+    let ad = basename(String(e.ad || 'dosya')).replace(/[\\/:*?"<>|\x00-\x1f]/g, '_').slice(0, 120) || 'dosya'
+    while (adlar.includes(ad)) ad = `_${ad}`
+    writeFileSync(join(klasor, ad), Buffer.from(e.veri))
+    adlar.push(ad)
+  }
+  return adlar
+}
+
+/** Yeni proje klasörü (kısa bir README ile). Ad yalnız klasör adı olabilir; kök boşsa ~/Atrium Projects kullanılır. */
+export function projeOlustur(kok: string, ad: string): { kok: string; ad: string } {
+  const temiz = ad.trim().replace(/\s+/g, ' ')
+  if (!temiz || temiz.length > 80 || /[\\/:*?"<>|\x00-\x1f]/.test(temiz) || /^\.+$/.test(temiz) || /[. ]$/.test(temiz)
+    || /^(con|prn|aux|nul|com\d|lpt\d)(\..*)?$/i.test(temiz)) throw new Error(ceviri()('projectNameInvalid'))
+  const hedefKok = kok.trim() || join(homedir(), 'Atrium Projects')
+  mkdirSync(hedefKok, { recursive: true })
+  const yol = join(hedefKok, temiz)
+  if (existsSync(yol)) throw new Error(ceviri()('projectExists'))
+  mkdirSync(yol)
+  writeFileSync(join(yol, 'README.md'), `# ${temiz}
+`, 'utf-8')
+  return { kok: hedefKok, ad: temiz }
+}
+
+/** Şirketteki bütün ajanları tek araca geçirir. */
+export function ekibiGecir(saglayici: SaglayiciId, model: string): number {
+  let n = 0
+  for (const k of katlariTara()) {
+    const ajanlar = ajanlariOku(k.id).map((a) => ({ ...a, saglayici, model }))
+    n += ajanlar.length
+    ajanlariYaz(k.id, ajanlar)
+  }
+  return n
+}
 
 function jsonOku<T>(yol: string, varsayilan: T): T {
   try {
@@ -68,12 +171,12 @@ function varsayilanProfil(): SirketProfili {
 
 export function profilOku(): SirketProfili {
   const v = varsayilanProfil()
-  const p = jsonOku<Partial<SirketProfili>>(join(VERI, 'sirket.json'), {})
+  const p = jsonOku<Partial<SirketProfili>>(join(SIRKET, 'sirket.json'), {})
   return { ...v, ...p, ayarlar: { ...v.ayarlar, ...(p.ayarlar ?? {}) } }
 }
 
 export function profilYaz(p: SirketProfili): SirketProfili {
-  jsonYaz(join(VERI, 'sirket.json'), p)
+  jsonYaz(join(SIRKET, 'sirket.json'), p)
   return p
 }
 
@@ -182,7 +285,7 @@ export function katlariTara(kaynak: KatKaynagi = profilOku()): Kat[] {
     let id = slug(ad)
     while (kullanilan.has(id)) id += '-2'
     kullanilan.add(id)
-    const hafizaYolu = join(VERI, 'katlar', id, 'hafiza.md')
+    const hafizaYolu = join(SIRKET, 'katlar', id, 'hafiza.md')
     const hafizaVar = existsSync(hafizaYolu)
     return {
       id,
@@ -204,8 +307,9 @@ export function katBul(katId: string): Kat {
 
 // --- ajanlar ----------------------------------------------------------------
 
-export function varsayilanEkip(t: Cevirmen): Ajan[] {
-  return [
+/** Hazır ekip, şirketin varsayılan yapay zeka aracıyla kurulur (Claude dışında model aracın varsayılanıdır). */
+export function varsayilanEkip(t: Cevirmen, saglayici: SaglayiciId = 'claude'): Ajan[] {
+  const ekip: Ajan[] = [
     { id: 'lider', ad: 'Atlas', rol: t('teamLeadRole'), lider: true, oda: 0, renk: '#7c5cff', model: 'sonnet', gorevTanimi: t('teamLeadDuty') },
     { id: 'gelistirici', ad: 'Nova', rol: t('teamDevRole'), oda: 1, renk: '#2f9e6e', model: 'sonnet', gorevTanimi: t('teamDevDuty') },
     { id: 'tasarimci', ad: 'Iris', rol: t('teamUxRole'), oda: 2, renk: '#e8590c', model: 'sonnet', gorevTanimi: t('teamUxDuty') },
@@ -213,12 +317,13 @@ export function varsayilanEkip(t: Cevirmen): Ajan[] {
     { id: 'arastirmaci', ad: 'Sage', rol: t('teamResRole'), oda: 4, renk: '#c2255c', model: 'sonnet', web: true, gorevTanimi: t('teamResDuty') },
     { id: 'hafiza', ad: 'Echo', rol: t('teamMemRole'), oda: 5, renk: '#868e96', model: 'haiku', gorevTanimi: t('teamMemDuty') }
   ]
+  return saglayici === 'claude' ? ekip : ekip.map((a) => ({ ...a, saglayici, model: '' }))
 }
 
-const katDosyasi = (katId: string, ad: string): string => join(VERI, 'katlar', katId, ad)
+const katDosyasi = (katId: string, ad: string): string => join(SIRKET, 'katlar', katId, ad)
 
 export function ajanlariOku(katId: string): Ajan[] {
-  return jsonOku<Ajan[] | null>(katDosyasi(katId, 'ajanlar.json'), null) ?? varsayilanEkip(ceviri())
+  return jsonOku<Ajan[] | null>(katDosyasi(katId, 'ajanlar.json'), null) ?? varsayilanEkip(ceviri(), profilOku().ayarlar.varsayilanSaglayici ?? 'claude')
 }
 
 export function ajanlariYaz(katId: string, ajanlar: Ajan[]): Ajan[] {
@@ -273,7 +378,7 @@ export function komutKaydet(komut: Komut): void {
 export function tumKomutlar(): Komut[] {
   let katlar: string[] = []
   try {
-    katlar = readdirSync(join(VERI, 'katlar'))
+    katlar = readdirSync(join(SIRKET, 'katlar'))
   } catch {
     return []
   }
@@ -293,6 +398,22 @@ export const bugun = (): string => {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
+
+type GunlukKullanim = Partial<Record<SaglayiciId, { kosu: number; token: number }>>
+
+/** Araç başına günlük kullanım (koşu ve token), son 30 gün. */
+export function kullanimEkle(saglayici: SaglayiciId, token: number): void {
+  const yol = join(VERI, 'kullanim.json')
+  const veri = jsonOku<Record<string, GunlukKullanim>>(yol, {})
+  const gun = (veri[bugun()] ??= {})
+  const o = (gun[saglayici] ??= { kosu: 0, token: 0 })
+  o.kosu += 1
+  o.token += Math.max(0, Math.round(token || 0))
+  for (const k of Object.keys(veri).sort().slice(0, -30)) delete veri[k]
+  jsonYaz(yol, veri)
+}
+
+export const bugunKullanim = (): GunlukKullanim => jsonOku<Record<string, GunlukKullanim>>(join(VERI, 'kullanim.json'), {})[bugun()] ?? {}
 
 export function bugunHarcanan(): number {
   return jsonOku<Record<string, number>>(join(VERI, 'maliyet.json'), {})[bugun()] ?? 0

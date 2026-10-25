@@ -167,3 +167,14 @@ figure.cerceve.genis { margin-top: 24px; }
   .ikili, .yerel, .yenilikler { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) { .saglayicilar { grid-template-columns: 1fr; } }
+
+/* gizlilik */
+.gizlilik-bolum { text-align: center; }
+.gizlilik-rozet { width: 72px; height: 72px; margin: 0 auto 18px; display: grid; place-items: center; font-size: 34px; border-radius: 22px; background: radial-gradient(circle, rgba(63, 191, 127, .3), rgba(63, 191, 127, .06)); border: 1px solid rgba(63, 191, 127, .45); box-shadow: 0 0 60px rgba(63, 191, 127, .25); }
+.gizlilik-izgara { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; }
+.gizlilik-izgara > div { padding: 24px; border-radius: 18px; background: var(--yuzey); border: 1px solid var(--cizgi); }
+.gizlilik-izgara .hic { border-color: rgba(63, 191, 127, .55); background: radial-gradient(circle at 0% 0%, rgba(63, 191, 127, .12), transparent 60%), var(--yuzey); }
+.gizlilik-izgara b { font-size: 18px; }
+.gizlilik-izgara p { margin: 8px 0 0; color: #c4cae0; font-size: 15px; }
+.kucuk-not { color: var(--soluk); font-size: 14px; margin-top: 18px; }
+@media (max-width: 900px) { .gizlilik-izgara { grid-template-columns: 1fr; } }

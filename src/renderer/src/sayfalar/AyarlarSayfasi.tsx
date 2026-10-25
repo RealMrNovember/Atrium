@@ -4,6 +4,7 @@ import { DILLER, type Dil } from '@ortak/i18n'
 import { SirketLogosu } from '../bilesenler/Kimlik'
 import { ProjeSecici } from '../bilesenler/ProjeSecici'
 import { AracAyarlari } from '../bilesenler/AracAyarlari'
+import { SirketlerKarti } from '../bilesenler/SirketSecici'
 import { Markdown } from '../bilesenler/Markdown'
 import { surumNotlari } from '@ortak/yenilikler'
 import { useDil } from '../dil'
@@ -90,6 +91,8 @@ export function AyarlarSayfasi({ profil, guncelleme, onKaydet, onYerelYz }: {
           </label>
         </div>
       </section>
+
+      <SirketlerKarti />
 
       <section className="kart">
         <h2>{t('aiTitle')}</h2>

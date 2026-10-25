@@ -21,6 +21,8 @@ export function yerelBaslat(veriKlasoru: string, yayinla: (d: Record<string, Ind
 }
 
 export const indirmeDurumu = (): Record<string, Indirme> => indirmeler
+/** Başka modüllerin (tek tıkla bağlanma) ilerlemesi de aynı kanaldan yayınlanır. */
+export const ilerlemeBildir = (hedef: string, yama: Partial<Indirme>): void => guncelle(hedef, yama)
 
 function guncelle(hedef: string, yama: Partial<Indirme>): void {
   const onceki: Indirme = indirmeler[hedef] ?? { hedef, durum: 'iniyor', yuzde: 0 }

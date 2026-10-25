@@ -6,6 +6,9 @@ import { AtriumIsareti, SirketLogosu } from '../bilesenler/Kimlik'
 import { ProjeSecici, seciliProjeler, useKlasordekiler } from '../bilesenler/ProjeSecici'
 import { DilSaglayici, useDil } from '../dil'
 import { CICIBYTE, hataMetni, logoOku } from '../yardimci'
+import { AracAyarlari } from '../bilesenler/AracAyarlari'
+import { TekTiklaDugmesi } from '../bilesenler/TekTikla'
+import { SihirbazdanDon } from '../bilesenler/SirketSecici'
 
 const ADIM_SAYISI = 6
 
@@ -65,6 +68,7 @@ function Sihirbaz({ p, setP, onBitti }: { p: SirketProfili; setP: (p: SirketProf
     <div className="kurulum">
       <aside className="kurulum-yan">
         <div className="kurulum-marka"><AtriumIsareti boyut={40} /><div><b>Atrium</b><span>{t('appTagline')}</span></div></div>
+        <SihirbazdanDon />
         <h1>{t('wzWelcome')}</h1>
         <p>{t('wzIntro')}</p>
         <ol className="adimlar">
@@ -95,7 +99,16 @@ function Sihirbaz({ p, setP, onBitti }: { p: SirketProfili; setP: (p: SirketProf
               <ProjeSecici p={p} setP={setP} />
             </div>
           )}
-          {adim === 3 && <ClaudeAdimi p={p} setP={setP} />}
+          {adim === 3 && (
+            <div className="yz-adimi">
+              <p className="kucuk">{t('wzAiHint')}</p>
+              <h3>✳️ Claude Code</h3>
+              <ClaudeAdimi p={p} setP={setP} />
+              <h3>{t('wzAiOthers')}</h3>
+              <AracAyarlari p={p} setP={setP} />
+              <p className="kucuk">🦙 {t('wzAiLocal')}</p>
+            </div>
+          )}
           {adim === 4 && <SohbetAdimi p={p} setP={setP} />}
           {adim === 5 && <TavanAdimi p={p} setP={setP} />}
         </div>
@@ -163,13 +176,10 @@ export function ClaudeAdimi({ p, setP }: AdimProps): ReactElement {
           <div><b>{durum?.girisli ? t('clLoggedIn', { method: durum.yontem ?? '' }) : t('clNotLoggedIn')}</b></div>
         </div>
       </div>
-      {durum && !durum.kurulu && (
-        <div className="bilgi-kutu">{t('clInstallHow')} <code>npm install -g @anthropic-ai/claude-code</code></div>
-      )}
-      {durum?.kurulu && !durum.girisli && (
+      {durum && (!durum.kurulu || !durum.girisli) && (
         <div className="bilgi-kutu">
-          <button className="birincil" onClick={() => void window.sirket.claudeGiris()}>{t('clLogin')}</button>
-          <span className="kucuk">{t('clLoginHint')}</span>
+          <TekTiklaDugmesi id="claude" onBitti={() => void kontrolEt()} />
+          <span className="kucuk">{durum.kurulu ? t('clLoginHint') : t('connectExplain')}</span>
         </div>
       )}
       <button className="ikincil" disabled={kontrol} onClick={() => void kontrolEt()}>{kontrol ? t('clChecking') : t('clCheck')}</button>

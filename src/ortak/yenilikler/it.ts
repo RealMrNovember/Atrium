@@ -2,6 +2,17 @@ import type { SurumNotu } from './en'
 
 export const it: SurumNotu[] = [
   {
+    surum: '1.5.0', tarih: '2026-10-26', baslik: "Più aziende, IA con un clic, supporto integrato",
+    maddeler: [
+      "🏙️ Gestisci più aziende — ognuna con i suoi progetti, il suo team, la sua memoria e il suo strumento IA predefinito. Passa dall’una all’altra dal menu ▾ accanto al nome dell’azienda.",
+      "⚡ Collegamento con un clic: Collegati con ChatGPT, Collegati con Google e Collega Claude installano ciò che manca e aprono la pagina di accesso. La procedura guidata ora propone tutti gli strumenti IA.",
+      "📊 La barra in alto mostra una scheda di utilizzo per ogni strumento IA che usi.",
+      "📎 Allega immagini, PDF e file di testo a un comando. Crea nuovi progetti e avvia nuove chat di Claude Code direttamente da Atrium — anche con una cartella vuota.",
+      "🛟 Nuova pagina Supporto: invia desideri, richieste, reclami e segnalazioni di bug e leggi le nostre risposte nell’app. Account gratuito facoltativo con email o Google.",
+      "🔒 Una promessa chiara sulla privacy: i tuoi progetti, il codice, le chat, la memoria e le chiavi non lasciano mai il tuo computer."
+    ]
+  },
+  {
     surum: '1.4.2', tarih: '2026-10-25', baslik: "Aggiornamenti più rapidi",
     maddeler: [
       "🔄 Atrium ora controlla se c’è una nuova versione appena si apre e poi ogni 10 minuti.",

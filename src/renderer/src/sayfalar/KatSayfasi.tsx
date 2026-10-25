@@ -17,9 +17,11 @@ interface Props {
   profil: SirketProfili
   canli: CanliDurum
   onDegisti: () => void
+  /** Komut hatasını Destek sayfasında hata raporu taslağı olarak açar. */
+  onHataBildir?: (konu: string, metin: string) => void
 }
 
-export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti }: Props): ReactElement {
+export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti, onHataBildir }: Props): ReactElement {
   const { t, dil } = useDil()
   const [detay, setDetay] = useState<KatDetayi | null>(null)
   const [sekme, setSekme] = useState<Sekme>(acilacakSohbet ? 'sohbetler' : 'komut')
@@ -102,7 +104,7 @@ export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti }: 
             ))}
           </div>
           <div className="panel-icerik">
-            {sekme === 'komut' && <KomutPaneli detay={detay} canli={canli} profil={profil} onAjanSec={ajanSec} />}
+            {sekme === 'komut' && <KomutPaneli detay={detay} canli={canli} profil={profil} onAjanSec={ajanSec} onHataBildir={onHataBildir} />}
             {sekme === 'ajan' && (seciliMisafir
               ? <MisafirPaneli m={seciliMisafir} onGeri={() => ajanSec(null)}
                   onSohbetAc={seciliMisafir.id.startsWith('sohbet-') ? () => { setAcikSohbet(seciliMisafir.id.slice(7)); setSekme('sohbetler') } : undefined} />
@@ -124,11 +126,23 @@ export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti }: 
 
 // --- Komut ---------------------------------------------------------------------
 
-function KomutPaneli({ detay, canli, profil, onAjanSec }: { detay: KatDetayi; canli: CanliDurum; profil: SirketProfili; onAjanSec: (id: string) => void }): ReactElement {
+function KomutPaneli({ detay, canli, profil, onAjanSec, onHataBildir }: {
+  detay: KatDetayi; canli: CanliDurum; profil: SirketProfili; onAjanSec: (id: string) => void; onHataBildir?: (konu: string, metin: string) => void
+}): ReactElement {
   const { t, dil } = useDil()
   const [metin, setMetin] = useState('')
   const [yazma, setYazma] = useState(false)
   const [hata, setHata] = useState('')
+  const [ekler, setEkler] = useState<File[]>([])
+  const [surukleniyor, setSurukleniyor] = useState(false)
+  const ekle = (liste: FileList | File[]): void => {
+    const yeni = [...ekler]
+    for (const d of Array.from(liste)) {
+      if (d.size > 10 * 1024 * 1024) { setHata(t('attachTooBig', { name: d.name })); continue }
+      if (yeni.length < 10 && !yeni.some((x) => x.name === d.name && x.size === d.size)) yeni.push(d)
+    }
+    setEkler(yeni)
+  }
   const aktif = canli.aktifKomutlar.find((k) => k.katId === detay.kat.id)
   const lider = detay.ajanlar.find((a) => a.lider) ?? detay.ajanlar[0]
   const komut = aktif ?? detay.komutlar[0]
@@ -138,19 +152,37 @@ function KomutPaneli({ detay, canli, profil, onAjanSec }: { detay: KatDetayi; ca
     if (!metin.trim()) return
     setHata('')
     try {
-      await window.sirket.komutVer(detay.kat.id, metin, yazma)
+      const veri = await Promise.all(ekler.map(async (d) => ({ ad: d.name, veri: new Uint8Array(await d.arrayBuffer()) })))
+      await window.sirket.komutVer(detay.kat.id, metin, yazma, veri)
       setMetin('')
+      setEkler([])
     } catch (e) {
       setHata(hataMetni(e))
     }
   }
 
   return (
-    <div className="komut-paneli">
+    <div className={surukleniyor ? 'komut-paneli surukleniyor' : 'komut-paneli'}
+      onDragOver={(e) => { if (!aktif && e.dataTransfer.types.includes('Files')) { e.preventDefault(); setSurukleniyor(true) } }}
+      onDragLeave={() => setSurukleniyor(false)}
+      onDrop={(e) => { e.preventDefault(); setSurukleniyor(false); if (!aktif) ekle(e.dataTransfer.files) }}>
       <label className="etiket-ust">{lider ? t('commandTo', { name: lider.ad, role: lider.rol }) : t('commandGeneric')}</label>
       <textarea value={metin} disabled={!!aktif} onChange={(e) => setMetin(e.target.value)}
         onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) void gonder() }}
         placeholder={t('commandPlaceholder')} rows={5} />
+      <div className="ek-satiri">
+        <label className={aktif ? 'ikincil mini-buyuk dosya-dugmesi pasif' : 'ikincil mini-buyuk dosya-dugmesi'} title={t('attachHint')}>
+          📎 {t('attach')}
+          <input type="file" multiple hidden disabled={!!aktif} onChange={(e) => { if (e.target.files) ekle(e.target.files); e.target.value = '' }} />
+        </label>
+        {ekler.map((d, i) => (
+          <span key={i} className="ek-cip" title={`${d.name} · ${Math.max(1, Math.round(d.size / 1024))} KB`}>
+            {d.type.startsWith('image/') ? '🖼️' : d.type === 'application/pdf' ? '📄' : '📝'} {d.name}
+            <button className="cip-kaldir" onClick={() => setEkler(ekler.filter((_, j) => j !== i))} aria-label={t('remove')}>×</button>
+          </span>
+        ))}
+        {!ekler.length && <span className="kucuk">{t('attachDrop')}</span>}
+      </div>
       <label className="onay">
         <input type="checkbox" checked={yazma} disabled={!!aktif} onChange={(e) => setYazma(e.target.checked)} />
         <span>{t('allowWrite')} <small>{t('allowWriteHint')}</small></span>
@@ -175,6 +207,7 @@ function KomutPaneli({ detay, canli, profil, onAjanSec }: { detay: KatDetayi; ca
             {aktif && <button className="tehlike mini" onClick={() => void window.sirket.komutIptal(aktif.id)}>{t('stop')}</button>}
           </div>
           <p className="komut-alinti">“{komut.metin}”</p>
+          {komut.ekler?.length ? <p className="kucuk">📎 {komut.ekler.join(' · ')}</p> : null}
           {komut.plan && <p className="plan">🧭 {komut.plan}</p>}
           <ul className="gorev-listesi">
             {komut.gorevler.map((g) => {
@@ -193,7 +226,11 @@ function KomutPaneli({ detay, canli, profil, onAjanSec }: { detay: KatDetayi; ca
               )
             })}
           </ul>
-          {komut.hata && <p className="hata-metni">{komut.hata}</p>}
+          {komut.hata && (
+            <p className="hata-metni">{komut.hata}
+              {onHataBildir && <button className="ikincil mini-buyuk hata-bildir" onClick={() => onHataBildir(t('bugSubject'), komut.hata ?? '')}>🐞 {t('reportBug')}</button>}
+            </p>
+          )}
           {!aktif && komut.rapor && (
             <details open className="rapor-kutu">
               <summary>📨 {t('leadReport')}</summary>

@@ -2,6 +2,17 @@ import type { SurumNotu } from './en'
 
 export const tr: SurumNotu[] = [
   {
+    surum: '1.5.0', tarih: '2026-10-26', baslik: "Birçok şirket, tek tıkla yapay zeka, yerleşik destek",
+    maddeler: [
+      "🏙️ Birden fazla şirket yönet — her birinin kendi projeleri, ekibi, hafızası ve varsayılan yapay zeka aracı var. Şirket adının yanındaki ▾ menüsünden geçiş yap.",
+      "⚡ Tek tıkla bağlan: ChatGPT ile bağlan, Google ile bağlan ve Claude’u bağla eksik olanı kurar ve giriş sayfasını açar. Kurulum sihirbazı artık bütün yapay zeka araçlarını sunuyor.",
+      "📊 Üst çubuk, kullandığın her yapay zeka aracı için ayrı bir kullanım kartı gösteriyor.",
+      "📎 Komuta görsel, PDF ve metin dosyası ekle. Yeni proje oluştur ve yeni Claude Code sohbeti başlat — boş bir klasörle bile.",
+      "🛟 Yeni Destek sayfası: dilek, istek, şikayet ve hata raporu gönder, cevaplarımızı uygulamada oku. E-posta ya da Google ile isteğe bağlı ücretsiz hesap.",
+      "🔒 Açık bir gizlilik sözü: projelerin, kodun, sohbetlerin, hafızan ve anahtarların bilgisayarından hiç çıkmaz."
+    ]
+  },
+  {
     surum: '1.4.2', tarih: '2026-10-25', baslik: "Daha hızlı güncellemeler",
     maddeler: [
       "🔄 Atrium artık açılır açılmaz ve sonra her 10 dakikada bir yeni sürüm olup olmadığına bakıyor.",

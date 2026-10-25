@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, join } from 'node:path'
 import type { Cevirmen } from '@ortak/i18n'
+import { yonetilenAdaylar } from './yollar'
 
 export interface KosuSecenegi {
   cwd: string
@@ -27,6 +28,12 @@ export interface KosuSecenegi {
   /** Kullanıcının mevcut Claude Code oturumuna devam (oturum kimliği). O zaman oturum kaydı ve otomatik
    *  hafıza Claude Code'daki gibi açık kalır, istem Atrium işaretiyle işaretlenmez. */
   devam?: string
+  /** Kullanıcının kendi Claude Code sohbeti gibi yeni bir oturum aç (kayıtlı kalır, sohbet listesinde görünür). */
+  yeniOturum?: boolean
+  /** Proje dışında okunabilecek klasörler (komut ekleri). */
+  ekKlasorleri?: string[]
+  /** Claude oturum kimliğini bildirince (system/init). */
+  oturum?: (id: string) => void
 }
 
 export interface KosuSonucu {
@@ -35,6 +42,8 @@ export interface KosuSonucu {
   /** Maliyet claude'dan okunamadıysa (süre aşımı, iptal) tavan yazılır ve bu alan true olur. */
   maliyetTahmini: boolean
   hata?: string
+  /** Araç bildirdiyse kullanılan token (girdi + çıktı). */
+  token?: number
 }
 
 // Ajan hiçbir koşulda gizli dosya okuyamaz, kabuk komutu çalıştıramaz, kendi alt ajanını açamaz
@@ -57,8 +66,9 @@ export function claudeBul(ayar?: string): { komut: string; kabuk: boolean } {
          join(ev, '.local', 'bin', 'claude.exe')]
       : [join(ev, '.local', 'bin', 'claude'), join(ev, '.claude', 'local', 'claude'),
          '/opt/homebrew/bin/claude', '/usr/local/bin/claude', '/usr/bin/claude', join(ev, '.npm-global', 'bin', 'claude')]
-  const bulunan = adaylar.find((a) => a && existsSync(a))
-  if (bulunan) return { komut: bulunan, kabuk: false }
+  const yonetilen = yonetilenAdaylar('claude', ['@anthropic-ai', 'claude-code', 'bin', process.platform === 'win32' ? 'claude.exe' : 'claude'])
+  const bulunan = [...adaylar, ...yonetilen].find((a) => a && existsSync(a))
+  if (bulunan) return { komut: bulunan, kabuk: /.(cmd|bat)$/i.test(bulunan) }
   return { komut: 'claude', kabuk: process.platform === 'win32' }
 }
 
@@ -161,14 +171,15 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
     '--max-budget-usd', String(s.butceUsd),
     '--permission-mode', s.yazma ? 'acceptEdits' : 'default',
     // ajan koşuları kullanıcının Claude Code sohbet geçmişine düşmesin (devam edilen sohbet hariç)
-    ...(s.devam ? [] : ['--no-session-persistence']),
+    ...(s.devam || s.yeniOturum ? [] : ['--no-session-persistence']),
+    ...(s.ekKlasorleri ?? []).flatMap((k) => ['--add-dir', k]),
     '--allowedTools', s.araclar.join(','),
     '--disallowedTools', yasak.join(',')
   ]
   // Ajan koşularında Claude Code'un yerleşik otomatik hafızası kapalı: ~/.claude altına kendi hafıza
   // dosyalarını yazmasın, proje hafızası yalnızca Atrium'da dursun. Kullanıcının kendi sohbetinde açık kalır.
   const ortam = temizOrtam({
-    ...(s.devam ? {} : { CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1' }),
+    ...(s.devam || s.yeniOturum ? {} : { CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1' }),
     ...(s.apiAnahtari ? { ANTHROPIC_API_KEY: s.apiAnahtari } : {})
   })
 
@@ -208,6 +219,7 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
       if (!satir.trim()) return
       let olay: Record<string, any>
       try { olay = JSON.parse(satir) } catch { return }
+      if (olay.type === 'system' && typeof olay.session_id === 'string') s.oturum?.(olay.session_id)
       if (olay.type === 'assistant') {
         for (const parca of olay.message?.content ?? []) {
           if (parca.type === 'tool_use') s.etkinlik?.(aracSatiri(parca.name, parca.input ?? {}, s.t))
@@ -224,6 +236,7 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
           metin: olay.is_error ? '' : String(olay.result ?? ''),
           maliyetUsd: Number(olay.total_cost_usd ?? 0),
           maliyetTahmini: false,
+          token: Number(olay.usage?.input_tokens ?? 0) + Number(olay.usage?.output_tokens ?? 0) + Number(olay.usage?.cache_creation_input_tokens ?? 0),
           hata: olay.is_error ? hataMetni(String(olay.result || olay.subtype || 'error'), s.t, s.butceUsd) : undefined
         }
       }
@@ -245,6 +258,6 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
       bitir(sonuc)
     })
     surec.stdin.on('error', () => { /* süreç erken kapandıysa */ })
-    surec.stdin.end(s.devam ? s.istem : `${ATRIUM_ISARETI}\n${s.istem}`, 'utf-8')
+    surec.stdin.end(s.devam || s.yeniOturum ? s.istem :`${ATRIUM_ISARETI}\n${s.istem}`, 'utf-8')
   })
 }

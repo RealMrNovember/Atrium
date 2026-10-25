@@ -4,6 +4,17 @@ export interface SurumNotu { surum: string; tarih: string; baslik: string; madde
 
 export const en: SurumNotu[] = [
   {
+    surum: '1.5.0', tarih: '2026-10-26', baslik: "Many companies, one-click AI, built-in support",
+    maddeler: [
+      "🏙️ Run several companies — each with its own projects, team, memory and default AI tool. Switch from the ▾ menu next to the company name.",
+      "⚡ One-click connect: Connect with ChatGPT, Connect with Google and Connect Claude install what is missing and open the sign-in page. The setup wizard now offers every AI tool.",
+      "📊 The top bar shows one usage card per AI tool you use.",
+      "📎 Attach images, PDFs and text files to a command. Create new projects and start new Claude Code chats right from Atrium — even with an empty folder.",
+      "🛟 New Support page: send wishes, requests, complaints and bug reports and read our answers in the app. Optional free account with email or Google.",
+      "🔒 A clear privacy promise: your projects, code, chats, memory and keys never leave your computer."
+    ]
+  },
+  {
     surum: '1.4.2', tarih: '2026-10-25', baslik: "Faster updates",
     maddeler: [
       "🔄 Atrium now checks for a new version as soon as it opens and every 10 minutes after that.",

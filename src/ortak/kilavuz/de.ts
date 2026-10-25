@@ -83,6 +83,36 @@ Die Seite **Berichte** sammelt jeden Befehl aus jeder Etage mit dem Bericht des 
 - **Limit** ist Atriums eigenes **tägliches Sicherheitslimit**. Agenten starten nie Arbeit, die darüber hinausgehen könnte. Wenn ein Lauf eine Zeitüberschreitung hat oder abgebrochen wird und seine Kosten nicht gelesen werden können, wird das volle Limit pro Agent angerechnet, sodass das Tageslimit nie zu niedrig gezählt wird.
 - Beide Limits änderst du unter **Profil & Einstellungen → Limits und Sicherheit**.
 
+## Mehrere Unternehmen
+Führe mehr als ein Unternehmen in Atrium — zum Beispiel dein eigenes Studio und einen Kunden. Jedes Unternehmen hat **eigene Projekte, ein eigenes Team, Gedächtnis, Berichte und ein eigenes Standard-KI-Tool**.
+- Öffne das Menü **▾** neben deinem Unternehmensnamen oben links, um das Unternehmen zu wechseln oder ein **Neues Unternehmen** hinzuzufügen. Ein neues Unternehmen beginnt mit dem Einrichtungsassistenten; überlegst du es dir anders, nutze im Assistenten **Zurück zu …**.
+- **Profil & Einstellungen → Meine Unternehmen** listet alle auf; dort kannst du ein Unternehmen öffnen oder entfernen. Beim Entfernen werden nur Atriums Daten gelöscht (Team, Gedächtnis, Berichte) — nie deine Projektordner.
+- Unter **Profil & Einstellungen → KI-Tools** stellt **Ganzes Team auf das Standard-Tool umstellen** alle Agenten des aktuellen Unternehmens auf einmal um.
+
+## Neue Projekte und neue Chats
+- Noch keine Projekte? Gib im Einrichtungsassistenten (oder mit **＋** neben *Etagen*) einen Namen ein und klicke auf **Neues Projekt** — Atrium erstellt den Ordner mit einer kurzen README. Ohne gewählten Ordner landet er in *Atrium Projects* in deinem Benutzerordner.
+- In einer Etage hat der Tab **Chats** die Schaltfläche **＋ Neuer Chat**: Sie startet einen echten Claude-Code-Chat in diesem Projektordner. Er wird gespeichert, erscheint in deiner Chatliste und kann später fortgesetzt werden — in Atrium oder in Claude Code.
+
+## Dateien an einen Befehl anhängen
+Klicke unter dem Befehlsfeld auf **📎 Anhängen** oder zieh Dateien darauf — Bilder, PDFs und Textdateien, bis zu 10 Dateien mit je 10 MB. Kleine Textdateien bekommen die Agenten direkt; Bilder und PDFs öffnen die Agenten mit ihren Datei-Tools. Anhänge werden in Atriums eigenem Datenordner gespeichert, nie in deinem Projekt.
+
+## KI-Tools mit einem Klick verbinden
+- **Mit ChatGPT verbinden** (Codex), **Mit Google verbinden** (Gemini) und **Claude verbinden**: Fehlt das Tool, installiert Atrium es in seinem eigenen Ordner (ohne Administratorrechte; Node.js wird benötigt) und öffnet dann die Anmeldeseite des Tools in deinem Browser. Sobald du die Anmeldung abgeschlossen hast, springt der Status von selbst auf **Bereit**.
+- Der Schritt **KI** im Einrichtungsassistenten bietet alle Tools an — verbinde eines oder mehrere.
+- Die obere Leiste zeigt **eine Nutzungskarte pro verwendetem KI-Tool**: Claudes Sitzungs- und Wochenlimits (oder die heutigen Dollar mit einem API-Schlüssel), die Codex-Limits, sofern es sie meldet, die heutigen Läufe und Tokens für die anderen und *lokal · kostenlos* für Ollama.
+
+## Support & dein Konto
+Auf der Seite **🛟 Support** kannst du uns einen **Wunsch**, eine **Anfrage**, eine **Beschwerde** oder einen **Fehlerbericht** schicken und unsere Antworten direkt dort lesen (ein Badge zeigt neue Antworten).
+- Zum Senden von Nachrichten brauchst du ein kostenloses, optionales Konto: E-Mail + Passwort oder **Weiter mit Google**.
+- Neben einem fehlgeschlagenen Befehl findest du **🐞 Melden**; es öffnet einen Fehlerbericht mit der Fehlermeldung. Kreuze **Diagnoseinfos hinzufügen** nur an, wenn du willst — du siehst genau, was hinzugefügt wird (App-Version, System, letzte Fehler, ohne persönliche Pfade und Schlüssel).
+- Du kannst dich jederzeit abmelden oder **dein Konto löschen**; dein Konto und alle deine Nachrichten werden dauerhaft gelöscht.
+
+## Privatsphäre
+- Deine Projekte, dein Code, deine Dateien, Chats, das Projektgedächtnis, Prompts, Agentenergebnisse und API-Schlüssel **verlassen nie deinen Computer**. Wir können sie weder sehen noch lesen — sie erreichen uns nie.
+- KI-Anfragen gehen direkt von deinem Computer an das KI-Tool deiner Wahl (oder bleiben mit lokalen Modellen auf deinem Computer). Dazwischen gibt es keinen Atrium-Server.
+- Atrium selbst geht nur ins Internet, um nach Updates und Versionshinweisen zu suchen, und — nur wenn du sie nutzt — für dein Konto und die Nachrichten, die du sendest.
+- Mit einem Konto speichern wir nur deine E-Mail, deinen Namen und deine App-Version; dein Passwort wird nur als Einweg-Hash gespeichert.
+
 ## Sicherheit
 - Agenten können keine \`.env\`-, Schlüssel- oder Passwortdateien lesen, keine Shell-Befehle ausführen und keine eigenen Subagenten starten.
 - Agenten committen nie, pushen nie, installieren keine Pakete, schreiben niemandem und veröffentlichen nichts.

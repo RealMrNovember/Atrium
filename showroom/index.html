@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=1.4.2" />
+  <link rel="stylesheet" href="style.css?v=1.5.0" />
 </head>
 <body>
   <header class="ust">
@@ -25,6 +25,7 @@
       <a href="#ai" data-t="navAi">AI tools</a>
       <a href="#local" data-t="navLocal">Local AI</a>
       <a href="#how" data-t="navHow">How it works</a>
+      <a href="#privacy" data-t="navPrivacy">Privacy</a>
       <a href="#new" data-t="navNew">What's new</a>
       <a href="#faq" data-t="navFaq">FAQ</a>
     </nav>
@@ -69,6 +70,10 @@
         <article><span>💬</span><h3 data-t="f5t">Your Claude Code chats move in</h3><p data-t="f5p">Atrium files your past conversations by project. Sub-agents Claude starts in a chat appear live as guests on that floor.</p></article>
         <article><span>🛡️</span><h3 data-t="f6t">You stay in charge</h3><p data-t="f6p">Read-only by default, secrets off-limits, spending caps everywhere. Nothing is pushed or published.</p></article>
         <article><span>🤝</span><h3 data-t="f7t">Not just Claude</h3><p data-t="f7p">Run agents on Claude Code, OpenAI Codex, Gemini, Ollama or any OpenAI-compatible server — mixed on the same floor.</p></article>
+        <article><span>🏙️</span><h3 data-t="f9t">Many companies</h3><p data-t="f9p">Run your studio and your clients side by side — each company with its own projects, team, memory and AI.</p></article>
+        <article><span>⚡</span><h3 data-t="f10t">One-click connect</h3><p data-t="f10p">Connect ChatGPT, Google Gemini or Claude in one click — Atrium installs what is missing and opens the sign-in page.</p></article>
+        <article><span>📎</span><h3 data-t="f11t">Files with your command</h3><p data-t="f11p">Drop images, PDFs or text files onto the command box. Start new projects and new chats right from the app.</p></article>
+        <article><span>🛟</span><h3 data-t="f12t">Support built in</h3><p data-t="f12p">Send a wish, a request, a complaint or a bug report from the app — and read the answer right there.</p></article>
         <article><span>🦙</span><h3 data-t="f8t">Local AI, one click</h3><p data-t="f8p">Atrium measures your PC, shows which open models will run, then downloads Ollama and the models for you. Free, offline, private.</p></article>
       </div>
     </section>
@@ -102,6 +107,27 @@
         <figure class="cerceve"><img src="assets/local-ai.png" alt="" loading="lazy" /><figcaption data-t="locImg1">Your computer, measured — engine status and your models.</figcaption></figure>
       </div>
       <figure class="cerceve genis"><img src="assets/local-catalog.png" alt="" loading="lazy" /><figcaption data-t="locImg2">A model catalog that knows your hardware — one-click download.</figcaption></figure>
+    </section>
+
+    <section id="privacy" class="bolum gizlilik-bolum">
+      <div class="gizlilik-rozet">🔒</div>
+      <h2 data-t="privTitle">Your code never leaves your computer</h2>
+      <p class="bolum-alt" data-t="privSub">Atrium is built so that your work never reaches us. We cannot see or read your projects — not because we promise not to look, but because they are never sent.</p>
+      <div class="gizlilik-izgara">
+        <div class="hic"><b data-t="pv1t">🚫 Never sent</b><p data-t="pv1p">Your projects, code, files, chats, project memory, prompts, agent results and API keys. AI requests go straight from your computer to the AI tool you chose — or nowhere at all with local models.</p></div>
+        <div class="secersen"><b data-t="pv2t">✋ Only if you choose</b><p data-t="pv2p">A free, optional account (email, name, app version — the password only as a one-way hash) and the messages and bug reports you write and send yourself. Diagnostic info only if you tick the box, and you see exactly what is sent.</p></div>
+        <div class="guncelleme"><b data-t="pv3t">🔄 Update check</b><p data-t="pv3p">Atrium checks GitHub and atrium.cicibyte.com for new versions and release notes.</p></div>
+      </div>
+      <p class="ortala kucuk-not" data-t="pv4">Delete your account at any time — your account and all your messages are removed permanently.</p>
+    </section>
+
+    <section id="companies" class="bolum">
+      <h2 data-t="coTitle">Many companies. One place for support.</h2>
+      <p class="bolum-alt" data-t="coSub">Switch between companies in a click — each with its own projects, team and AI. And when you need us, we are one page away.</p>
+      <div class="ikili">
+        <figure class="cerceve"><img src="assets/companies.png" alt="" loading="lazy" /><figcaption data-t="coImg1">Every company keeps its own projects, team, memory and default AI tool.</figcaption></figure>
+        <figure class="cerceve"><img src="assets/support.png" alt="" loading="lazy" /><figcaption data-t="coImg2">Wishes, requests, complaints and bug reports — answered inside Atrium.</figcaption></figure>
+      </div>
     </section>
 
     <section id="tokens" class="bolum vurgu-bolum">
@@ -156,10 +182,12 @@
     <section id="faq" class="bolum">
       <h2 data-t="faqTitle">Questions</h2>
       <div class="sss">
-        <details><summary data-t="q1">Does Atrium send my code or chats anywhere?</summary><p data-t="a1">No. Your code, chats and project memory stay on your computer. Agents run through the AI tool you choose — with a local model nothing leaves the machine. Atrium itself only checks for updates and release notes.</p></details>
+        <details><summary data-t="q1">Does Atrium send my code or chats anywhere?</summary><p data-t="a1">No. Your code, chats and project memory stay on your computer. Agents run through the AI tool you choose — with a local model nothing leaves the machine. Atrium itself only checks for updates and release notes, and — only if you use them — sends your account details and the messages you write.</p></details>
         <details><summary data-t="q2">Can I use Atrium without Claude?</summary><p data-t="a2">Yes. Any agent can run on OpenAI Codex, Gemini CLI, an OpenAI-compatible server or a local model through Ollama, which Atrium installs for you.</p></details>
         <details><summary data-t="q3">Do I need a powerful computer for local AI?</summary><p data-t="a3">No. Small models run on almost any recent computer, even without a graphics card. The Local AI page measures your machine and recommends a model.</p></details>
         <details><summary data-t="q4">How much does it cost?</summary><p data-t="a4">Atrium is free. Agents use your own Claude, ChatGPT or Google plan — or cost nothing with local models. For Claude you set per-run and daily caps.</p></details>
+        <details><summary data-t="q6">Do I need an account?</summary><p data-t="a6">No. Atrium works fully without one. A free account is only needed to send feedback or bug reports and read our answers — sign up with email or Google, delete it any time.</p></details>
+        <details><summary data-t="q7">Can I manage several companies?</summary><p data-t="a7">Yes. Add as many as you like; each has its own projects, team, memory, reports and default AI tool.</p></details>
         <details><summary data-t="q5">Is it safe to let agents work on my projects?</summary><p data-t="a5">Agents are read-only by default, never open secret files, never commit, push or publish, and treat web pages and file contents as data — not instructions.</p></details>
       </div>
     </section>
@@ -181,7 +209,7 @@
     <div><span data-t="madeBy">Made by</span> <a href="https://cicibyte.com" target="_blank" rel="noopener">CiciByte Technology, Inc.</a> · <a href="https://github.com/RealMrNovember/Atrium" target="_blank" rel="noopener">GitHub</a></div>
   </footer>
 
-  <script src="i18n.js?v=1.4.2"></script>
-  <script src="app.js?v=1.4.2"></script>
+  <script src="i18n.js?v=1.5.0"></script>
+  <script src="app.js?v=1.5.0"></script>
 </body>
 </html>

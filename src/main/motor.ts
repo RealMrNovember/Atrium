@@ -1,14 +1,17 @@
 // Ajan motoru: komut → lider planı (gerekirse işe alım) → görevler → raporlar → sahibine tek rapor + hafıza.
 // Canlı durum (kim nerede, ne yapıyor) burada tutulur ve her değişiklikte arayüze yollanır.
 import { randomUUID } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import type {
-  Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, MisafirAjan, PlanLimiti, PlanLimitleri, SaglayiciId, SirketProfili
+  Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, KomutEki, MisafirAjan, PlanLimiti, PlanLimitleri, SaglayiciId, SirketProfili, SohbetKosusu
 } from '@ortak/tipler'
 import { ajanAnahtari } from '@ortak/tipler'
 import { dilAdiIngilizce, type Cevirmen } from '@ortak/i18n'
 import { claudeKos, type KosuSonucu } from './claude'
-import { kos } from './saglayicilar'
+import { kos, limitBildiriciAyarla } from './saglayicilar'
+import { hataKaydet } from './hatalar'
 import * as depo from './depo'
 import { simKos } from './simulasyon'
 
@@ -19,8 +22,11 @@ const ODA_SAYISI = 8
 const RENK_PALETI = ['#f08c00', '#0c8599', '#9c36b5', '#5c940d', '#e64980', '#4263eb', '#d9480f', '#2b8a3e']
 
 const canli: CanliDurum = {
-  ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {}
+  ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {},
+  kullanim: {}, saglayiciLimitleri: {}, aktifSaglayicilar: ['claude']
 }
+let aktifSaglayicilarOku: () => SaglayiciId[] = () => ['claude']
+let aktifSonOkuma = 0
 const sohbetIptalleri = new Map<string, AbortController>()
 const iptaller = new Map<string, AbortController>()
 let yayinci: (d: CanliDurum) => void = () => {}
@@ -39,6 +45,23 @@ export function motorBaslat(
   sohbetBaglami = baglam
   canli.bugunHarcanan = depo.bugunHarcanan()
   canli.planLimitleri = depo.planLimitleriOku()
+  canli.kullanim = depo.bugunKullanim()
+  limitBildiriciAyarla((id, l) => {
+    canli.saglayiciLimitleri = { ...canli.saglayiciLimitleri, [id]: { ...canli.saglayiciLimitleri[id], ...l, guncelleme: new Date().toISOString() } }
+    yayinci(structuredClone(canli)) // (bu kapsamda 'yayinla' parametre adı)
+  })
+}
+
+/** Sağ üstte gösterilecek araçlar (şirketteki ajanların kullandıkları). */
+export function aktifSaglayicilarAyarla(f: () => SaglayiciId[]): void {
+  aktifSaglayicilarOku = f
+  aktifSonOkuma = 0
+  yayinla()
+}
+
+function kullanimYaz(saglayici: SaglayiciId, token?: number): void {
+  depo.kullanimEkle(saglayici, token ?? 0)
+  canli.kullanim = depo.bugunKullanim()
 }
 
 /** Claude Code'un rate_limit_event bilgisinden oturum (5 saat) ve haftalık kullanım. */
@@ -73,6 +96,15 @@ export async function planLimitleriYenile(): Promise<PlanLimitleri | null> {
 
 export const canliDurum = (): CanliDurum => canli
 
+/** Şirket değişince önceki şirketin canlı durumu temizlenir. */
+export function sirketDegisti(): void {
+  aktifSonOkuma = 0
+  canli.ajanlar = {}
+  canli.misafirler = {}
+  canli.aktifSohbetler = {}
+  yayinla()
+}
+
 export function misafirleriGuncelle(m: Record<string, MisafirAjan[]>): void {
   if (JSON.stringify(m) === JSON.stringify(canli.misafirler)) return
   canli.misafirler = m
@@ -101,6 +133,11 @@ function yayinla(): void {
   yayinBekliyor = true
   setTimeout(() => {
     yayinBekliyor = false
+    // araç listesi tüm katların ekiplerini okur; en çok 15 saniyede bir yenilenir
+    if (Date.now() - aktifSonOkuma > 15_000) {
+      aktifSonOkuma = Date.now()
+      try { canli.aktifSaglayicilar = aktifSaglayicilarOku() } catch { /* bir sonraki yayında */ }
+    }
     yayinci(structuredClone(canli))
   }, 80)
 }
@@ -143,6 +180,8 @@ interface AjanKosusu {
   butceUsd: number
   tur: 'plan' | 'gorev' | 'rapor' | 'hafiza'
   sinyal?: AbortSignal
+  /** Komut ekleri: araçlara bu klasörü okuma izni verilir. */
+  ekKlasorleri?: string[]
 }
 
 async function ajaniKostur(k: AjanKosusu): Promise<KosuSonucu> {
@@ -160,11 +199,13 @@ async function ajaniKostur(k: AjanKosusu): Promise<KosuSonucu> {
     ? await simKos(k.tur, k.istem, k.ajan, t, etkinlik, k.sinyal)
     : await kos({
         saglayici, ayar: ayarlar.saglayicilar?.[saglayici] ?? {}, anahtar: apiAnahtari(saglayici),
-        cwd: k.kat.yol, istem: k.istem, model: k.ajan.model, butceUsd: k.butceUsd, araclar: k.araclar,
+        cwd: k.kat.yol, istem: k.istem, model: k.ajan.model, butceUsd: k.butceUsd, araclar: k.araclar, ekKlasorleri: k.ekKlasorleri,
         yazma: k.yazma, sureMs: ayarlar.kosuSuresiDk * 60_000, claudeYolu: ayarlar.claudeYolu,
         apiAnahtari: apiAnahtari(), t, sinyal: k.sinyal, etkinlik, limitler: limitleriIsle
       })
   harcamaYaz(sonuc.maliyetUsd)
+  if (!ayarlar.simulasyon) kullanimYaz(saglayici, sonuc.token)
+  if (sonuc.hata) hataKaydet(`${saglayici}/${k.ajan.model || '-'} · ${k.tur}`, sonuc.hata)
   return sonuc
 }
 
@@ -221,6 +262,29 @@ export function odakAyristir(metin: string, ekip: Ajan[]): Map<string, string[]>
   return sonuc
 }
 
+const METIN_UZANTILARI = /\.(txt|md|markdown|json|csv|tsv|log|ya?ml|xml|html?|css|scss|js|jsx|ts|tsx|mjs|cjs|py|rb|go|rs|java|kt|swift|c|h|cpp|hpp|cs|php|sql|sh|ps1|bat|ini|toml|env\.example)$/i
+
+/** Sahibinin eklediği dosyalar: küçük metin dosyaları istemin içine, diğerleri yollarıyla. */
+function ekBlogu(kat: Kat, komut: Komut): string {
+  if (!komut.ekler?.length) return ''
+  const klasor = depo.ekKlasoru(kat.id, komut.id)
+  let toplam = 0
+  const parcalar = komut.ekler.map((ad) => {
+    const yol = join(klasor, ad)
+    if (METIN_UZANTILARI.test(ad) && !/\.env$/i.test(ad)) {
+      try {
+        const icerik = readFileSync(yol, 'utf-8')
+        if (icerik.length <= 20_000 && toplam + icerik.length <= 60_000) {
+          toplam += icerik.length
+          return `<file name="${ad}">\n${icerik}\n</file>`
+        }
+      } catch { /* okunamadı: yolu yeter */ }
+    }
+    return `- ${ad}: ${yol}  (open it with your file tools)`
+  })
+  return `## Files the owner attached to this command\nThey are part of the request; use them.\n${parcalar.join('\n')}`
+}
+
 function planIstemi(s: SirketProfili, kat: Kat, lider: Ajan, ekip: Ajan[], komut: Komut, bosOda: number): string {
   const ekipSatirlari = ekip.map((a) => `- id: ${a.id} · ${a.ad} · ${a.rol} — ${a.gorevTanimi.split(/(?<=\.)\s/)[0]}` +
     (a.odak?.length ? ` (focus: ${a.odak.join(', ')})` : '')).join('\n')
@@ -235,6 +299,7 @@ ${ekipSatirlari}
 <command>
 ${komut.metin}
 </command>
+${ekBlogu(kat, komut)}
 File changes: ${komut.yazmaIzni ? 'ALLOWED — the team may change files' : 'NOT allowed — the team only reviews, proposes and reports'}.
 
 ${kurallar(false, s)}
@@ -268,7 +333,7 @@ what is done, what is in progress, risks or problems you see, and what should co
 Trust the project memory; look only at a few files in your focus folders to confirm. Do not do new work.`
 }
 
-function gorevIstemi(s: SirketProfili, kat: Kat, ajan: Ajan, lider: Ajan, gorev: Gorev, yazma: boolean): string {
+function gorevIstemi(s: SirketProfili, kat: Kat, ajan: Ajan, lider: Ajan, gorev: Gorev, yazma: boolean, komut?: Komut): string {
   return `${kimlik(s, kat, ajan)}
 
 ${hafizaBlogu(kat.id)}
@@ -278,6 +343,7 @@ Title: ${gorev.baslik}
 <instructions>
 ${gorev.talimat}
 </instructions>
+${komut ? ekBlogu(kat, komut) : ''}
 
 ${kurallar(yazma, s)}
 
@@ -406,12 +472,12 @@ const hafizaSatirlari = (metin: string): string[] =>
 
 // --- komut akışı -------------------------------------------------------------
 
-export const komutVer = (katId: string, metin: string, yazmaIzni: boolean): Promise<Komut> => komutBaslat(katId, metin, yazmaIzni, false)
+export const komutVer = (katId: string, metin: string, yazmaIzni: boolean, ekler: KomutEki[] = []): Promise<Komut> => komutBaslat(katId, metin, yazmaIzni, false, ekler)
 
 /** Lider masa masa dolaşıp her ajandan durum raporu toplar, sonunda tek rapor sunar. */
 export const durumTuru = (katId: string): Promise<Komut> => komutBaslat(katId, depo.ceviri()('tourCommand'), false, true)
 
-async function komutBaslat(katId: string, metin: string, yazmaIzni: boolean, turZorla: boolean): Promise<Komut> {
+async function komutBaslat(katId: string, metin: string, yazmaIzni: boolean, turZorla: boolean, ekler: KomutEki[] = []): Promise<Komut> {
   const t = depo.ceviri()
   const kat = depo.katBul(katId)
   const ekip = depo.ajanlariOku(katId)
@@ -422,6 +488,7 @@ async function komutBaslat(katId: string, metin: string, yazmaIzni: boolean, tur
     id: randomUUID(), katId, metin: metin.trim(), yazmaIzni, durum: 'planlaniyor', tur: turZorla ? 'tur' : 'gorev',
     zaman: new Date().toISOString(), gorevler: [], maliyetUsd: 0
   }
+  if (ekler.length) komut.ekler = depo.ekleriKaydet(katId, komut.id, ekler)
   canli.aktifKomutlar = [...canli.aktifKomutlar, komut]
   depo.komutKaydet(komut)
   yayinla()
@@ -460,6 +527,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
       const bosOdalar = Array.from({ length: ODA_SAYISI }, (_, i) => i).filter((i) => !ekip.some((a) => a.oda === i))
       const plan = await ajaniKostur({
         kat, ajan: lider, istem: planIstemi(sirket, kat, lider, ekipUyeleri, komut, bosOdalar.length), araclar: ['Read', 'Glob', 'Grep'],
+        ekKlasorleri: komut.ekler?.length ? [depo.ekKlasoru(kat.id, komut.id)] : undefined,
         yazma: false, butceUsd: sirket.ayarlar.kosuButcesiUsd, tur: 'plan', sinyal
       })
       ekleMaliyet(plan.maliyetUsd)
@@ -570,7 +638,8 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
       ajanGuncelle(kat.id, ajan.id, { durum: 'calisiyor', hedef: 'masa' }, t('evStarted', { title: g.baslik }))
       gorevYama({ durum: 'calisiyor', baslangic: new Date().toISOString() })
       const sonuc = await ajaniKostur({
-        kat, ajan, istem: gorevIstemi(sirket, kat, ajan, lider, g, komut.yazmaIzni),
+        kat, ajan, istem: gorevIstemi(sirket, kat, ajan, lider, g, komut.yazmaIzni, komut),
+        ekKlasorleri: komut.ekler?.length ? [depo.ekKlasoru(kat.id, komut.id)] : undefined,
         araclar: okumaAraclari(ajan, komut.yazmaIzni), yazma: komut.yazmaIzni,
         butceUsd: sirket.ayarlar.kosuButcesiUsd, tur: 'gorev', sinyal
       })
@@ -660,6 +729,7 @@ export async function sohbetDevam(id: string, hedef: SohbetHedefi, mesaj: string
       metinParcasi: (m) => ekle('claude', m)
     })
     harcamaYaz(sonuc.maliyetUsd)
+    kullanimYaz('claude', sonuc.token)
     if (sonuc.hata) ekle('hata', sonuc.hata)
   } finally {
     sohbetIptalleri.delete(id)
@@ -667,6 +737,45 @@ export async function sohbetDevam(id: string, hedef: SohbetHedefi, mesaj: string
     canli.sohbetKosulari = { ...canli.sohbetKosulari, [id]: { ...k, calisiyor: false } }
     aktifSohbetleriGuncelle(Object.fromEntries(Object.entries(canli.aktifSohbetler).map(([k2, l]) => [k2, l.filter((s) => !s.atriumdan)])))
     yayinla()
+  }
+}
+
+/** Katın klasöründe yeni bir Claude Code sohbeti: kullanıcının kendi sohbeti gibi kaydedilir ve listede görünür. */
+export async function yeniSohbet(katId: string, mesaj: string, yazma: boolean): Promise<void> {
+  const t = depo.ceviri()
+  const anahtar = `yeni-${katId}`
+  if (canli.sohbetKosulari[anahtar]?.calisiyor) throw new Error(t('errChatBusy'))
+  const kat = depo.katBul(katId)
+  const { ayarlar } = depo.profilOku()
+  const butce = Math.max(0.5, ayarlar.sohbetButcesiUsd ?? 5)
+  if (depo.bugunHarcanan() + butce > ayarlar.gunlukTavanUsd + 1e-9) {
+    throw new Error(t('errDailyCap', { spent: depo.bugunHarcanan().toFixed(2), run: butce, cap: ayarlar.gunlukTavanUsd }))
+  }
+  canli.sohbetKosulari = { ...canli.sohbetKosulari, [anahtar]: { id: anahtar, katId, calisiyor: true, satirlar: [{ rol: 'sen', metin: mesaj }] } }
+  yayinla()
+  const guncelle = (yama: Partial<SohbetKosusu>, satir?: { rol: 'claude' | 'arac' | 'hata'; metin: string }): void => {
+    const k = canli.sohbetKosulari[anahtar]
+    canli.sohbetKosulari = { ...canli.sohbetKosulari, [anahtar]: { ...k, ...yama, satirlar: satir ? [...k.satirlar, satir].slice(-200) : k.satirlar } }
+    yayinla()
+  }
+  const iptal = new AbortController()
+  sohbetIptalleri.set(anahtar, iptal)
+  try {
+    const sonuc = await claudeKos({
+      cwd: kat.yol, istem: mesaj, model: 'sonnet', butceUsd: butce,
+      araclar: ['Read', 'Glob', 'Grep', 'TodoWrite', 'WebSearch', 'WebFetch', ...(yazma ? ['Edit', 'Write', 'MultiEdit'] : [])],
+      yazma, sureMs: ayarlar.kosuSuresiDk * 60_000, claudeYolu: ayarlar.claudeYolu, apiAnahtari: apiAnahtari(), t,
+      sinyal: iptal.signal, yeniOturum: true, limitler: limitleriIsle,
+      oturum: (id) => guncelle({ oturum: id }),
+      etkinlik: (s) => { if (!s.startsWith('💬')) guncelle({}, { rol: 'arac', metin: s }) },
+      metinParcasi: (m) => guncelle({}, { rol: 'claude', metin: m })
+    })
+    harcamaYaz(sonuc.maliyetUsd)
+    kullanimYaz('claude', sonuc.token)
+    if (sonuc.hata) { guncelle({}, { rol: 'hata', metin: sonuc.hata }); hataKaydet('claude · new chat', sonuc.hata) }
+  } finally {
+    sohbetIptalleri.delete(anahtar)
+    guncelle({ calisiyor: false })
   }
 }
 

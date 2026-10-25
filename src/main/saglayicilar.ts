@@ -8,8 +8,27 @@ import type { Cevirmen } from '@ortak/i18n'
 import { SAGLAYICILAR, type SaglayiciAyari, type SaglayiciDurumu, type SaglayiciId } from '@ortak/tipler'
 import { aracSatiri, claudeKos, kisalt, temizOrtam, type KosuSecenegi, type KosuSonucu } from './claude'
 import { aracCalistir, araclar, claudeAdi } from './dosyaAraclari'
+import { yonetilenAdaylar } from './yollar'
 
 export const OLLAMA_ADRESI = 'http://127.0.0.1:11434'
+
+type Pencere = { yuzde: number; sifirlanma: number }
+/** Codex'in bildirdiği kullanım limitleri (birincil ~5 saat, ikincil ~haftalık). */
+let limitBildir: (id: SaglayiciId, l: { oturum?: Pencere; haftalik?: Pencere }) => void = () => {}
+export const limitBildiriciAyarla = (f: typeof limitBildir): void => { limitBildir = f }
+
+function codexLimitleri(o: Record<string, any>): void {
+  const rl = o.rate_limits ?? o.msg?.rate_limits ?? o.info?.rate_limits
+  if (!rl || typeof rl !== 'object') return
+  const cevir = (p: Record<string, any> | undefined): Pencere | undefined => {
+    if (!p || typeof p.used_percent !== 'number') return undefined
+    const sifir = typeof p.resets_at === 'number' ? p.resets_at
+      : typeof p.resets_in_seconds === 'number' ? Math.round(Date.now() / 1000 + p.resets_in_seconds) : 0
+    return { yuzde: Math.round(p.used_percent), sifirlanma: sifir }
+  }
+  const l = { oturum: cevir(rl.primary), haftalik: cevir(rl.secondary) }
+  if (l.oturum || l.haftalik) limitBildir('codex', l)
+}
 
 export interface GenelKosu extends KosuSecenegi {
   saglayici: SaglayiciId
@@ -47,7 +66,7 @@ export function cliBul(adi: 'codex' | 'gemini' | 'ollama', ayar?: string): { kom
     : [join(ev, '.local', 'bin', adi), '/opt/homebrew/bin/' + adi, '/usr/local/bin/' + adi, '/usr/bin/' + adi,
        join(ev, '.npm-global', 'bin', adi), join(ev, '.bun', 'bin', adi),
        ...(adi === 'ollama' ? ['/Applications/Ollama.app/Contents/Resources/ollama', yonetilenOllama] : [])]
-  const bulunan = adaylar.find((a) => a && existsSync(a))
+  const bulunan = [...adaylar, ...(adi === 'ollama' ? [] : yonetilenAdaylar(adi))].find((a) => a && existsSync(a))
   if (bulunan) return { komut: bulunan, kabuk: /\.(cmd|bat)$/i.test(bulunan) }
   return { komut: adi, kabuk: process.platform === 'win32' }
 }
@@ -171,11 +190,14 @@ async function codexKos(s: GenelKosu): Promise<KosuSonucu> {
   const sonDosya = join(tmpdir(), `atrium-codex-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.txt`)
   let metin = ''
   let hata: string | undefined
+  let token = 0
   const args = ['exec', '--json', '--skip-git-repo-check', '--sandbox', s.yazma ? 'workspace-write' : 'read-only',
     ...(s.model ? ['-m', s.model] : []), '-o', sonDosya, '-']
   const r = await cliKostur(s, komut, kabuk, args, temizOrtam(), (satir) => {
     let o: Record<string, any>
     try { o = JSON.parse(satir) } catch { return }
+    codexLimitleri(o)
+    if (o.type === 'turn.completed' && o.usage) token += Number(o.usage.input_tokens ?? 0) + Number(o.usage.output_tokens ?? 0)
     const oge = o.item
     if (oge && (o.type === 'item.started' || o.type === 'item.completed')) {
       if (oge.type === 'command_execution' && o.type === 'item.started') s.etkinlik?.(s.t('toolBash'))
@@ -203,7 +225,7 @@ async function codexKos(s: GenelKosu): Promise<KosuSonucu> {
   if (r.hataBaslangic) return { metin: '', maliyetUsd: 0, maliyetTahmini: false, hata: cliHatasi('codex', r.hataBaslangic, s.t) }
   if (r.zamanAsimi) return { metin, maliyetUsd: 0, maliyetTahmini: false, hata: r.zamanAsimi }
   if (hata || (!metin && r.kod !== 0)) return { metin: '', maliyetUsd: 0, maliyetTahmini: false, hata: cliHatasi('codex', hata || r.stderr || `codex exit ${r.kod}`, s.t) }
-  return { metin, maliyetUsd: 0, maliyetTahmini: false }
+  return { metin, maliyetUsd: 0, maliyetTahmini: false, token }
 }
 
 // --- Gemini CLI --------------------------------------------------------------------------
@@ -219,8 +241,10 @@ async function geminiKos(s: GenelKosu): Promise<KosuSonucu> {
   let metin = ''
   let hata: string | undefined
   let olayVar = false
+  let token = 0
   // salt okumada onay isteyen araçlar (kabuk, yazma) başsız modda hiç çalışmaz; yazma izninde yalnız düzenlemeler onaylanır
-  const args = ['--output-format', 'stream-json', '--approval-mode', s.yazma ? 'auto_edit' : 'default', ...(s.model ? ['-m', s.model] : [])]
+  const args = ['--output-format', 'stream-json', '--approval-mode', s.yazma ? 'auto_edit' : 'default', ...(s.model ? ['-m', s.model] : []),
+    ...(s.ekKlasorleri?.length ? ['--include-directories', s.ekKlasorleri.join(',')] : [])]
   const r = await cliKostur(s, komut, kabuk, args, ortam, (satir) => {
     let o: Record<string, any>
     try { o = JSON.parse(satir) } catch { return }
@@ -232,6 +256,9 @@ async function geminiKos(s: GenelKosu): Promise<KosuSonucu> {
       s.etkinlik?.(aracSatiri(GEMINI_ARACLARI[o.tool_name] ?? String(o.tool_name), o.parameters ?? {}, s.t))
     } else if (o.type === 'error') {
       hata = String(o.message ?? o.error?.message ?? 'error')
+    } else if (o.type === 'result' && o.stats) {
+      token = Number(o.stats.total_tokens ?? 0) || Number(o.stats.input_tokens ?? 0) + Number(o.stats.output_tokens ?? 0)
+      if (o.status === 'error') hata = String(o.error?.message ?? hata ?? 'error')
     } else if (o.type === 'result' && o.status === 'error') {
       hata = String(o.error?.message ?? hata ?? 'error')
     }
@@ -242,13 +269,13 @@ async function geminiKos(s: GenelKosu): Promise<KosuSonucu> {
   if (!olayVar && r.kod === 0 && r.stdout.trim()) metin = r.stdout.trim()
   if (hata || (!metin && r.kod !== 0)) return { metin: '', maliyetUsd: 0, maliyetTahmini: false, hata: cliHatasi('gemini', hata || r.stderr || `gemini exit ${r.kod}`, s.t) }
   if (metin) s.etkinlik?.(`💬 ${kisalt(metin)}`)
-  return { metin, maliyetUsd: 0, maliyetTahmini: false }
+  return { metin, maliyetUsd: 0, maliyetTahmini: false, token }
 }
 
 // --- Ollama ve OpenAI uyumlu uç noktalar: Atrium'un kendi araç döngüsü --------------------------
 
 interface Cagri { id?: string; ad: string; girdi: Record<string, any> }
-interface Cevap { metin: string; cagrilar: Cagri[]; ham: Record<string, any> }
+interface Cevap { metin: string; cagrilar: Cagri[]; ham: Record<string, any>; token: number }
 
 const SISTEM = (yazma: boolean, araclarVar: boolean): string => [
   'You are an AI agent working inside a software project folder for the Atrium app.',
@@ -283,16 +310,20 @@ async function istekGonder(s: GenelKosu, mesajlar: Record<string, any>[], taniml
     if (typeof girdi === 'string') { try { girdi = JSON.parse(girdi) } catch { girdi = {} } }
     return { id: c.id, ad: String(c.function?.name ?? ''), girdi }
   })
-  return { metin: String(mesaj.content ?? ''), cagrilar, ham: mesaj }
+  const token = ollama ? Number(veri.prompt_eval_count ?? 0) + Number(veri.eval_count ?? 0) : Number(veri.usage?.total_tokens ?? 0)
+  return { metin: String(mesaj.content ?? ''), cagrilar, ham: mesaj, token }
 }
 
 async function uyumluKos(s: GenelKosu): Promise<KosuSonucu> {
   const ollama = s.saglayici === 'ollama'
+  // model seçilmemiş yerel ajan: kurulu ilk modelle çalışır
+  if (ollama && !s.model) s = { ...s, model: (await ollamaModelleri(s.ayar))?.[0]?.ad ?? '' }
   if (!s.model) return { metin: '', maliyetUsd: 0, maliyetTahmini: false, hata: s.t('errNoModel', { name: ad(s.saglayici) }) }
   if (!ollama && !s.ayar.url) return { metin: '', maliyetUsd: 0, maliyetTahmini: false, hata: s.t('errProviderMissing', { name: ad(s.saglayici) }) }
   const sinyal = AbortSignal.any([AbortSignal.timeout(s.sureMs), ...(s.sinyal ? [s.sinyal] : [])])
   let tanimlar: unknown[] | null = s.araclar.length ? araclar(s.yazma) : null
   const mesajlar: Record<string, any>[] = [{ role: 'system', content: SISTEM(s.yazma, !!tanimlar) }, { role: 'user', content: s.istem }]
+  let token = 0
   try {
     for (let adim = 0; adim < 40; adim++) {
       let cevap: Cevap
@@ -308,16 +339,17 @@ async function uyumluKos(s: GenelKosu): Promise<KosuSonucu> {
         }
         throw e
       }
+      token += cevap.token
       if (!cevap.cagrilar.length) {
         const metin = dusunceyiAt(cevap.metin)
         if (metin) { s.etkinlik?.(`💬 ${kisalt(metin)}`); s.metinParcasi?.(metin) }
-        return { metin, maliyetUsd: 0, maliyetTahmini: false }
+        return { metin, maliyetUsd: 0, maliyetTahmini: false, token }
       }
       mesajlar.push(ollama ? cevap.ham : { role: 'assistant', content: cevap.metin || null, tool_calls: cevap.ham.tool_calls })
       for (const c of cevap.cagrilar) {
         const etiket = claudeAdi(c.ad, c.girdi)
         s.etkinlik?.(aracSatiri(etiket.ad, etiket.girdi, s.t))
-        const sonuc = aracCalistir(s.cwd, c.ad, c.girdi, s.yazma)
+        const sonuc = aracCalistir(s.cwd, c.ad, c.girdi, s.yazma, s.ekKlasorleri)
         mesajlar.push(ollama ? { role: 'tool', content: sonuc, tool_name: c.ad } : { role: 'tool', tool_call_id: c.id, content: sonuc })
       }
     }

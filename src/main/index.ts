@@ -6,7 +6,11 @@ import { claudeDurumuOku, claudeGirisBaslat, terminaldeCalistir } from './claude
 import { donanimOku } from './donanim'
 import { cliBul, saglayiciDurumu, uyumluModeller } from './saglayicilar'
 import * as yerel from './yerel'
+import { baglanIlerlemeAyarla, tekTiklaBagla } from './baglan'
+import { cliKokuAyarla } from './yollar'
 import * as erisim from './erisim'
+import * as hesap from './hesap'
+import { hataKaydet, hataYollariniAyarla } from './hatalar'
 import * as depo from './depo'
 import * as guncelleme from './guncelleme'
 import * as motor from './motor'
@@ -32,6 +36,13 @@ function apiAnahtariOku(id: SaglayiciId = 'claude'): string | undefined {
 
 async function claudeDurumu(): Promise<ClaudeDurumu> {
   return claudeDurumuOku(depo.profilOku().ayarlar.claudeYolu, !!apiAnahtariOku())
+}
+
+/** Şirkette en az bir ajanın kullandığı araçlar + varsayılan araç. */
+function kullanilanSaglayicilar(): SaglayiciId[] {
+  const kume = new Set<SaglayiciId>([depo.profilOku().ayarlar.varsayilanSaglayici ?? 'claude'])
+  for (const k of depo.katlariTara()) for (const a of depo.ajanlariOku(k.id)) kume.add(a.saglayici ?? 'claude')
+  return [...kume]
 }
 
 async function saglayiciDurumlari(): Promise<SaglayiciDurumu[]> {
@@ -112,7 +123,8 @@ function kanallar(): void {
     depo.ajanlariYaz(katId, depo.ajanlariOku(katId).filter((a) => a.id !== ajanId || a.lider)))
   ipcMain.handle('hafizaKaydet', (_e, katId: string, metin: string) => depo.hafizaYaz(katId, metin))
   ipcMain.handle('hafizaCikar', (_e, katId: string) => { void motor.hafizaCikar(katId) })
-  ipcMain.handle('komutVer', (_e, katId: string, metin: string, yazmaIzni: boolean) => motor.komutVer(katId, metin, yazmaIzni))
+  ipcMain.handle('komutVer', (_e, katId: string, metin: string, yazmaIzni: boolean, ekler?: { ad: string; veri: Uint8Array }[]) =>
+    motor.komutVer(katId, metin, yazmaIzni, Array.isArray(ekler) ? ekler.filter((e) => e?.veri instanceof Uint8Array) : []))
   ipcMain.handle('komutIptal', (_e, komutId: string) => motor.komutIptal(komutId))
   ipcMain.handle('tumRaporlar', () => depo.tumKomutlar())
   ipcMain.handle('canli', () => motor.canliDurum())
@@ -170,6 +182,10 @@ function kanallar(): void {
     else if (id === 'gemini') terminaldeCalistir(cliBul('gemini', ayar?.yol).komut, [], 'Gemini login')
     else if (id === 'ollama') return yerel.ollamaBaslat(ayar)
   })
+  ipcMain.handle('tekTiklaBagla', (_e, id: SaglayiciId) => {
+    const p = depo.profilOku().ayarlar
+    void tekTiklaBagla(id, { yol: id === 'claude' ? p.claudeYolu : p.saglayicilar?.[id]?.yol })
+  })
   ipcMain.handle('saglayiciAnahtari', (_e, id: SaglayiciId, anahtar: string | null) => {
     if (!SAGLAYICI_IDLERI.includes(id)) return saglayiciDurumlari()
     const temiz = String(anahtar ?? '').trim()
@@ -178,6 +194,27 @@ function kanallar(): void {
     return saglayiciDurumlari()
   })
   const ollamaAyari = (): SaglayiciAyari | undefined => depo.profilOku().ayarlar.saglayicilar?.ollama
+  ipcMain.handle('sirketler', () => depo.sirketler())
+  ipcMain.handle('projeOlustur', (_e, kok: string, ad: string) => depo.projeOlustur(String(kok ?? ''), String(ad ?? '')))
+  ipcMain.handle('yeniSohbet', (_e, katId: string, mesaj: string, yazma: boolean) => { void motor.yeniSohbet(String(katId), String(mesaj ?? '').slice(0, 20000), !!yazma) })
+  // çalışan komut varken şirket değiştirilmez (ajanlar başka şirketin klasöründe çalışıyor olur)
+  const mesgulMu = (): void => { if (motor.canliDurum().aktifKomutlar.length) throw new Error(depo.ceviri()('companyBusy')) }
+  ipcMain.handle('sirketEkle', () => { mesgulMu(); depo.sirketEkle(); motor.sirketDegisti() })
+  ipcMain.handle('sirketSec', (_e, id: string) => { mesgulMu(); depo.sirketSec(String(id)); motor.sirketDegisti() })
+  ipcMain.handle('sirketSil', (_e, id: string) => depo.sirketSil(String(id)))
+  ipcMain.handle('ekibiGecir', (_e, saglayici: SaglayiciId, model: string) => depo.ekibiGecir(saglayici, String(model ?? '')))
+  ipcMain.handle('hesapDurumu', () => hesap.hesapDurumu())
+  ipcMain.handle('hesapDenetle', () => hesap.hesapDenetle())
+  ipcMain.handle('hesapKayit', (_e, eposta: string, ad: string, sifre: string) => hesap.kayit(String(eposta ?? ''), String(ad ?? ''), String(sifre ?? '')))
+  ipcMain.handle('hesapGiris', (_e, eposta: string, sifre: string) => hesap.giris(String(eposta ?? ''), String(sifre ?? '')))
+  ipcMain.handle('hesapGoogle', () => hesap.googleGiris())
+  ipcMain.handle('hesapCikis', () => hesap.cikis())
+  ipcMain.handle('hesapSil', (_e, onay: string) => hesap.hesabiSil(String(onay ?? '')))
+  ipcMain.handle('destekListe', () => hesap.destekListe())
+  ipcMain.handle('destekGonder', (_e, tur, konu: string, metin: string, tanilama: boolean) => hesap.destekGonder(tur, String(konu ?? ''), String(metin ?? ''), !!tanilama))
+  ipcMain.handle('destekYanit', (_e, id: number, metin: string) => hesap.destekYanit(Number(id), String(metin ?? '')))
+  ipcMain.handle('destekOkundu', (_e, id: number) => hesap.destekOkundu(Number(id)))
+  ipcMain.handle('tanilama', () => hesap.tanilama())
   ipcMain.handle('erisimDurumu', () => erisim.erisimDurumu())
   ipcMain.handle('erisimDenetle', () => erisim.erisimDenetle())
   ipcMain.handle('lisansEtkinlestir', (_e, anahtar: string) => erisim.lisansEtkinlestir(String(anahtar ?? '')))
@@ -193,11 +230,11 @@ function kanallar(): void {
 
 /** Claude Code sohbetlerinde açılan alt ajanları 3 saniyede bir tarar. */
 function misafirTaramasi(): void {
-  let katOnbellek = { zaman: 0, katlar: depo.katlariTara() }
+  let katOnbellek = { zaman: 0, katlar: depo.katlariTara(), sirket: depo.sirketKlasoru() }
   setInterval(() => {
     const p = depo.profilOku()
     if (!p.kurulumTamam) return
-    if (Date.now() - katOnbellek.zaman > 60_000) katOnbellek = { zaman: Date.now(), katlar: depo.katlariTara() }
+    if (Date.now() - katOnbellek.zaman > 60_000 || katOnbellek.sirket !== depo.sirketKlasoru()) katOnbellek = { zaman: Date.now(), katlar: depo.katlariTara(), sirket: depo.sirketKlasoru() }
     void oturumlar.acikOturumlar().then((acik) => {
       try {
         motor.misafirleriGuncelle(sohbet.misafirleriTara(p.sohbetKlasoru, katOnbellek.katlar, depo.ceviri()))
@@ -214,6 +251,13 @@ app.whenReady().then(() => {
   erisim.erisimBaslat(depo.veriKlasoru(), () => depo.profilOku().dil, (d) => pencere?.webContents.send('erisim', d))
   motor.motorBaslat((d) => pencere?.webContents.send('canli', d), apiAnahtariOku, sohbetBaglami)
   yerel.yerelBaslat(depo.veriKlasoru(), (d) => pencere?.webContents.send('indirme', d))
+  cliKokuAyarla(join(depo.veriKlasoru(), 'cli'))
+  baglanIlerlemeAyarla(yerel.ilerlemeBildir)
+  // hata raporlarında kişisel yollar görünmesin
+  hataYollariniAyarla(() => { const p = depo.profilOku(); return [p.projeKlasoru, ...p.ekProjeler, p.sohbetKlasoru] })
+  process.on('uncaughtException', (e) => hataKaydet('atrium', e?.stack?.split(/\r?\n/).slice(0, 3).join(' ') ?? String(e)))
+  motor.aktifSaglayicilarAyarla(kullanilanSaglayicilar)
+  hesap.hesapBaslat(depo.veriKlasoru(), () => depo.profilOku().dil, kullanilanSaglayicilar, (d) => pencere?.webContents.send('hesap', d))
   kanallar()
   pencereAc()
   misafirTaramasi()

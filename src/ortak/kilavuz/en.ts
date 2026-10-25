@@ -83,6 +83,36 @@ The **Reports** page collects every command from every floor with the lead's rep
 - **Cap** is Atrium's own **daily safety limit**. Agents never start work that could go past it. If a run times out or is cancelled and its cost can't be read, the full per-agent cap is counted, so the daily cap is never under-counted.
 - Change both caps in **Profile & Settings → Limits and safety**.
 
+## Multiple companies
+Run more than one company in Atrium — for example your own studio and a client. Each company has its **own projects, team, memory, reports and default AI tool**.
+- Open the **▾** menu next to your company name in the top-left corner to switch companies or add a **New company**. A new company starts with the setup wizard; if you change your mind, use **Back to …** in the wizard.
+- **Profile & Settings → My companies** lists them all; you can open or remove a company there. Removing deletes only Atrium's data (team, memory, reports) — never your project folders.
+- In **Profile & Settings → AI tools**, **Move the whole team to the default tool** switches every agent of the current company at once.
+
+## New projects and new chats
+- No projects yet? In the setup wizard (or with **＋** next to *Floors*), type a name and click **New project** — Atrium creates the folder with a short README. Without a chosen folder it goes into *Atrium Projects* in your home folder.
+- Inside a floor, the **Chats** tab has **＋ New chat**: it starts a real Claude Code chat in that project folder. It is saved, appears in your chat list and can be continued later — in Atrium or in Claude Code.
+
+## Attaching files to a command
+Click **📎 Attach** under the command box, or drop files onto it — images, PDFs and text files, up to 10 files of 10 MB each. Small text files are given to the agents directly; images and PDFs are opened by the agents with their file tools. Attachments are stored in Atrium's own data folder, never in your project.
+
+## Connecting AI tools in one click
+- **Connect with ChatGPT** (Codex), **Connect with Google** (Gemini) and **Connect Claude**: if the tool is missing, Atrium installs it in its own folder (no admin rights; Node.js is required), then opens the tool's sign-in page in your browser. When you finish signing in, the status turns **Ready** by itself.
+- The setup wizard's **AI** step offers all tools — connect one or several.
+- The top bar shows **one usage card per AI tool in use**: Claude's session and weekly limits (or today's dollars with an API key), Codex limits when it reports them, today's runs and tokens for the others, and *local · free* for Ollama.
+
+## Support & your account
+The **🛟 Support** page lets you send us a **wish**, a **request**, a **complaint** or a **bug report**, and read our answers right there (a badge shows new answers).
+- To send messages you need a free, optional account: email + password, or **Continue with Google**.
+- Next to a failed command you'll find **🐞 Report**; it opens a bug report with the error message. Tick **Add diagnostic info** only if you want to — you see exactly what is added (app version, system, recent errors with personal paths and keys removed).
+- You can sign out or **delete your account** at any time; your account and all your messages are deleted permanently.
+
+## Privacy
+- Your projects, code, files, chats, project memory, prompts, agent results and API keys **never leave your computer**. We cannot see or read them — they never reach us.
+- AI requests go straight from your computer to the AI tool you chose (or stay on your computer with local models). There is no Atrium server in between.
+- Atrium itself only contacts the internet to check for updates and release notes, and — only if you use them — for your account and the messages you send.
+- With an account we store only your email, name and app version; your password is kept only as a one-way hash.
+
 ## Safety
 - Agents cannot read \`.env\`, key or password files, cannot run shell commands and cannot start their own sub-agents.
 - Agents never commit, push, install packages, message anyone or publish anything.

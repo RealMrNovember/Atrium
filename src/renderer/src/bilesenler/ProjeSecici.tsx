@@ -2,6 +2,7 @@
 import { useEffect, useState, type ReactElement } from 'react'
 import type { SirketProfili } from '@ortak/tipler'
 import { useDil } from '../dil'
+import { hataMetni } from '../yardimci'
 
 const ad = (yol: string): string => yol.split(/[\\/]/).filter(Boolean).pop() ?? yol
 
@@ -11,19 +12,41 @@ export function seciliProjeler(p: SirketProfili, klasordekiler: string[]): strin
   return [...klasordekiler.filter((k) => !haric.has(k)), ...p.ekProjeler.map(ad)].sort((a, b) => a.localeCompare(b))
 }
 
-export function useKlasordekiler(klasor: string): string[] {
+/** Yeni proje açılınca klasörü okuyan her bileşen tazelensin. */
+export const projelerDegisti = (): void => { window.dispatchEvent(new Event('atrium-projeler')) }
+
+export function useKlasordekiler(klasor: string, tazele = 0): string[] {
   const [adlar, setAdlar] = useState<string[]>([])
+  const [olay, setOlay] = useState(0)
+  useEffect(() => {
+    const dinle = (): void => setOlay((n) => n + 1)
+    window.addEventListener('atrium-projeler', dinle)
+    return () => window.removeEventListener('atrium-projeler', dinle)
+  }, [])
   useEffect(() => {
     if (klasor) void window.sirket.katOnizle(klasor).then(setAdlar)
     else setAdlar([])
-  }, [klasor])
+  }, [klasor, tazele, olay])
   return adlar
 }
 
 export function ProjeSecici({ p, setP }: { p: SirketProfili; setP: (p: SirketProfili) => void }): ReactElement {
   const { t } = useDil()
-  const klasordekiler = useKlasordekiler(p.projeKlasoru)
+  const [tazele, setTazele] = useState(0)
+  const klasordekiler = useKlasordekiler(p.projeKlasoru, tazele)
   const haric = new Set(p.haricTutulan)
+  const [yeniAd, setYeniAd] = useState('')
+  const [hata, setHata] = useState('')
+  const projeOlustur = async (): Promise<void> => {
+    setHata('')
+    try {
+      const { kok } = await window.sirket.projeOlustur(p.projeKlasoru, yeniAd)
+      if (kok !== p.projeKlasoru) setP({ ...p, projeKlasoru: kok, haricTutulan: [] })
+      setYeniAd('')
+      setTazele((n) => n + 1)
+      projelerDegisti()
+    } catch (e) { setHata(hataMetni(e)) }
+  }
 
   const kokSec = async (): Promise<void> => {
     const klasor = await window.sirket.klasorSec(p.projeKlasoru)
@@ -65,6 +88,14 @@ export function ProjeSecici({ p, setP }: { p: SirketProfili; setP: (p: SirketPro
           </span>
         ))}
       </div>
+      {p.projeKlasoru && !klasordekiler.length && !p.ekProjeler.length && <p className="kucuk uyari-metin">{t('folderEmpty')}</p>}
+      <div className="yeni-proje">
+        <input value={yeniAd} placeholder={t('newProjectName')} maxLength={80} onChange={(e) => setYeniAd(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && yeniAd.trim()) { e.preventDefault(); void projeOlustur() } }} />
+        <button type="button" className="birincil" disabled={!yeniAd.trim()} onClick={() => void projeOlustur()}>＋ {t('newProject')}</button>
+      </div>
+      {!p.projeKlasoru && <p className="kucuk">{t('newProjectDefault')}</p>}
+      {hata && <p className="hata-metni">{hata}</p>}
       <button type="button" className="ikincil" onClick={() => void projeEkle()}>{t('addProject')}</button>
     </div>
   )

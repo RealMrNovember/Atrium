@@ -2,7 +2,8 @@
 import { useState, type ReactElement } from 'react'
 import { SAGLAYICILAR, type SaglayiciAyari, type SaglayiciDurumu, type SaglayiciId, type SirketProfili } from '@ortak/tipler'
 import { useDil } from '../dil'
-import { useSaglayicilar } from './SaglayiciSecici'
+import { useSaglayicilar, varsayilanModel } from './SaglayiciSecici'
+import { TekTiklaDugmesi } from './TekTikla'
 
 const KURULUM: Partial<Record<SaglayiciId, { komut: string; adres: string }>> = {
   codex: { komut: 'npm i -g @openai/codex', adres: 'https://github.com/openai/codex' },
@@ -56,12 +57,13 @@ export function AracAyarlari({ p, setP, onYerelYz }: {
               {d?.yontem && <span className="kucuk">· {d.yontem}</span>}
               {d?.modeller && <span className="kucuk">· {t('aiModels', { n: d.modeller.length })}</span>}
               <span />
-              {(s.id === 'codex' || s.id === 'gemini') && d?.kurulu && !d.hazir &&
-                <button className="ikincil mini-buyuk" onClick={() => void window.sirket.saglayiciGiris(s.id)}>{t('aiLogin')}</button>}
+              {(s.id === 'codex' || s.id === 'gemini') && d && !d.hazir && <TekTiklaDugmesi id={s.id} onBitti={yenile} />}
               {s.id === 'ollama' && onYerelYz && <button className="ikincil mini-buyuk" onClick={onYerelYz}>🦙 {t('aiOpenLocal')}</button>}
+              {s.id === 'ollama' && d && !d.kurulu && <button className="birincil mini-buyuk" onClick={() => { void window.sirket.ollamaKur(); onYerelYz?.() }}>⚡ {t('engInstall')}</button>}
+              {s.id === 'ollama' && d?.kurulu && !d.hazir && <button className="ikincil mini-buyuk" onClick={() => void window.sirket.ollamaBaslat().then(yenile)}>▶ {t('aiStart')}</button>}
             </div>
             {kurulum && d && !d.kurulu && (
-              <p className="kucuk">{t('aiInstallCmd', { cmd: kurulum.komut })} · <a href="#" onClick={(e) => { e.preventDefault(); void window.sirket.disBaglanti(kurulum.adres) }}>GitHub ↗</a></p>
+              <p className="kucuk">{t('connectExplain')} <a href="#" onClick={(e) => { e.preventDefault(); void window.sirket.disBaglanti(kurulum.adres) }}>GitHub ↗</a></p>
             )}
             {s.id === 'gemini' && d?.kurulu && anahtarAlani('gemini', d)}
             {s.id === 'ollama' && (
@@ -89,6 +91,15 @@ export function AracAyarlari({ p, setP, onYerelYz }: {
       })}
       <div className="form-dugmeler">
         <button className="ikincil" onClick={yenile}>↻ {t('aiRefresh')}</button>
+        <span />
+        {p.kurulumTamam && (
+          <button className="ikincil" title={t('aiMoveTeamHint')} onClick={() => {
+            const id = p.ayarlar.varsayilanSaglayici ?? 'claude'
+            const model = varsayilanModel(id, durumlar?.find((d) => d.id === id))
+            if (id !== 'claude' && (id === 'ollama' || id === 'openai') && !model) { alert(t('noLocalModels')); return }
+            if (confirm(t('aiMoveTeamConfirm'))) void window.sirket.ekibiGecir(id, model).then((n) => alert(t('aiMovedTeam', { n })))
+          }}>⇄ {t('aiMoveTeam')}</button>
+        )}
       </div>
       <ul className="guvence"><li>{t('aiNoCost')}</li><li>{t('aiSecretNote')}</li></ul>
     </div>

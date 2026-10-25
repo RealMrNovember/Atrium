@@ -37,7 +37,13 @@ export function araclar(yazma: boolean): AracTanimi[] {
 }
 
 /** Göreli yolu proje içinde çözer; dışarı çıkan ya da gizli dosyaya giden yolu reddeder. */
-function guvenliYol(kok: string, yol: string): string {
+function guvenliYol(kok: string, yol: string, ekKokler: string[] = []): string {
+  // komut ekleri: mutlak yolla yalnız okunabilir
+  for (const ek of ekKokler) {
+    const ekGercek = existsSync(ek) ? realpathSync(ek) : ek
+    const aday = resolve(String(yol || ''))
+    if (existsSync(aday) && !relative(ekGercek, realpathSync(aday)).startsWith('..')) return realpathSync(aday)
+  }
   const kokGercek = realpathSync(kok)
   const hedef = resolve(kokGercek, String(yol || '.'))
   const gercek = existsSync(hedef) ? realpathSync(hedef) : hedef
@@ -85,7 +91,7 @@ function ara(kok: string, klasor: string, aranan: string, sonuc: string[], sayac
 }
 
 /** Bir araç çağrısını çalıştırır; hata da modelin okuyacağı metin olarak döner. */
-export function aracCalistir(kok: string, ad: string, girdi: Record<string, any>, yazma: boolean): string {
+export function aracCalistir(kok: string, ad: string, girdi: Record<string, any>, yazma: boolean, ekKokler: string[] = []): string {
   try {
     switch (ad) {
       case 'list_files': {
@@ -95,7 +101,7 @@ export function aracCalistir(kok: string, ad: string, girdi: Record<string, any>
         return satirlar.join('\n') || '(empty)'
       }
       case 'read_file': {
-        const dosya = guvenliYol(kok, girdi.path)
+        const dosya = guvenliYol(kok, girdi.path, ekKokler)
         if (statSync(dosya).size > DOSYA_SINIRI * 4) return 'file is too large'
         const satirlar = readFileSync(dosya, 'utf-8').split('\n')
         const bas = Math.max(1, Number(girdi.start_line) || 1)

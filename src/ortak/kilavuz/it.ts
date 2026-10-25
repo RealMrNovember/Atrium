@@ -83,6 +83,36 @@ La pagina **Report** raccoglie ogni comando di ogni piano con il report del capo
 - **Massimale** è il **limite di sicurezza giornaliero** di Atrium. Gli agenti non avviano mai un lavoro che potrebbe superarlo. Se un'esecuzione va in timeout o viene annullata e il suo costo non può essere letto, viene conteggiato l'intero massimale per agente, così il massimale giornaliero non viene mai sottostimato.
 - Modifica entrambi i massimali in **Profilo e impostazioni → Limiti e sicurezza**.
 
+## Più aziende
+Gestisci più di un’azienda in Atrium — per esempio il tuo studio e un cliente. Ogni azienda ha **i suoi progetti, il suo team, la sua memoria, i suoi report e il suo strumento IA predefinito**.
+- Apri il menu **▾** accanto al nome della tua azienda in alto a sinistra per cambiare azienda o aggiungere una **Nuova azienda**. Una nuova azienda parte con la procedura guidata; se cambi idea, usa **Torna a …** nella procedura.
+- **Profilo e impostazioni → Le mie aziende** le elenca tutte; da lì puoi aprire o rimuovere un’azienda. La rimozione elimina solo i dati di Atrium (team, memoria, report) — mai le cartelle dei tuoi progetti.
+- In **Profilo e impostazioni → Strumenti IA**, **Passa tutto il team allo strumento predefinito** cambia in un colpo solo tutti gli agenti dell’azienda attuale.
+
+## Nuovi progetti e nuove chat
+- Non hai ancora progetti? Nella procedura guidata (o con **＋** accanto a *Piani*) scrivi un nome e clicca su **Nuovo progetto** — Atrium crea la cartella con un breve README. Se non hai scelto una cartella, finisce in *Atrium Projects* nella tua cartella utente.
+- Dentro un piano, la scheda **Chat** ha **＋ Nuova chat**: avvia una vera chat di Claude Code in quella cartella di progetto. Viene salvata, compare nel tuo elenco di chat e si può continuare più tardi — in Atrium o in Claude Code.
+
+## Allegare file a un comando
+Clicca su **📎 Allega** sotto il campo del comando, oppure trascinaci sopra i file — immagini, PDF e file di testo, fino a 10 file da 10 MB ciascuno. I piccoli file di testo vengono passati direttamente agli agenti; immagini e PDF vengono aperti dagli agenti con i loro strumenti per i file. Gli allegati sono salvati nella cartella dati di Atrium, mai nel tuo progetto.
+
+## Collegare gli strumenti IA con un clic
+- **Collegati con ChatGPT** (Codex), **Collegati con Google** (Gemini) e **Collega Claude**: se lo strumento manca, Atrium lo installa nella sua cartella (senza diritti di amministratore; serve Node.js), poi apre la pagina di accesso dello strumento nel browser. Quando hai finito di accedere, lo stato passa da solo a **Pronto**.
+- Il passaggio **IA** della procedura guidata propone tutti gli strumenti — collegane uno o più.
+- La barra in alto mostra **una scheda di utilizzo per ogni strumento IA in uso**: i limiti di sessione e settimanali di Claude (o i dollari di oggi con una chiave API), i limiti di Codex quando li comunica, le esecuzioni e i token di oggi per gli altri, e *locale · gratis* per Ollama.
+
+## Supporto e il tuo account
+La pagina **🛟 Supporto** ti permette di mandarci un **desiderio**, una **richiesta**, un **reclamo** o una **segnalazione di bug**, e di leggere lì le nostre risposte (un badge segnala le nuove risposte).
+- Per inviare messaggi ti serve un account gratuito e facoltativo: email + password, oppure **Continua con Google**.
+- Accanto a un comando non riuscito trovi **🐞 Segnala**; apre una segnalazione di bug con il messaggio di errore. Spunta **Aggiungi informazioni diagnostiche** solo se vuoi — vedi esattamente cosa viene aggiunto (versione dell’app, sistema, errori recenti, senza percorsi personali e chiavi).
+- Puoi uscire o **eliminare il tuo account** in qualsiasi momento; l’account e tutti i tuoi messaggi vengono eliminati definitivamente.
+
+## Privacy
+- I tuoi progetti, il codice, i file, le chat, la memoria del progetto, i prompt, i risultati degli agenti e le chiavi API **non lasciano mai il tuo computer**. Non possiamo vederli né leggerli — non ci arrivano mai.
+- Le richieste all’IA vanno direttamente dal tuo computer allo strumento IA che hai scelto (oppure restano sul tuo computer con i modelli locali). Non c’è nessun server Atrium nel mezzo.
+- Atrium si collega a Internet solo per controllare aggiornamenti e note di rilascio e — solo se li usi — per il tuo account e i messaggi che invii.
+- Con un account salviamo solo la tua email, il tuo nome e la versione dell’app; la password è conservata solo come hash irreversibile.
+
 ## Sicurezza
 - Gli agenti non possono leggere file \`.env\`, di chiavi o di password, non possono eseguire comandi shell e non possono avviare propri sub-agenti.
 - Gli agenti non fanno mai commit né push, non installano pacchetti, non scrivono a nessuno e non pubblicano nulla.

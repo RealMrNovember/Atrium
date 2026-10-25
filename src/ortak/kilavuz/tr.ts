@@ -83,6 +83,36 @@ Bir ajanı değiştirmek için ona tıkla, **Yapay zeka aracı** ve **Model**'i 
 - **Tavan**, Atrium'un kendi **günlük güvenlik sınırıdır**. Ajanlar bu sınırı aşabilecek bir işe başlamaz. Bir koşu süre aşımına uğrar ya da iptal edilir ve maliyeti okunamazsa ajan başına tavanın tamamı sayılır; böylece günlük tavan asla eksik sayılmaz.
 - İki tavanı da **Profil & Ayarlar → Tavanlar ve güvenlik**'ten değiştirebilirsin.
 
+## Birden fazla şirket
+Atrium'da birden fazla şirket yönetebilirsin — örneğin kendi stüdyon ve bir müşterin. Her şirketin **kendi projeleri, ekibi, hafızası, raporları ve varsayılan yapay zeka aracı** vardır.
+- Sol üstte şirket adının yanındaki **▾** menüsünden şirketler arasında geçiş yap ya da **Yeni şirket** ekle. Yeni şirket kurulum sihirbazıyla başlar; vazgeçersen sihirbazdaki **… şirketine dön** düğmesini kullan.
+- **Profil & Ayarlar → Şirketlerim** hepsini listeler; oradan bir şirketi açabilir ya da kaldırabilirsin. Kaldırmak yalnız Atrium verisini (ekip, hafıza, raporlar) siler — proje klasörlerine asla dokunmaz.
+- **Profil & Ayarlar → Yapay zeka araçları**'ndaki **Tüm ekibi varsayılan araca geçir**, o şirketteki bütün ajanları tek seferde geçirir.
+
+## Yeni proje ve yeni sohbet
+- Henüz projen yok mu? Kurulum sihirbazında (ya da *Katlar* yanındaki **＋** ile) bir ad yaz ve **Yeni proje**'ye tıkla — Atrium klasörü kısa bir README ile oluşturur. Klasör seçmediysen kullanıcı klasöründeki *Atrium Projects* içine açılır.
+- Bir katın **Sohbetler** sekmesinde **＋ Yeni sohbet** var: o proje klasöründe gerçek bir Claude Code sohbeti başlatır. Sohbet kaydedilir, listende görünür ve sonra — Atrium'da ya da Claude Code'da — devam ettirilebilir.
+
+## Komuta dosya eklemek
+Komut kutusunun altındaki **📎 Dosya ekle**'ye tıkla ya da dosyaları kutuya bırak — görsel, PDF ve metin dosyaları; en çok 10 dosya, her biri 10 MB. Küçük metin dosyaları ajanlara doğrudan verilir; görselleri ve PDF'leri ajanlar dosya araçlarıyla açar. Ekler projende değil, Atrium'un kendi veri klasöründe durur.
+
+## Yapay zeka araçlarını tek tıkla bağlamak
+- **ChatGPT ile bağlan** (Codex), **Google ile bağlan** (Gemini) ve **Claude'u bağla**: araç kurulu değilse Atrium onu kendi klasörüne kurar (yönetici izni gerekmez; Node.js gerekir), sonra aracın giriş sayfasını tarayıcında açar. Girişi bitirince durum kendiliğinden **Hazır** olur.
+- Kurulum sihirbazının **Yapay zeka** adımı bütün araçları sunar — birini ya da birkaçını bağla.
+- Üst çubukta **kullanılan her yapay zeka aracı için ayrı bir kullanım kartı** görünür: Claude'un oturum ve haftalık limitleri (API anahtarıyla bugünkü dolar), Codex bildirirse limitleri, diğerleri için bugünkü koşu ve token sayısı, Ollama için *yerel · ücretsiz*.
+
+## Destek ve hesabın
+**🛟 Destek** sayfasından bize **dilek**, **istek**, **şikayet** ya da **hata raporu** gönderebilir, cevaplarımızı orada okuyabilirsin (yeni cevaplar rozetle görünür).
+- Mesaj göndermek için ücretsiz ve isteğe bağlı bir hesap gerekir: e-posta + şifre ya da **Google ile devam et**.
+- Hata veren bir komutun yanında **🐞 Bildir** bulunur; hata mesajıyla bir hata raporu açar. **Tanılama bilgisi ekle**'yi yalnız istersen işaretle — tam olarak neyin eklendiğini görürsün (uygulama sürümü, sistem, kişisel yollar ve anahtarlar ayıklanmış son hatalar).
+- İstediğin an çıkış yapabilir ya da **hesabını silebilirsin**; hesabın ve tüm mesajların kalıcı olarak silinir.
+
+## Gizlilik
+- Projelerin, kodun, dosyaların, sohbetlerin, proje hafızan, komutların, ajan sonuçların ve API anahtarların **bilgisayarından hiç çıkmaz**. Onları göremeyiz, okuyamayız — bize hiç ulaşmazlar.
+- Yapay zeka istekleri bilgisayarından doğrudan seçtiğin araca gider (yerel modellerde hiç dışarı çıkmaz). Arada Atrium sunucusu yoktur.
+- Atrium internete yalnızca güncellemeleri ve sürüm notlarını denetlemek için, bir de — yalnız kullanırsan — hesabın ve gönderdiğin mesajlar için bağlanır.
+- Hesap açarsan yalnızca e-postanı, adını ve uygulama sürümünü saklarız; şifren yalnızca geri çevrilemez bir özet olarak tutulur.
+
 ## Güvenlik
 - Ajanlar \`.env\`, anahtar ve parola dosyalarını okuyamaz, kabuk komutu çalıştıramaz ve kendi alt ajanlarını başlatamaz.
 - Ajanlar commit atmaz, push etmez, paket kurmaz, kimseye mesaj göndermez, hiçbir şey yayınlamaz.
