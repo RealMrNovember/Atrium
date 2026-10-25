@@ -2,6 +2,17 @@ import type { SurumNotu } from './en'
 
 export const fr: SurumNotu[] = [
   {
+    surum: '1.6.0', tarih: '2026-10-26', baslik: "Tu valides chaque modification",
+    maddeler: [
+      "✅ Aperçu des modifications : quand les modifications de fichiers sont autorisées, les agents travaillent sur une copie de ton projet. Vérifie chaque fichier et chaque ligne, applique tout ou une partie, rejette — et annule après avoir appliqué.",
+      "↪ Passages de relais : quand un agent a fini, un collègue vérifie le travail automatiquement (par défaut : développeur → QA).",
+      "⏰ Travail planifié par étage : tours de statut quotidiens, mises à jour hebdomadaires de la mémoire ou n’importe quelle commande à heure fixe.",
+      "⚖️ Compare deux IA côte à côte — réponses, coût, temps et tokens.",
+      "🧩 Modèles d’équipe : Agence web, Application mobile, Studio de contenu, Données et analyse, Studio de jeux.",
+      "📤 Partage le rapport du chef de projet sous forme de page web soignée."
+    ]
+  },
+  {
     surum: '1.5.0', tarih: '2026-10-26', baslik: "Plusieurs entreprises, l’IA en un clic, assistance intégrée",
     maddeler: [
       "🏙️ Gère plusieurs entreprises — chacune avec ses propres projets, son équipe, sa mémoire et son outil d’IA par défaut. Change d’entreprise depuis le menu ▾ à côté de son nom.",

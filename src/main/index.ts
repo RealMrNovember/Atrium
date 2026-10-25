@@ -8,6 +8,7 @@ import { cliBul, saglayiciDurumu, uyumluModeller } from './saglayicilar'
 import * as yerel from './yerel'
 import { baglanIlerlemeAyarla, tekTiklaBagla } from './baglan'
 import { cliKokuAyarla } from './yollar'
+import { zamanlayiciBaslat } from './zamanlayici'
 import * as erisim from './erisim'
 import * as hesap from './hesap'
 import { hataKaydet, hataYollariniAyarla } from './hatalar'
@@ -125,6 +126,24 @@ function kanallar(): void {
   ipcMain.handle('hafizaCikar', (_e, katId: string) => { void motor.hafizaCikar(katId) })
   ipcMain.handle('komutVer', (_e, katId: string, metin: string, yazmaIzni: boolean, ekler?: { ad: string; veri: Uint8Array }[]) =>
     motor.komutVer(katId, metin, yazmaIzni, Array.isArray(ekler) ? ekler.filter((e) => e?.veri instanceof Uint8Array) : []))
+  ipcMain.handle('ekipSablonu', (_e, katId: string, sablonId: string) => depo.ekipSablonuKur(String(katId), String(sablonId)))
+  ipcMain.handle('raporKaydet', async (_e, html: string, onerilenAd: string) => {
+    const ad = String(onerilenAd ?? 'atrium-report').replace(/[\\/:*?"<>|]/g, '_').slice(0, 100)
+    const sonuc = await dialog.showSaveDialog(pencere!, { defaultPath: `${ad}.html`, filters: [{ name: 'HTML', extensions: ['html'] }] })
+    if (sonuc.canceled || !sonuc.filePath) return null
+    writeFileSync(sonuc.filePath, String(html ?? ''), 'utf-8')
+    shell.showItemInFolder(sonuc.filePath)
+    return sonuc.filePath
+  })
+  ipcMain.handle('karsilastir', (_e, katId: string, metin: string, secenekler) => { void motor.karsilastir(String(katId), String(metin ?? ''), Array.isArray(secenekler) ? secenekler : []) })
+  ipcMain.handle('zamanlamalar', (_e, katId?: string) => depo.zamanlamalar().filter((z) => !katId || z.katId === katId))
+  ipcMain.handle('zamanlamaKaydet', (_e, z) => depo.zamanlamaKaydet(z))
+  ipcMain.handle('zamanlamaSil', (_e, id: string) => depo.zamanlamaSil(String(id)))
+  ipcMain.handle('degisiklikFarki', (_e, katId: string, komutId: string, yol: string) => motor.degisiklikFarki(String(katId), String(komutId), String(yol)))
+  ipcMain.handle('degisiklikUygula', (_e, katId: string, komutId: string, yollar?: string[]) =>
+    motor.degisiklikUygula(String(katId), String(komutId), Array.isArray(yollar) ? yollar.map(String) : undefined))
+  ipcMain.handle('degisiklikVazgec', (_e, katId: string, komutId: string) => motor.degisiklikVazgec(String(katId), String(komutId)))
+  ipcMain.handle('degisiklikGeriAl', (_e, katId: string, komutId: string) => motor.degisiklikGeriAl(String(katId), String(komutId)))
   ipcMain.handle('komutIptal', (_e, komutId: string) => motor.komutIptal(komutId))
   ipcMain.handle('tumRaporlar', () => depo.tumKomutlar())
   ipcMain.handle('canli', () => motor.canliDurum())
@@ -257,6 +276,7 @@ app.whenReady().then(() => {
   hataYollariniAyarla(() => { const p = depo.profilOku(); return [p.projeKlasoru, ...p.ekProjeler, p.sohbetKlasoru] })
   process.on('uncaughtException', (e) => hataKaydet('atrium', e?.stack?.split(/\r?\n/).slice(0, 3).join(' ') ?? String(e)))
   motor.aktifSaglayicilarAyarla(kullanilanSaglayicilar)
+  zamanlayiciBaslat()
   hesap.hesapBaslat(depo.veriKlasoru(), () => depo.profilOku().dil, kullanilanSaglayicilar, (d) => pencere?.webContents.send('hesap', d))
   kanallar()
   pencereAc()

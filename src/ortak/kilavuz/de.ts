@@ -83,6 +83,29 @@ Die Seite **Berichte** sammelt jeden Befehl aus jeder Etage mit dem Bericht des 
 - **Limit** ist Atriums eigenes **tägliches Sicherheitslimit**. Agenten starten nie Arbeit, die darüber hinausgehen könnte. Wenn ein Lauf eine Zeitüberschreitung hat oder abgebrochen wird und seine Kosten nicht gelesen werden können, wird das volle Limit pro Agent angerechnet, sodass das Tageslimit nie zu niedrig gezählt wird.
 - Beide Limits änderst du unter **Profil & Einstellungen → Limits und Sicherheit**.
 
+## Änderungen prüfen, bevor sie übernommen werden
+Wenn du Dateiänderungen erlaubst, arbeitet das Team an einer **Kopie** deines Projekts. In deine Dateien wird nichts geschrieben, bis du es sagst.
+- Wenn der Befehl fertig ist, listet **Vorgeschlagene Änderungen** jede neue, geänderte und gelöschte Datei mit ihren +/−-Zeilen auf. Klicke auf eine Datei, um die genauen Zeilen zu sehen.
+- **Übernehmen** schreibt alle Änderungen; entferne bei einzelnen Dateien das Häkchen und nutze **… ausgewählte übernehmen** für einen Teil; **Verwerfen** wirft sie weg.
+- Nach dem Übernehmen setzt **Rückgängig** jede Datei wieder auf ihren vorherigen Stand zurück.
+- Wenn du eine Datei selbst bearbeitet hast, während das Team gearbeitet hat, überschreibt Atrium sie nicht und markiert sie als **von dir geändert**.
+- Du kannst das unter **Profil & Einstellungen** ausschalten (nicht empfohlen).
+
+## Übergaben zwischen Agenten
+In den Einstellungen eines Agenten wählst du mit **Wenn fertig, übergeben an** einen Kollegen, der die Arbeit automatisch prüft — zum Beispiel übergibt der Entwickler an den QA-Tester. Die Prüfaufgabe erscheint mit ↪ in der Aufgabenliste. Das Standardteam und die Team-Vorlagen bringen sinnvolle Übergaben schon mit.
+
+## Geplante Arbeit
+Der ⏰-Tab einer Etage erledigt Arbeit von selbst: jeden Morgen eine **Statusrunde**, jeden Freitag **Gedächtnis aktualisieren** oder ein beliebiger schreibgeschützter **Befehl** zu einer festen Uhrzeit. Wähle die Tage und die Uhrzeit. Zeitpläne laufen, solange Atrium geöffnet ist; war es beschäftigt oder geschlossen, wird die Arbeit innerhalb von 30 Minuten nachgeholt.
+
+## Zwei KIs vergleichen
+**⚖️ Vergleichen** neben dem Befehlsfeld führt dieselbe schreibgeschützte Aufgabe gleichzeitig mit zwei KI-Tools oder Modellen aus — zum Beispiel mit Claude und einem lokalen Modell — und zeigt die Antworten nebeneinander mit Kosten, Zeit und Tokens. Ideal, um herauszufinden, wo ein kostenloses lokales Modell gut genug ist.
+
+## Team-Vorlagen
+Im Tab **Team** richtet **Team-Vorlagen** mit einem Klick ein fertiges Team ein: Webagentur, Mobile App, Content-Studio, Daten & Analytics oder Game-Studio. Die Agenten nutzen das Standard-KI-Tool deines Unternehmens.
+
+## Einen Bericht teilen
+Unter dem Bericht des Projektleiters speichert **Teilen** ihn als saubere Webseite (mit deinem Unternehmensnamen und Logo), die du an einen Kunden oder dein Team schicken kannst; 📋 kopiert ihn als Markdown.
+
 ## Mehrere Unternehmen
 Führe mehr als ein Unternehmen in Atrium — zum Beispiel dein eigenes Studio und einen Kunden. Jedes Unternehmen hat **eigene Projekte, ein eigenes Team, Gedächtnis, Berichte und ein eigenes Standard-KI-Tool**.
 - Öffne das Menü **▾** neben deinem Unternehmensnamen oben links, um das Unternehmen zu wechseln oder ein **Neues Unternehmen** hinzuzufügen. Ein neues Unternehmen beginnt mit dem Einrichtungsassistenten; überlegst du es dir anders, nutze im Assistenten **Zurück zu …**.

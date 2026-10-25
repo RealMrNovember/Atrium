@@ -3,12 +3,17 @@ import type { Ajan, CanliDurum, KatDetayi, MisafirAjan, SirketProfili } from '@o
 import { ajanAnahtari } from '@ortak/tipler'
 import { Markdown } from '../bilesenler/Markdown'
 import { SaglayiciSecici, saglayiciIkonu } from '../bilesenler/SaglayiciSecici'
+import { DegisiklikPaneli } from '../bilesenler/DegisiklikPaneli'
+import { ZamanlamaPaneli } from '../bilesenler/ZamanlamaPaneli'
+import { KarsilastirmaPaneli } from '../bilesenler/KarsilastirmaPaneli'
+import { RaporPaylas } from '../bilesenler/RaporPaylas'
+import { SablonSecici } from '../bilesenler/SablonSecici'
 import { SohbetListesi } from '../bilesenler/SohbetListesi'
 import { useDil } from '../dil'
 import { KatSahnesi } from '../sahne/KatSahnesi'
 import { DURUM_ANAHTARI, GOREV_ANAHTARI, hataMetni, KOMUT_ANAHTARI, RENKLER, usd, zamanMetni } from '../yardimci'
 
-type Sekme = 'komut' | 'ajan' | 'raporlar' | 'hafiza' | 'sohbetler'
+type Sekme = 'komut' | 'ajan' | 'raporlar' | 'hafiza' | 'sohbetler' | 'zaman'
 
 interface Props {
   katId: string
@@ -97,9 +102,9 @@ export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti, on
         </div>
         <aside className="sag-panel">
           <div className="sekmeler">
-            {(['komut', 'ajan', 'raporlar', 'hafiza', 'sohbetler'] as Sekme[]).map((s) => (
-              <button key={s} className={sekme === s ? 'etkin' : ''} onClick={() => setSekme(s)}>
-                {{ komut: t('tabCommand'), ajan: t('tabTeam'), raporlar: t('tabReports'), hafiza: t('tabMemory'), sohbetler: t('tabChats') }[s]}
+            {(['komut', 'ajan', 'raporlar', 'hafiza', 'sohbetler', 'zaman'] as Sekme[]).map((s) => (
+              <button key={s} className={sekme === s ? 'etkin' : ''} onClick={() => setSekme(s)} title={s === 'zaman' ? t('tabSchedule') : undefined}>
+                {{ komut: t('tabCommand'), ajan: t('tabTeam'), raporlar: t('tabReports'), hafiza: t('tabMemory'), sohbetler: t('tabChats'), zaman: '⏰' }[s]}
               </button>
             ))}
           </div>
@@ -115,6 +120,7 @@ export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti, on
                   }}
                   onKaydedildi={(id) => { setTaslakAjan(null); setSeciliAjan(id); yenile(); onDegisti() }} />)}
             {sekme === 'raporlar' && <KatRaporlari detay={detay} />}
+            {sekme === 'zaman' && <ZamanlamaPaneli katId={detay.kat.id} />}
             {sekme === 'hafiza' && <HafizaPaneli detay={detay} calisiyor={hafizaCalisiyor} onCikar={hafizaCikar} onKaydedildi={() => { yenile(); onDegisti() }} />}
             {sekme === 'sohbetler' && <SohbetListesi key={acikSohbet ?? 'liste'} katId={katId} aciklama={t('chatsExplain')} acik={acikSohbet} canli={canli} />}
           </div>
@@ -135,6 +141,7 @@ function KomutPaneli({ detay, canli, profil, onAjanSec, onHataBildir }: {
   const [hata, setHata] = useState('')
   const [ekler, setEkler] = useState<File[]>([])
   const [surukleniyor, setSurukleniyor] = useState(false)
+  const [karsilastirma, setKarsilastirma] = useState(false)
   const ekle = (liste: FileList | File[]): void => {
     const yeni = [...ekler]
     for (const d of Array.from(liste)) {
@@ -192,11 +199,15 @@ function KomutPaneli({ detay, canli, profil, onAjanSec, onHataBildir }: {
           {profil.ayarlar.simulasyon ? `🧪 ${t('simNoSpend')}` : t('perAgentCap', { cap: usd(profil.ayarlar.kosuButcesiUsd) })} · Ctrl+Enter
         </span>
         <span className="komut-dugmeleri">
+          <button className="ikincil" title={t('compareHint')} onClick={() => setKarsilastirma(!karsilastirma)}>⚖️ {t('compareButton')}</button>
           <button className="ikincil" disabled={!!aktif} title={t('tourHint')} onClick={() => void window.sirket.durumTuru(detay.kat.id).catch((e) => setHata(hataMetni(e)))}>📋 {t('tourButton')}</button>
           <button className="birincil" disabled={!!aktif || !metin.trim()} onClick={() => void gonder()}>{t('send')}</button>
         </span>
       </div>
       {hata && <p className="hata-metni">{hata}</p>}
+      {(karsilastirma || canli.karsilastirmalar[detay.kat.id]?.sonuclar.some((x) => x.calisiyor)) && (
+        <KarsilastirmaPaneli katId={detay.kat.id} canli={canli} ilkMetin={metin} onKapat={() => setKarsilastirma(false)} />
+      )}
 
       {komut && (
         <div className="komut-kart">
@@ -218,7 +229,7 @@ function KomutPaneli({ detay, canli, profil, onAjanSec, onHataBildir }: {
                   <span className="ajan-nokta" style={{ background: a?.renk }} />
                   <div>
                     <b>{a?.ad ?? g.ajanId}</b> <span className="kucuk">{a?.rol}</span> {a?.iseAlindi && <span className="etiket iyi">🎉</span>}
-                    <div className="gorev-baslik">{g.baslik}</div>
+                    <div className="gorev-baslik">{g.devredenId && <span title={t('handoffBadge')}>↪ </span>}{g.baslik}</div>
                     {aktif && c?.etkinlik && g.durum === 'calisiyor' && <div className="kucuk canli-satir">{c.etkinlik}</div>}
                   </div>
                   <span className={`rozet ${g.durum}`}>{t(GOREV_ANAHTARI[g.durum])}</span>
@@ -231,9 +242,11 @@ function KomutPaneli({ detay, canli, profil, onAjanSec, onHataBildir }: {
               {onHataBildir && <button className="ikincil mini-buyuk hata-bildir" onClick={() => onHataBildir(t('bugSubject'), komut.hata ?? '')}>🐞 {t('reportBug')}</button>}
             </p>
           )}
+          {!aktif && komut.degisiklik && <DegisiklikPaneli key={`${komut.id}-${komut.degisiklik.durum}`} katId={detay.kat.id} komut={komut} />}
           {!aktif && komut.rapor && (
             <details open className="rapor-kutu">
               <summary>📨 {t('leadReport')}</summary>
+              <RaporPaylas komut={komut} katAdi={detay.kat.ad} />
               <Markdown metin={komut.rapor} />
             </details>
           )}
@@ -299,15 +312,16 @@ function EkipPaneli({ detay, canli, seciliAjan, taslak, onSec, onYeni, onKaydedi
           )
         })}
         {detay.ajanlar.length < 8 && <button className="ikincil genis" onClick={onYeni}>{t('addAgent')}</button>}
+        <SablonSecici katId={detay.kat.id} onKuruldu={() => onKaydedildi(null)} />
       </div>
     )
   }
   return <AjanFormu key={ajan.id} katId={detay.kat.id} ajan={ajan} yeni={!!taslak} canli={canli}
-    doluOdalar={detay.ajanlar.filter((a) => a.id !== ajan.id).map((a) => a.oda)} onGeri={() => onSec(null)} onKaydedildi={onKaydedildi} />
+    doluOdalar={detay.ajanlar.filter((a) => a.id !== ajan.id).map((a) => a.oda)} ekip={detay.ajanlar} onGeri={() => onSec(null)} onKaydedildi={onKaydedildi} />
 }
 
-function AjanFormu({ katId, ajan, yeni, canli, doluOdalar, onGeri, onKaydedildi }: {
-  katId: string; ajan: Ajan; yeni: boolean; canli: CanliDurum; doluOdalar: number[]; onGeri: () => void; onKaydedildi: (id: string | null) => void
+function AjanFormu({ katId, ajan, yeni, canli, doluOdalar, ekip, onGeri, onKaydedildi }: {
+  katId: string; ajan: Ajan; yeni: boolean; canli: CanliDurum; doluOdalar: number[]; ekip: Ajan[]; onGeri: () => void; onKaydedildi: (id: string | null) => void
 }): ReactElement {
   const { t } = useDil()
   const [f, setF] = useState<Ajan>(ajan)
@@ -360,6 +374,12 @@ function AjanFormu({ katId, ajan, yeni, canli, doluOdalar, onGeri, onKaydedildi 
           <input type="checkbox" checked={!!f.web} onChange={(e) => setF({ ...f, web: e.target.checked })} />
           <span>{t('fWeb')}</span>
         </label>
+        <label>{t('fHandoff')} <small>{t('fHandoffHint')}</small>
+          <select value={f.devret ?? ''} onChange={(e) => setF({ ...f, devret: e.target.value || undefined })}>
+            <option value="">—</option>
+            {ekip.filter((a) => a.id !== f.id).map((a) => <option key={a.id} value={a.id}>{a.ad} · {a.rol}</option>)}
+          </select>
+        </label>
         <label>{t('fDuty')}
           <textarea rows={7} value={f.gorevTanimi} onChange={(e) => setF({ ...f, gorevTanimi: e.target.value })} />
         </label>
@@ -390,7 +410,7 @@ function KatRaporlari({ detay }: { detay: KatDetayi }): ReactElement {
             <span className={`rozet ${k.durum}`}>{t(KOMUT_ANAHTARI[k.durum])}</span> {k.metin.slice(0, 60)}
             <span className="kucuk"> · {zamanMetni(k.zaman, t, dil)} · {usd(k.maliyetUsd)}</span>
           </summary>
-          {k.rapor ? <Markdown metin={k.rapor} /> : <p className="bos">{k.hata ?? t('noReport')}</p>}
+          {k.rapor ? <><RaporPaylas komut={k} katAdi={detay.kat.ad} /><Markdown metin={k.rapor} /></> : <p className="bos">{k.hata ?? t('noReport')}</p>}
         </details>
       ))}
     </div>

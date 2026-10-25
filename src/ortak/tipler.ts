@@ -45,6 +45,8 @@ export interface SirketAyarlari {
   claudeYolu: string
   /** Ses efektleri açık mı. */
   ses: boolean
+  /** Yazma izinli komutlarda değişiklikleri projeye yazmadan önce göster (önerilen). */
+  onizleme: boolean
   /** Yeni ajanların ve lider işe alımlarının varsayılan yapay zeka aracı. */
   varsayilanSaglayici: SaglayiciId
   /** Claude dışındaki araçların ayarları (yol, adres). */
@@ -95,6 +97,60 @@ export interface Donanim {
   gpular: { ad: string; vramGb?: number }[]
   /** Apple Silicon: ekran kartı ana belleği paylaşır. */
   birlesikBellek: boolean
+}
+
+export interface DegisenDosya {
+  yol: string
+  tur: 'eklendi' | 'degisti' | 'silindi'
+  eklenen: number
+  silinen: number
+  ikili?: boolean
+}
+
+export interface DegisiklikOzeti {
+  /** bekliyor: onay bekliyor · uygulandi · vazgecildi · geri-alindi · dogrudan: önizleme yapılamadı, doğrudan yazıldı */
+  durum: 'bekliyor' | 'uygulandi' | 'vazgecildi' | 'geri-alindi' | 'dogrudan'
+  dosyalar: DegisenDosya[]
+  eklenen: number
+  silinen: number
+  uygulanan?: string[]
+  cakisan?: string[]
+  /** dogrudan: neden (ör. proje çok büyük) */
+  neden?: string
+}
+
+/** Aynı görevin iki araç/modelle karşılaştırması. */
+export interface Karsilastirma {
+  id: string
+  katId: string
+  metin: string
+  zaman: string
+  sonuclar: {
+    saglayici: SaglayiciId
+    model: string
+    calisiyor: boolean
+    metin?: string
+    hata?: string
+    maliyetUsd?: number
+    sureMs?: number
+    token?: number
+  }[]
+}
+
+/** Zamanlanmış iş: bir katta belirli gün ve saatte durum turu, hafıza güncellemesi ya da komut. */
+export interface Zamanlama {
+  id: string
+  katId: string
+  tur: 'tur' | 'hafiza' | 'komut'
+  /** tur 'komut' ise verilecek komut */
+  metin?: string
+  /** "09:00" (yerel saat) */
+  saat: string
+  /** 0 = Pazar … 6 = Cumartesi */
+  gunler: number[]
+  acik: boolean
+  sonCalisma?: string
+  sonHata?: string
 }
 
 /** Komuta eklenen dosya (arayüzden ana sürece). */
@@ -188,6 +244,8 @@ export interface Ajan {
   lider?: boolean
   /** WebSearch / WebFetch kullanabilir mi. */
   web?: boolean
+  /** İşini bitirince bu ajana devreder (ör. geliştirici → test uzmanı). */
+  devret?: string
   /** Lider tarafından bir komut sırasında işe alındıysa zamanı. */
   iseAlindi?: string
   /** Ajanın asıl çalıştığı klasörler (proje köküne göre). Ajan önce bunlarda arar → daha az token. */
@@ -216,6 +274,8 @@ export interface Gorev {
   baslik: string
   talimat: string
   durum: GorevDurumu
+  /** Bu görev başka bir ajanın devriyle açıldıysa devreden ajan. */
+  devredenId?: string
   sonuc?: string
   maliyetUsd?: number
   baslangic?: string
@@ -234,6 +294,8 @@ export interface Komut {
   tur?: 'gorev' | 'tur'
   /** Sahibinin komuta eklediği dosyaların adları. */
   ekler?: string[]
+  /** Yazma izinli komutta ajanların önerdiği değişiklikler (önizleme). */
+  degisiklik?: DegisiklikOzeti
   zaman: string
   plan?: string
   gorevler: Gorev[]
@@ -319,6 +381,8 @@ export interface CanliDurum {
   aktifSohbetler: Record<string, AktifSohbet[]> // anahtar: katId
   sohbetKosulari: Record<string, SohbetKosusu> // anahtar: sohbet id
   planLimitleri?: PlanLimitleri
+  /** Kat başına son karşılaştırma. */
+  karsilastirmalar: Record<string, Karsilastirma>
   /** Bugünkü kullanım, araç başına (koşu ve token). */
   kullanim: Partial<Record<SaglayiciId, { kosu: number; token: number }>>
   /** Claude dışındaki araçların bildirdiği kullanım limitleri (ör. Codex). */
@@ -383,6 +447,22 @@ export interface SirketApi {
   hafizaKaydet(katId: string, metin: string): Promise<void>
   hafizaCikar(katId: string): Promise<void>
   komutVer(katId: string, metin: string, yazmaIzni: boolean, ekler?: KomutEki[]): Promise<Komut>
+  /** Katın ekibini hazır bir şablonla değiştirir. */
+  ekipSablonu(katId: string, sablonId: string): Promise<Ajan[]>
+  /** Raporu bağımsız bir HTML dosyası olarak kaydeder (kaydetme penceresi); kaydedilen yol ya da null. */
+  raporKaydet(html: string, onerilenAd: string): Promise<string | null>
+  /** Aynı görevi iki araç/modelle (salt okuma) çalıştırır; ilerleme canli.karsilastirmalar[katId]. */
+  karsilastir(katId: string, metin: string, secenekler: { saglayici: SaglayiciId; model: string }[]): Promise<void>
+  /** Zamanlanmış işler (katId verilirse yalnız o kat). */
+  zamanlamalar(katId?: string): Promise<Zamanlama[]>
+  zamanlamaKaydet(z: Zamanlama): Promise<Zamanlama[]>
+  zamanlamaSil(id: string): Promise<Zamanlama[]>
+  /** Önizlemedeki bir dosyanın birleşik farkı. */
+  degisiklikFarki(katId: string, komutId: string, yol: string): Promise<string>
+  /** Değişiklikleri projeye yazar (yollar verilmezse hepsi). */
+  degisiklikUygula(katId: string, komutId: string, yollar?: string[]): Promise<Komut>
+  degisiklikVazgec(katId: string, komutId: string): Promise<Komut>
+  degisiklikGeriAl(katId: string, komutId: string): Promise<Komut>
   komutIptal(komutId: string): Promise<void>
   tumRaporlar(): Promise<Komut[]>
   canli(): Promise<CanliDurum>

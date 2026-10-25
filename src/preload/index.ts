@@ -3,7 +3,7 @@ import type { CanliDurum, ErisimDurumu, GuncellemeDurumu, HesapDurumu, Indirme, 
 
 const KANALLAR = [
   'profil', 'profilKaydet', 'katlar', 'katOnizle', 'katDetayi', 'ajanKaydet', 'ajanSil', 'hafizaKaydet',
-  'hafizaCikar', 'komutVer', 'komutIptal', 'tumRaporlar', 'canli', 'klasorAc', 'klasorSec', 'claudeDurumu',
+  'hafizaCikar', 'komutVer', 'ekipSablonu', 'raporKaydet', 'karsilastir', 'zamanlamalar', 'zamanlamaKaydet', 'zamanlamaSil', 'degisiklikFarki', 'degisiklikUygula', 'degisiklikVazgec', 'degisiklikGeriAl', 'komutIptal', 'tumRaporlar', 'canli', 'klasorAc', 'klasorSec', 'claudeDurumu',
   'claudeGiris', 'apiAnahtariKaydet', 'apiAnahtariSil', 'sohbetOzeti', 'sohbetler', 'sohbetMesajlari', 'disBaglanti',
   'katSirala', 'durumTuru', 'sohbetDevam', 'sohbetDurdur', 'guncellemeDurumu', 'guncellemeDenetle', 'guncellemeKur', 'planLimitleriYenile',
   'saglayiciDurumlari', 'saglayiciGiris', 'tekTiklaBagla', 'saglayiciAnahtari', 'donanim', 'ollamaKur', 'ollamaBaslat', 'modelIndir', 'modelSil',

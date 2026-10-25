@@ -47,6 +47,7 @@ Atrium turns that into a company you can **see**:
 - 🤝 **Not just Claude.** Each agent can run on Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama or any OpenAI-compatible server — mixed on the same floor.
 - 🦙 **Local AI, built in.** Atrium measures your computer, shows which open models will run, downloads and installs Ollama and the models for you, and lets any agent use them — free, offline and private.
 - 💬 **Your Claude Code chats move in.** Atrium reads your existing Claude Code conversations and files them by project. Open chats light up their floor, and when a chat waits for your decision an agent leans out of the window and calls you.
+- ✅ **You approve every change.** With file changes allowed, agents work on a copy; you review the diff, apply what you want and undo with one click.
 - 🏙️ **Many companies, one app.** Run your studio and your clients side by side — each company with its own projects, team, memory and AI.
 - 🔒 **Private by design.** Your code, chats, memory and keys never leave your computer. We can't see them — they never reach us.
 - 🛟 **Support built in.** Send a wish, a request, a complaint or a bug report from the app and read the answer right there.
@@ -90,6 +91,17 @@ Models marked **Can be an agent** open and read project files through Atrium's o
 <td align="center"><b>Your computer, measured</b> — engine status and your models.</td>
 <td align="center"><b>A catalog that knows your hardware</b> — one-click download.</td>
 </tr></table>
+
+## ✅ From one command to finished work
+
+- **Review before it lands.** With file changes allowed, the team works on a copy of your project. You see every changed file and line, then **Apply**, **Apply selected** or **Discard** — and **Undo** after applying. Files you edited meanwhile are never overwritten.
+- **Hand-offs.** When the developer finishes, the QA tester checks the work automatically. Choose who hands over to whom in each agent's settings.
+- **Scheduled work.** A status round every morning, a memory update every Friday, or any read-only command at a set time — per floor.
+- **Compare two AIs.** Run the same task with two tools or models side by side, with cost, time and tokens — find out where a free local model is good enough.
+- **Team templates.** Web agency, Mobile app, Content studio, Data & analytics, Game studio — a full team in one click.
+- **Share reports.** Save the lead's report as a clean web page for a client or your team.
+
+<div align="center"><img src="docs/screenshots/preview.png" alt="Proposed changes waiting for approval, with a line-by-line diff" width="430" /></div>
 
 ## 🔒 Privacy
 

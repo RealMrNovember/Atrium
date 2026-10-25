@@ -83,6 +83,29 @@ Bir ajanı değiştirmek için ona tıkla, **Yapay zeka aracı** ve **Model**'i 
 - **Tavan**, Atrium'un kendi **günlük güvenlik sınırıdır**. Ajanlar bu sınırı aşabilecek bir işe başlamaz. Bir koşu süre aşımına uğrar ya da iptal edilir ve maliyeti okunamazsa ajan başına tavanın tamamı sayılır; böylece günlük tavan asla eksik sayılmaz.
 - İki tavanı da **Profil & Ayarlar → Tavanlar ve güvenlik**'ten değiştirebilirsin.
 
+## Değişiklikleri uygulamadan önce görmek
+Dosya değişikliğine izin verdiğinde ekip projenin bir **kopyasında** çalışır. Sen onaylamadan dosyalarına hiçbir şey yazılmaz.
+- Komut bitince **Önerilen değişiklikler** her yeni, değişen ve silinen dosyayı +/− satır sayısıyla listeler. Bir dosyaya tıklayınca satırları birebir görürsün.
+- **Uygula** bütün değişiklikleri yazar; bazı dosyaların işaretini kaldırıp **Seçili … dosyayı uygula** ile bir kısmını uygulayabilirsin; **Vazgeç** hepsini atar.
+- Uyguladıktan sonra **Geri al** her dosyayı eski hâline döndürür.
+- Ekip çalışırken bir dosyayı sen değiştirdiysen Atrium onun üzerine yazmaz ve **sen değiştirdin** diye işaretler.
+- Bunu **Profil & Ayarlar**'dan kapatabilirsin (önerilmez).
+
+## Ajanlar arası devir
+Bir ajanın ayarlarındaki **İşini bitirince devret**, işi kendiliğinden kontrol edecek bir çalışma arkadaşı seçer — örneğin geliştirici işi test uzmanına devreder. Kontrol görevi görev listesinde ↪ ile görünür. Hazır ekip ve ekip şablonları uygun devirlerle gelir.
+
+## Zamanlanmış işler
+Bir katın ⏰ sekmesi işleri kendiliğinden çalıştırır: her sabah **durum turu**, her cuma **hafızayı güncelle** ya da belirli saatte salt okuma bir **komut**. Günleri ve saati seç. Zamanlamalar Atrium açıkken çalışır; meşgul ya da kapalıysa 30 dakika içinde telafi edilir.
+
+## İki yapay zekayı karşılaştırmak
+Komut kutusunun yanındaki **⚖️ Karşılaştır**, aynı salt okuma görevi iki yapay zeka aracı ya da modeliyle aynı anda çalıştırır — örneğin Claude ve bir yerel model — ve yanıtları maliyet, süre ve token ile yan yana gösterir. Ücretsiz bir yerel modelin nerede yettiğini bulmak için idealdir.
+
+## Hazır ekip şablonları
+**Ekip** sekmesindeki **Hazır ekip şablonları** tek tıkla hazır bir ekip kurar: Web ajansı, Mobil uygulama, İçerik üretimi, Veri ve analitik ya da Oyun stüdyosu. Ajanlar şirketinin varsayılan yapay zeka aracını kullanır.
+
+## Raporu paylaşmak
+Liderin raporunun altındaki **Paylaş**, raporu müşteriye ya da ekibine göndermek için temiz bir web sayfası olarak kaydeder (şirket adın ve logonla); 📋 Markdown olarak kopyalar.
+
 ## Birden fazla şirket
 Atrium'da birden fazla şirket yönetebilirsin — örneğin kendi stüdyon ve bir müşterin. Her şirketin **kendi projeleri, ekibi, hafızası, raporları ve varsayılan yapay zeka aracı** vardır.
 - Sol üstte şirket adının yanındaki **▾** menüsünden şirketler arasında geçiş yap ya da **Yeni şirket** ekle. Yeni şirket kurulum sihirbazıyla başlar; vazgeçersen sihirbazdaki **… şirketine dön** düğmesini kullan.

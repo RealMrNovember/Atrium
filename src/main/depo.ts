@@ -3,8 +3,9 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
-import type { Ajan, Kat, Komut, PlanLimitleri, SaglayiciId, SirketOzeti, SirketProfili } from '@ortak/tipler'
+import type { Ajan, Kat, Komut, PlanLimitleri, SaglayiciId, SirketOzeti, SirketProfili, Zamanlama } from '@ortak/tipler'
 import { cevirmen, dilSec, type Cevirmen, type Dil } from '@ortak/i18n'
+import { metin as sablonMetni, SABLONLAR } from '@ortak/sablonlar'
 
 /** Uygulama geneli veri (anahtarlar, hesap, maliyet, plan limitleri). */
 let VERI = ''
@@ -79,6 +80,34 @@ export function sirketSil(id: string): void {
   rmSync(join(VERI, 'sirketler', id), { recursive: true, force: true })
 }
 
+// --- zamanlanmış işler (şirket başına) ---------------------------------------------
+
+export const zamanlamalar = (): Zamanlama[] => jsonOku<Zamanlama[]>(join(SIRKET, 'zamanlamalar.json'), [])
+
+export function zamanlamaKaydet(z: Zamanlama): Zamanlama[] {
+  const temiz: Zamanlama = {
+    id: z.id || `z-${Date.now().toString(36)}`, katId: String(z.katId), tur: ['tur', 'hafiza', 'komut'].includes(z.tur) ? z.tur : 'tur',
+    metin: z.tur === 'komut' ? String(z.metin ?? '').slice(0, 4000) : undefined,
+    saat: /^\d{2}:\d{2}$/.test(z.saat) ? z.saat : '09:00',
+    gunler: [...new Set((z.gunler ?? []).map(Number).filter((g) => g >= 0 && g <= 6))].sort(),
+    acik: !!z.acik, sonCalisma: z.sonCalisma, sonHata: z.sonHata
+  }
+  const liste = zamanlamalar()
+  const yeni = liste.some((x) => x.id === temiz.id) ? liste.map((x) => (x.id === temiz.id ? temiz : x)) : [...liste, temiz]
+  jsonYaz(join(SIRKET, 'zamanlamalar.json'), yeni)
+  return yeni
+}
+
+export function zamanlamaSil(id: string): Zamanlama[] {
+  const yeni = zamanlamalar().filter((x) => x.id !== id)
+  jsonYaz(join(SIRKET, 'zamanlamalar.json'), yeni)
+  return yeni
+}
+
+/** Değişiklik önizlemesinin çalışma alanı ve uygulama yedeği. */
+export const calismaKlasoru = (katId: string, komutId: string): string => join(SIRKET, 'katlar', katId, 'calisma', komutId)
+export const yedekKlasoru = (katId: string, komutId: string): string => join(SIRKET, 'katlar', katId, 'geri', komutId)
+
 /** Komut eklerinin klasörü (Atrium verisinde; proje klasörüne hiçbir şey yazılmaz). */
 export const ekKlasoru = (katId: string, komutId: string): string => join(SIRKET, 'katlar', katId, 'ekler', komutId)
 
@@ -109,6 +138,20 @@ export function projeOlustur(kok: string, ad: string): { kok: string; ad: string
   writeFileSync(join(yol, 'README.md'), `# ${temiz}
 `, 'utf-8')
   return { kok: hedefKok, ad: temiz }
+}
+
+/** Katın ekibini hazır şablonla kurar (şirketin varsayılan aracıyla). */
+export function ekipSablonuKur(katId: string, sablonId: string): Ajan[] {
+  const sablon = SABLONLAR.find((s) => s.id === sablonId)
+  if (!sablon) throw new Error('template')
+  const p = profilOku()
+  const saglayici = p.ayarlar.varsayilanSaglayici ?? 'claude'
+  const ekip: Ajan[] = sablon.ekip.slice(0, 8).map((a, i) => ({
+    id: a.id, ad: a.ad, renk: a.renk, oda: i, lider: a.id === 'lider' || undefined,
+    rol: sablonMetni(a.rol, p.dil), gorevTanimi: sablonMetni(a.gorev, p.dil), web: a.web, devret: a.devret,
+    ...(saglayici === 'claude' ? { model: 'sonnet' } : { saglayici, model: '' })
+  }))
+  return ajanlariYaz(katId, ekip)
 }
 
 /** Şirketteki bütün ajanları tek araca geçirir. */
@@ -163,6 +206,7 @@ function varsayilanProfil(): SirketProfili {
       simulasyon: false,
       claudeYolu: '',
       ses: true,
+      onizleme: true,
       varsayilanSaglayici: 'claude',
       saglayicilar: {}
     }
@@ -311,7 +355,7 @@ export function katBul(katId: string): Kat {
 export function varsayilanEkip(t: Cevirmen, saglayici: SaglayiciId = 'claude'): Ajan[] {
   const ekip: Ajan[] = [
     { id: 'lider', ad: 'Atlas', rol: t('teamLeadRole'), lider: true, oda: 0, renk: '#7c5cff', model: 'sonnet', gorevTanimi: t('teamLeadDuty') },
-    { id: 'gelistirici', ad: 'Nova', rol: t('teamDevRole'), oda: 1, renk: '#2f9e6e', model: 'sonnet', gorevTanimi: t('teamDevDuty') },
+    { id: 'gelistirici', ad: 'Nova', rol: t('teamDevRole'), oda: 1, renk: '#2f9e6e', model: 'sonnet', gorevTanimi: t('teamDevDuty'), devret: 'test' },
     { id: 'tasarimci', ad: 'Iris', rol: t('teamUxRole'), oda: 2, renk: '#e8590c', model: 'sonnet', gorevTanimi: t('teamUxDuty') },
     { id: 'test', ad: 'Orion', rol: t('teamQaRole'), oda: 3, renk: '#1c7ed6', model: 'sonnet', gorevTanimi: t('teamQaDuty') },
     { id: 'arastirmaci', ad: 'Sage', rol: t('teamResRole'), oda: 4, renk: '#c2255c', model: 'sonnet', web: true, gorevTanimi: t('teamResDuty') },

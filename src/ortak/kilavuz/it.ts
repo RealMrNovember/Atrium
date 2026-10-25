@@ -83,6 +83,29 @@ La pagina **Report** raccoglie ogni comando di ogni piano con il report del capo
 - **Massimale** è il **limite di sicurezza giornaliero** di Atrium. Gli agenti non avviano mai un lavoro che potrebbe superarlo. Se un'esecuzione va in timeout o viene annullata e il suo costo non può essere letto, viene conteggiato l'intero massimale per agente, così il massimale giornaliero non viene mai sottostimato.
 - Modifica entrambi i massimali in **Profilo e impostazioni → Limiti e sicurezza**.
 
+## Controllare le modifiche prima di applicarle
+Quando consenti le modifiche ai file, il team lavora su una **copia** del tuo progetto. Nei tuoi file non viene scritto nulla finché non lo decidi tu.
+- Quando il comando finisce, **Modifiche proposte** elenca ogni file nuovo, modificato ed eliminato con le sue righe +/−. Clicca su un file per vedere le righe esatte.
+- **Applica** scrive tutte le modifiche; togli la spunta ad alcuni file e usa **Applica … selezionati** per applicarne solo una parte; **Scarta** le butta via.
+- Dopo averle applicate, **Annulla** riporta ogni file com'era prima.
+- Se hai modificato tu un file mentre il team lavorava, Atrium non lo sovrascrive e lo segna come **modificato da te**.
+- Puoi disattivare questa funzione in **Profilo e impostazioni** (sconsigliato).
+
+## Passaggi di consegne tra agenti
+Nelle impostazioni di un agente, **Al termine, passa a** sceglie un collega che controlla il lavoro automaticamente — per esempio lo sviluppatore passa al tester QA. L'attività di controllo compare con ↪ nell'elenco delle attività. Il team predefinito e i modelli di team includono già passaggi sensati.
+
+## Lavoro pianificato
+La scheda ⏰ di un piano esegue il lavoro da sola: un **giro di stato** ogni mattina, **aggiorna memoria** ogni venerdì, oppure qualsiasi **comando** in sola lettura a un'ora stabilita. Scegli i giorni e l'ora. Le pianificazioni funzionano mentre Atrium è aperto; se era occupato o chiuso, recuperano entro 30 minuti.
+
+## Confrontare due IA
+**⚖️ Confronta**, accanto alla casella dei comandi, esegue la stessa attività in sola lettura con due strumenti o modelli IA contemporaneamente — per esempio Claude e un modello locale — e mostra le risposte fianco a fianco con costo, tempo e token. Perfetto per scoprire dove un modello locale gratuito è sufficiente.
+
+## Modelli di team
+Nella scheda **Team**, **Modelli di team** crea con un clic un team già pronto: Agenzia web, App mobile, Studio di contenuti, Dati e analisi o Studio di videogiochi. Gli agenti usano lo strumento IA predefinito della tua azienda.
+
+## Condividere un report
+Sotto il report del responsabile, **Condividi** lo salva come pagina web pulita (con il nome e il logo della tua azienda) da inviare a un cliente o al tuo team; 📋 lo copia come Markdown.
+
 ## Più aziende
 Gestisci più di un’azienda in Atrium — per esempio il tuo studio e un cliente. Ogni azienda ha **i suoi progetti, il suo team, la sua memoria, i suoi report e il suo strumento IA predefinito**.
 - Apri il menu **▾** accanto al nome della tua azienda in alto a sinistra per cambiare azienda o aggiungere una **Nuova azienda**. Una nuova azienda parte con la procedura guidata; se cambi idea, usa **Torna a …** nella procedura.

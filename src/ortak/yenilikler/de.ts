@@ -2,6 +2,17 @@ import type { SurumNotu } from './en'
 
 export const de: SurumNotu[] = [
   {
+    surum: '1.6.0', tarih: '2026-10-26', baslik: "Du gibst jede Änderung frei",
+    maddeler: [
+      "✅ Änderungsvorschau: Wenn Dateiänderungen erlaubt sind, arbeiten die Agenten an einer Kopie deines Projekts. Prüfe jede Datei und jede Zeile, übernimm alles oder einen Teil, verwirf — und mach es nach dem Übernehmen rückgängig.",
+      "↪ Übergaben: Wenn ein Agent fertig ist, prüft ein Kollege die Arbeit automatisch (standardmäßig Entwickler → QA).",
+      "⏰ Geplante Arbeit pro Etage: tägliche Statusrunden, wöchentliche Gedächtnis-Updates oder ein beliebiger Befehl zu einer festen Uhrzeit.",
+      "⚖️ Vergleiche zwei KIs nebeneinander — Antworten, Kosten, Zeit und Tokens.",
+      "🧩 Team-Vorlagen: Webagentur, Mobile App, Content-Studio, Daten & Analytics, Game-Studio.",
+      "📤 Teile den Bericht des Projektleiters als saubere Webseite."
+    ]
+  },
+  {
     surum: '1.5.0', tarih: '2026-10-26', baslik: "Viele Unternehmen, KI mit einem Klick, Support eingebaut",
     maddeler: [
       "🏙️ Führe mehrere Unternehmen — jedes mit eigenen Projekten, eigenem Team, Gedächtnis und Standard-KI-Tool. Wechsle über das Menü ▾ neben dem Unternehmensnamen.",

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactElement } from 'react'
 import type { Kat, Komut } from '@ortak/tipler'
 import { Markdown } from '../bilesenler/Markdown'
+import { RaporPaylas } from '../bilesenler/RaporPaylas'
 import { useDil } from '../dil'
 import { KOMUT_ANAHTARI, usd, zamanMetni } from '../yardimci'
 
@@ -37,7 +38,7 @@ export function RaporlarSayfasi({ katlar, onKatSec }: { katlar: Kat[]; onKatSec:
                 <p className="komut-alinti">“{secili.metin}”</p>
                 <p className="kucuk">{new Date(secili.zaman).toLocaleString(dil)} · {usd(secili.maliyetUsd)} · {secili.yazmaIzni ? t('hadWrite') : t('readOnly')}</p>
               </div>
-              <button className="ikincil" onClick={() => onKatSec(secili.katId)}>{t('goFloor')}</button>
+              <span className="rapor-ust-dugmeler"><RaporPaylas komut={secili} katAdi={katAdi(secili.katId)} /><button className="ikincil" onClick={() => onKatSec(secili.katId)}>{t('goFloor')}</button></span>
             </div>
             {secili.rapor ? <Markdown metin={secili.rapor} /> : <p className="bos">{secili.hata ?? t('reportNotReady')}</p>}
             {secili.gorevler.length > 0 && (

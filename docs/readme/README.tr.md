@@ -47,6 +47,7 @@ Atrium bunu **görebildiğin** bir şirkete dönüştürür:
 - 🤝 **Yalnız Claude değil.** Her ajan Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ya da OpenAI uyumlu herhangi bir sunucuyla çalışabilir — aynı katta karışık.
 - 🦙 **Yerleşik yerel YZ.** Atrium bilgisayarını ölçer, hangi açık modellerin çalışacağını gösterir, Ollama'yı ve modelleri senin için indirip kurar ve her ajanın kullanmasını sağlar — ücretsiz, internetsiz ve gizli.
 - 💬 **Claude Code sohbetlerin de taşınır.** Atrium mevcut Claude Code konuşmalarını okur ve projeye göre dosyalar. Açık sohbetler katlarını aydınlatır; bir sohbet senin kararını beklediğinde bir ajan pencereden sarkıp sana seslenir.
+- ✅ **Her değişikliği sen onaylarsın.** Dosya değişikliğine izin verildiğinde ajanlar bir kopyada çalışır; farkı incelersin, istediğini uygularsın ve tek tıkla geri alırsın.
 - 🏙️ **Birçok şirket, tek uygulama.** Stüdyonu ve müşterilerini yan yana yönet — her şirketin kendi projeleri, ekibi, hafızası ve yapay zekâsı olur.
 - 🔒 **Tasarımdan gizli.** Kodun, sohbetlerin, hafızan ve anahtarların bilgisayarından hiç çıkmaz. Onları göremeyiz — bize hiç ulaşmazlar.
 - 🛟 **Destek içinde.** Uygulamadan dilek, istek, şikayet ya da hata raporu gönder ve cevabı orada oku.
@@ -90,6 +91,17 @@ Ajanları kendi bilgisayarında yaşayan açık modellerle çalıştır — hesa
 <td align="center"><b>Bilgisayarın ölçüldü</b> — motor durumu ve modellerin.</td>
 <td align="center"><b>Donanımını tanıyan bir katalog</b> — tek tıkla indirme.</td>
 </tr></table>
+
+## ✅ Tek komuttan bitmiş işe
+
+- **Dosyalara yazılmadan önce incele.** Dosya değişikliğine izin verildiğinde ekip projenin bir kopyasında çalışır. Değişen her dosyayı ve satırı görürsün, sonra **Uygula**, **Seçili … dosyayı uygula** ya da **Vazgeç** — uyguladıktan sonra da **Geri al**. O arada senin değiştirdiğin dosyaların üzerine asla yazılmaz.
+- **Devir.** Geliştirici işini bitirince test uzmanı işi kendiliğinden kontrol eder. Kimin kime devredeceğini her ajanın ayarlarından seçersin.
+- **Zamanlanmış işler.** Her sabah durum turu, her cuma hafıza güncellemesi ya da belirli saatte salt okuma herhangi bir komut — kat başına.
+- **İki yapay zekâyı karşılaştır.** Aynı görevi iki araç ya da modelle yan yana çalıştır; maliyet, süre ve token ile — ücretsiz bir yerel modelin nerede yettiğini gör.
+- **Hazır ekip şablonları.** Web ajansı, Mobil uygulama, İçerik üretimi, Veri ve analitik, Oyun stüdyosu — tek tıkla eksiksiz bir ekip.
+- **Raporları paylaş.** Liderin raporunu müşteri ya da ekibin için temiz bir web sayfası olarak kaydet.
+
+<div align="center"><img src="../screenshots/preview.png" alt="Onay bekleyen önerilen değişiklikler ve satır satır fark" width="430" /></div>
 
 ## 🔒 Gizlilik
 

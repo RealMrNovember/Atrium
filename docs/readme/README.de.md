@@ -47,6 +47,7 @@ Atrium macht daraus ein Unternehmen, das du **sehen** kannst:
 - 🤝 **Nicht nur Claude.** Jeder Agent kann mit Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama oder einem OpenAI-kompatiblen Server laufen — gemischt auf derselben Etage.
 - 🦙 **Lokale KI, eingebaut.** Atrium misst deinen Computer, zeigt, welche offenen Modelle laufen, lädt Ollama und die Modelle für dich herunter und installiert sie — und jeder Agent kann sie nutzen: kostenlos, offline und privat.
 - 💬 **Deine Claude-Code-Chats ziehen ein.** Atrium liest deine bestehenden Claude-Code-Unterhaltungen und sortiert sie nach Projekt. Offene Chats bringen ihre Etage zum Leuchten, und wenn ein Chat auf deine Entscheidung wartet, lehnt sich ein Agent aus dem Fenster und ruft dich.
+- ✅ **Du gibst jede Änderung frei.** Wenn Dateiänderungen erlaubt sind, arbeiten die Agenten an einer Kopie; du prüfst den Diff, übernimmst, was du willst, und machst es mit einem Klick rückgängig.
 - 🏙️ **Viele Unternehmen, eine App.** Führe dein Studio und deine Kunden Seite an Seite — jedes Unternehmen mit eigenen Projekten, eigenem Team, Gedächtnis und eigener KI.
 - 🔒 **Privat von Grund auf.** Dein Code, deine Chats, dein Gedächtnis und deine Schlüssel verlassen nie deinen Computer. Wir können sie nicht sehen — sie erreichen uns nie.
 - 🛟 **Support eingebaut.** Schick aus der App einen Wunsch, eine Anfrage, eine Beschwerde oder einen Fehlerbericht und lies die Antwort direkt dort.
@@ -90,6 +91,17 @@ Modelle mit der Markierung **Kann Agent sein** öffnen und lesen Projektdateien 
 <td align="center"><b>Dein Computer, vermessen</b> — Engine-Status und deine Modelle.</td>
 <td align="center"><b>Ein Katalog, der deine Hardware kennt</b> — Download mit einem Klick.</td>
 </tr></table>
+
+## ✅ Vom Befehl zur fertigen Arbeit
+
+- **Prüfen, bevor es landet.** Wenn Dateiänderungen erlaubt sind, arbeitet das Team an einer Kopie deines Projekts. Du siehst jede geänderte Datei und Zeile und wählst dann **Übernehmen**, **… ausgewählte übernehmen** oder **Verwerfen** — und nach dem Übernehmen **Rückgängig**. Dateien, die du in der Zwischenzeit bearbeitet hast, werden nie überschrieben.
+- **Übergaben.** Wenn der Entwickler fertig ist, prüft der QA-Tester die Arbeit automatisch. Wer an wen übergibt, wählst du in den Einstellungen jedes Agenten.
+- **Geplante Arbeit.** Jeden Morgen eine Statusrunde, jeden Freitag ein Gedächtnis-Update oder ein beliebiger schreibgeschützter Befehl zu einer festen Uhrzeit — pro Etage.
+- **Zwei KIs vergleichen.** Führe dieselbe Aufgabe mit zwei Tools oder Modellen nebeneinander aus, mit Kosten, Zeit und Tokens — und finde heraus, wo ein kostenloses lokales Modell gut genug ist.
+- **Team-Vorlagen.** Webagentur, Mobile App, Content-Studio, Daten & Analytics, Game-Studio — ein komplettes Team mit einem Klick.
+- **Berichte teilen.** Speichere den Bericht des Projektleiters als saubere Webseite für einen Kunden oder dein Team.
+
+<div align="center"><img src="../screenshots/preview.png" alt="Vorgeschlagene Änderungen warten auf Freigabe, mit zeilengenauem Diff" width="430" /></div>
 
 ## 🔒 Datenschutz
 

@@ -139,7 +139,15 @@ window.ATRIUM_I18N = {
     "q6": "Do I need an account?",
     "a6": "No. Atrium works fully without one. A free account is only needed to send feedback or bug reports and read our answers — sign up with email or Google, delete it any time.",
     "q7": "Can I manage several companies?",
-    "a7": "Yes. Add as many as you like; each has its own projects, team, memory, reports and default AI tool."
+    "a7": "Yes. Add as many as you like; each has its own projects, team, memory, reports and default AI tool.",
+    "f13t": "You approve every change",
+    "f13p": "Agents work on a copy of your project. Review the diff, apply what you want, undo with one click.",
+    "f14t": "Scheduled & hand-offs",
+    "f14p": "Status rounds every morning; the developer hands over to QA automatically. A team that works on its own.",
+    "f15t": "Compare two AIs",
+    "f15p": "Same task, two models, side by side with cost and time — see where a free local model is enough.",
+    "f16t": "Templates & sharing",
+    "f16p": "Ready-made teams in one click, and reports you can share as a clean web page."
   },
   "tr": {
     "pageTitle": "Atrium — Yapay zekâ ajan ofisin",
@@ -281,7 +289,15 @@ window.ATRIUM_I18N = {
     "q6": "Hesap gerekli mi?",
     "a6": "Hayır. Atrium hesap olmadan da tam olarak çalışır. Ücretsiz hesap yalnızca geri bildirim ya da hata raporu göndermek ve cevaplarımızı okumak için gerekir — e-posta ya da Google ile kaydol, istediğin an sil.",
     "q7": "Birden fazla şirket yönetebilir miyim?",
-    "a7": "Evet. İstediğin kadar ekle; her birinin kendi projeleri, ekibi, hafızası, raporları ve varsayılan yapay zekâ aracı olur."
+    "a7": "Evet. İstediğin kadar ekle; her birinin kendi projeleri, ekibi, hafızası, raporları ve varsayılan yapay zekâ aracı olur.",
+    "f13t": "Her değişikliği sen onaylarsın",
+    "f13p": "Ajanlar projenin bir kopyasında çalışır. Farkı incele, istediğini uygula, tek tıkla geri al.",
+    "f14t": "Zamanlama ve devir",
+    "f14p": "Her sabah durum turu; geliştirici işi kendiliğinden test uzmanına devreder. Kendi kendine çalışan bir ekip.",
+    "f15t": "İki yapay zekâyı karşılaştır",
+    "f15p": "Aynı görev, iki model, maliyet ve süreyle yan yana — ücretsiz bir yerel modelin nerede yettiğini gör.",
+    "f16t": "Şablonlar ve paylaşım",
+    "f16p": "Tek tıkla hazır ekipler ve temiz bir web sayfası olarak paylaşabileceğin raporlar."
   },
   "de": {
     "pageTitle": "Atrium — Dein KI-Agentenbüro",
@@ -423,7 +439,15 @@ window.ATRIUM_I18N = {
     "q6": "Brauche ich ein Konto?",
     "a6": "Nein. Atrium funktioniert vollständig ohne. Ein kostenloses Konto brauchst du nur, um Feedback oder Fehlerberichte zu senden und unsere Antworten zu lesen — registriere dich mit E-Mail oder Google, lösche es jederzeit.",
     "q7": "Kann ich mehrere Unternehmen verwalten?",
-    "a7": "Ja. Füge so viele hinzu, wie du willst; jedes hat eigene Projekte, ein eigenes Team, Gedächtnis, Berichte und Standard-KI-Tool."
+    "a7": "Ja. Füge so viele hinzu, wie du willst; jedes hat eigene Projekte, ein eigenes Team, Gedächtnis, Berichte und Standard-KI-Tool.",
+    "f13t": "Du gibst jede Änderung frei",
+    "f13p": "Agenten arbeiten an einer Kopie deines Projekts. Prüfe den Diff, übernimm, was du willst, und mach es mit einem Klick rückgängig.",
+    "f14t": "Zeitpläne & Übergaben",
+    "f14p": "Jeden Morgen eine Statusrunde; der Entwickler übergibt automatisch an QA. Ein Team, das von selbst arbeitet.",
+    "f15t": "Zwei KIs vergleichen",
+    "f15p": "Dieselbe Aufgabe, zwei Modelle, nebeneinander mit Kosten und Zeit — sieh, wo ein kostenloses lokales Modell reicht.",
+    "f16t": "Vorlagen & Teilen",
+    "f16p": "Fertige Teams mit einem Klick und Berichte, die du als saubere Webseite teilen kannst."
   },
   "fr": {
     "pageTitle": "Atrium — Ton bureau d'agents IA",
@@ -565,7 +589,15 @@ window.ATRIUM_I18N = {
     "q6": "Ai-je besoin d'un compte ?",
     "a6": "Non. Atrium fonctionne entièrement sans. Un compte gratuit sert uniquement à envoyer des retours ou des rapports de bug et à lire nos réponses — inscris-toi avec un e-mail ou Google, supprime-le quand tu veux.",
     "q7": "Puis-je gérer plusieurs entreprises ?",
-    "a7": "Oui. Ajoutes-en autant que tu veux ; chacune a ses propres projets, son équipe, sa mémoire, ses rapports et son outil d'IA par défaut."
+    "a7": "Oui. Ajoutes-en autant que tu veux ; chacune a ses propres projets, son équipe, sa mémoire, ses rapports et son outil d'IA par défaut.",
+    "f13t": "Tu valides chaque modification",
+    "f13p": "Les agents travaillent sur une copie de ton projet. Vérifie le diff, applique ce que tu veux, annule en un clic.",
+    "f14t": "Planification et relais",
+    "f14p": "Un tour de statut chaque matin ; le développeur passe automatiquement le relais au QA. Une équipe qui travaille toute seule.",
+    "f15t": "Comparer deux IA",
+    "f15p": "Même tâche, deux modèles, côte à côte avec le coût et le temps — vois où un modèle local gratuit suffit.",
+    "f16t": "Modèles et partage",
+    "f16p": "Des équipes toutes prêtes en un clic, et des rapports à partager sous forme de page web soignée."
   },
   "it": {
     "pageTitle": "Atrium — Il tuo ufficio di agenti IA",
@@ -707,7 +739,15 @@ window.ATRIUM_I18N = {
     "q6": "Mi serve un account?",
     "a6": "No. Atrium funziona completamente senza. Un account gratuito serve solo per inviare feedback o segnalazioni di bug e leggere le nostre risposte — registrati con email o Google, eliminalo quando vuoi.",
     "q7": "Posso gestire più aziende?",
-    "a7": "Sì. Aggiungine quante ne vuoi; ognuna ha i suoi progetti, il suo team, la sua memoria, i suoi report e il suo strumento IA predefinito."
+    "a7": "Sì. Aggiungine quante ne vuoi; ognuna ha i suoi progetti, il suo team, la sua memoria, i suoi report e il suo strumento IA predefinito.",
+    "f13t": "Ogni modifica la approvi tu",
+    "f13p": "Gli agenti lavorano su una copia del tuo progetto. Controlla il diff, applica quello che vuoi, annulla con un clic.",
+    "f14t": "Pianificazione e passaggi",
+    "f14p": "Un giro di stato ogni mattina; lo sviluppatore passa automaticamente il lavoro al QA. Un team che lavora da solo.",
+    "f15t": "Confronta due IA",
+    "f15p": "Stessa attività, due modelli, fianco a fianco con costo e tempo — scopri dove basta un modello locale gratuito.",
+    "f16t": "Modelli e condivisione",
+    "f16p": "Team già pronti con un clic e report da condividere come pagina web pulita."
   },
   "ru": {
     "pageTitle": "Atrium — твой офис ИИ-агентов",
@@ -849,6 +889,14 @@ window.ATRIUM_I18N = {
     "q6": "Нужен ли аккаунт?",
     "a6": "Нет. Atrium полностью работает без него. Бесплатный аккаунт нужен только для отправки отзывов или сообщений об ошибках и чтения наших ответов — регистрируйся через e-mail или Google и удаляй его когда угодно.",
     "q7": "Можно ли управлять несколькими компаниями?",
-    "a7": "Да. Добавляй сколько угодно; у каждой свои проекты, команда, память, отчёты и ИИ-инструмент по умолчанию."
+    "a7": "Да. Добавляй сколько угодно; у каждой свои проекты, команда, память, отчёты и ИИ-инструмент по умолчанию.",
+    "f13t": "Каждое изменение одобряешь ты",
+    "f13p": "Агенты работают с копией твоего проекта. Посмотри diff, примени нужное, отмени одним щелчком.",
+    "f14t": "Расписание и передача работы",
+    "f14p": "Обход со статусом каждое утро; разработчик автоматически передаёт работу QA. Команда, которая работает сама.",
+    "f15t": "Сравни два ИИ",
+    "f15p": "Одна задача, две модели, бок о бок со стоимостью и временем — узнай, где хватит бесплатной локальной модели.",
+    "f16t": "Шаблоны и обмен",
+    "f16p": "Готовые команды одним щелчком и отчёты, которыми можно поделиться в виде аккуратной веб-страницы."
   }
 }

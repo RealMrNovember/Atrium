@@ -131,6 +131,10 @@ export function AyarlarSayfasi({ profil, guncelleme, onKaydet, onYerelYz }: {
             <input type="checkbox" checked={f.ayarlar.ses} onChange={(e) => ayar('ses', e.target.checked)} />
             <span>{t('soundToggle')}</span>
           </label>
+          <label className="onay">
+            <input type="checkbox" checked={f.ayarlar.onizleme !== false} onChange={(e) => ayar('onizleme', e.target.checked)} />
+            <span>{t('previewSetting')} <small>{t('previewSettingHint')}</small></span>
+          </label>
         </div>
         <ul className="guvence">
           <li>{t('safe1')}</li><li>{t('safe2')}</li><li>{t('safe3')}</li><li>{t('safe4')}</li>

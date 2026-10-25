@@ -83,6 +83,29 @@ The **Reports** page collects every command from every floor with the lead's rep
 - **Cap** is Atrium's own **daily safety limit**. Agents never start work that could go past it. If a run times out or is cancelled and its cost can't be read, the full per-agent cap is counted, so the daily cap is never under-counted.
 - Change both caps in **Profile & Settings → Limits and safety**.
 
+## Reviewing changes before they are applied
+When you allow file changes, the team works on a **copy** of your project. Nothing is written to your files until you say so.
+- When the command finishes, **Proposed changes** lists every new, changed and deleted file with its +/− lines. Click a file to see the exact lines.
+- **Apply** writes all changes; untick files and use **Apply selected** for a part; **Discard** throws them away.
+- After applying, **Undo** puts every file back the way it was.
+- If you edited a file yourself while the team was working, Atrium does not overwrite it and marks it **changed by you**.
+- You can turn this off in **Profile & Settings** (not recommended).
+
+## Hand-offs between agents
+In an agent's settings, **When done, hand over to** picks a colleague who checks the work automatically — for example the developer hands over to the QA tester. The checking task appears with ↪ in the task list. The default team and the team templates come with sensible hand-offs.
+
+## Scheduled work
+The ⏰ tab of a floor runs work on its own: a **status round** every morning, **update memory** every Friday, or any read-only **command** at a set time. Pick the days and the time. Schedules run while Atrium is open; if it was busy or closed, they catch up within 30 minutes.
+
+## Comparing two AIs
+**⚖️ Compare** next to the command box runs the same read-only task with two AI tools or models at once — for example Claude and a local model — and shows the answers side by side with cost, time and tokens. Great for finding out where a free local model is good enough.
+
+## Team templates
+On the **Team** tab, **Team templates** sets up a ready-made team in one click: Web agency, Mobile app, Content studio, Data & analytics or Game studio. The agents use your company's default AI tool.
+
+## Sharing a report
+Under the lead's report, **Share** saves it as a clean web page (with your company name and logo) to send to a client or your team; 📋 copies it as Markdown.
+
 ## Multiple companies
 Run more than one company in Atrium — for example your own studio and a client. Each company has its **own projects, team, memory, reports and default AI tool**.
 - Open the **▾** menu next to your company name in the top-left corner to switch companies or add a **New company**. A new company starts with the setup wizard; if you change your mind, use **Back to …** in the wizard.

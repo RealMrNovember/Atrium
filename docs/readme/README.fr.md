@@ -47,6 +47,7 @@ Atrium en fait une entreprise que tu peux **voir** :
 - 🤝 **Pas seulement Claude.** Chaque agent peut tourner avec Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ou tout serveur compatible OpenAI — mélangés sur le même étage.
 - 🦙 **IA locale intégrée.** Atrium mesure ton ordinateur, montre quels modèles ouverts vont tourner, télécharge et installe Ollama et les modèles pour toi, et n'importe quel agent peut les utiliser — gratuit, hors ligne et privé.
 - 💬 **Tes chats Claude Code emménagent.** Atrium lit tes conversations Claude Code existantes et les range par projet. Les chats ouverts illuminent leur étage, et quand un chat attend ta décision, un agent se penche à la fenêtre pour t'appeler.
+- ✅ **Tu valides chaque modification.** Quand les modifications de fichiers sont autorisées, les agents travaillent sur une copie ; tu vérifies le diff, tu appliques ce que tu veux et tu annules en un clic.
 - 🏙️ **Plusieurs entreprises, une seule app.** Gère ton studio et tes clients côte à côte — chaque entreprise avec ses propres projets, son équipe, sa mémoire et son IA.
 - 🔒 **Privé par conception.** Ton code, tes chats, ta mémoire et tes clés ne quittent jamais ton ordinateur. Nous ne pouvons pas les voir — ils ne nous parviennent jamais.
 - 🛟 **Assistance intégrée.** Envoie un souhait, une demande, une réclamation ou un rapport de bug depuis l'app et lis la réponse sur place.
@@ -90,6 +91,17 @@ Les modèles marqués **Peut être un agent** ouvrent et lisent les fichiers du 
 <td align="center"><b>Ton ordinateur, mesuré</b> — état du moteur et tes modèles.</td>
 <td align="center"><b>Un catalogue qui connaît ton matériel</b> — téléchargement en un clic.</td>
 </tr></table>
+
+## ✅ D'une commande au travail terminé
+
+- **Vérifie avant que ça arrive.** Quand les modifications de fichiers sont autorisées, l'équipe travaille sur une copie de ton projet. Tu vois chaque fichier et chaque ligne modifiés, puis tu choisis **Appliquer**, **Appliquer les … sélectionnés** ou **Rejeter** — et **Annuler** après avoir appliqué. Les fichiers que tu as modifiés entre-temps ne sont jamais écrasés.
+- **Passages de relais.** Quand le développeur a fini, le testeur QA vérifie le travail automatiquement. Choisis qui passe le relais à qui dans les réglages de chaque agent.
+- **Travail planifié.** Un tour de statut chaque matin, une mise à jour de la mémoire chaque vendredi, ou n'importe quelle commande en lecture seule à heure fixe — par étage.
+- **Compare deux IA.** Lance la même tâche avec deux outils ou modèles côte à côte, avec le coût, le temps et les tokens — et découvre où un modèle local gratuit suffit.
+- **Modèles d'équipe.** Agence web, Application mobile, Studio de contenu, Données et analyse, Studio de jeux — une équipe complète en un clic.
+- **Partage tes rapports.** Enregistre le rapport du chef de projet sous forme de page web soignée pour un client ou ton équipe.
+
+<div align="center"><img src="../screenshots/preview.png" alt="Modifications proposées en attente de validation, avec un diff ligne par ligne" width="430" /></div>
 
 ## 🔒 Confidentialité
 

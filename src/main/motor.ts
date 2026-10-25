@@ -1,17 +1,18 @@
 // Ajan motoru: komut → lider planı (gerekirse işe alım) → görevler → raporlar → sahibine tek rapor + hafıza.
 // Canlı durum (kim nerede, ne yapıyor) burada tutulur ve her değişiklikte arayüze yollanır.
 import { randomUUID } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type {
-  Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, KomutEki, MisafirAjan, PlanLimiti, PlanLimitleri, SaglayiciId, SirketProfili, SohbetKosusu
+  Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, KomutEki, MisafirAjan, PlanLimiti, PlanLimitleri, SaglayiciId, SirketProfili, SohbetKosusu, Karsilastirma
 } from '@ortak/tipler'
 import { ajanAnahtari } from '@ortak/tipler'
 import { dilAdiIngilizce, type Cevirmen } from '@ortak/i18n'
 import { claudeKos, type KosuSonucu } from './claude'
 import { kos, limitBildiriciAyarla } from './saglayicilar'
 import { hataKaydet } from './hatalar'
+import * as calisma from './calisma'
 import * as depo from './depo'
 import { simKos } from './simulasyon'
 
@@ -23,7 +24,7 @@ const RENK_PALETI = ['#f08c00', '#0c8599', '#9c36b5', '#5c940d', '#e64980', '#42
 
 const canli: CanliDurum = {
   ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {},
-  kullanim: {}, saglayiciLimitleri: {}, aktifSaglayicilar: ['claude']
+  kullanim: {}, saglayiciLimitleri: {}, aktifSaglayicilar: ['claude'], karsilastirmalar: {}
 }
 let aktifSaglayicilarOku: () => SaglayiciId[] = () => ['claude']
 let aktifSonOkuma = 0
@@ -182,6 +183,8 @@ interface AjanKosusu {
   sinyal?: AbortSignal
   /** Komut ekleri: araçlara bu klasörü okuma izni verilir. */
   ekKlasorleri?: string[]
+  /** Ajanın çalışacağı klasör (önizlemede projenin geçici kopyası). */
+  cwd?: string
 }
 
 async function ajaniKostur(k: AjanKosusu): Promise<KosuSonucu> {
@@ -199,7 +202,7 @@ async function ajaniKostur(k: AjanKosusu): Promise<KosuSonucu> {
     ? await simKos(k.tur, k.istem, k.ajan, t, etkinlik, k.sinyal)
     : await kos({
         saglayici, ayar: ayarlar.saglayicilar?.[saglayici] ?? {}, anahtar: apiAnahtari(saglayici),
-        cwd: k.kat.yol, istem: k.istem, model: k.ajan.model, butceUsd: k.butceUsd, araclar: k.araclar, ekKlasorleri: k.ekKlasorleri,
+        cwd: k.cwd ?? k.kat.yol, istem: k.istem, model: k.ajan.model, butceUsd: k.butceUsd, araclar: k.araclar, ekKlasorleri: k.ekKlasorleri,
         yazma: k.yazma, sureMs: ayarlar.kosuSuresiDk * 60_000, claudeYolu: ayarlar.claudeYolu,
         apiAnahtari: apiAnahtari(), t, sinyal: k.sinyal, etkinlik, limitler: limitleriIsle
       })
@@ -519,6 +522,28 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
   const ekleMaliyet = (usd: number): void => guncelle({ maliyetUsd: Math.round((komut.maliyetUsd + usd) * 10000) / 10000 })
 
   const ekipUyeleri = ekip.filter((a) => !a.lider)
+  // yazma izinli komut: ajanlar projenin geçici kopyasında çalışır, değişiklikler onaydan sonra yazılır
+  let alan: string | undefined
+  let calismaYolu: string | undefined
+  const onizlemeHazirla = (): void => {
+    if (!komut.yazmaIzni || sim || sirket.ayarlar.onizleme === false) return
+    const klasor = depo.calismaKlasoru(kat.id, komut.id)
+    try {
+      calisma.calismaAlaniHazirla(kat.yol, klasor)
+      calisma.projeYoluKaydet(klasor, kat.yol)
+      alan = klasor
+      calismaYolu = calisma.calismaKopyasi(klasor)
+      ajanGuncelle(kat.id, lider.id, {}, t('evStaging'))
+    } catch (e) {
+      guncelle({ degisiklik: { durum: 'dogrudan', dosyalar: [], eklenen: 0, silinen: 0, neden: e instanceof Error ? e.message : String(e) } })
+    }
+  }
+  const onizlemeBitir = (): void => {
+    if (!alan) return
+    const dosyalar = calisma.degisiklikleriBul(alan)
+    guncelle({ degisiklik: { durum: dosyalar.length ? 'bekliyor' : 'vazgecildi', dosyalar, ...calisma.ozetle(dosyalar) } })
+    if (!dosyalar.length) rmSync(alan, { recursive: true, force: true })
+  }
   try {
     // 1 · plan (durum turu düğmesiyle gelindiyse plan yok, doğrudan tur)
     let planSonucu: Plan = { plan: t('tourPlan'), gorevler: [], yeniAjanlar: [], tur: true }
@@ -543,7 +568,10 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
     }
     if (sinyal.aborted) throw new Error(t('errCancelled'))
     await raporla()
+    onizlemeBitir()
   } catch (e) {
+    // yarım kalan işte de ajanların yaptıkları gözden geçirilebilsin
+    try { onizlemeBitir() } catch { /* çalışma alanı okunamadı */ }
     const mesaj = e instanceof Error ? e.message : String(e)
     guncelle({ durum: sinyal.aborted ? 'iptal' : 'hata', hata: mesaj,
       gorevler: komut.gorevler.map((g) => (g.durum === 'bekliyor' || g.durum === 'calisiyor' ? { ...g, durum: 'iptal' } : g)) })
@@ -622,6 +650,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
     ajanGuncelle(kat.id, lider.id, { durum: 'bosta', hedef: 'masa' }, t('evTasksAssigned', { n: gorevler.length }))
 
     // 2 · görevler
+    onizlemeHazirla()
     const paralel = komut.yazmaIzni ? 1 : Math.max(1, sirket.ayarlar.esZamanli)
     const kuyruk = [...komut.gorevler]
     const goreviYurut = async (g: Gorev): Promise<void> => {
@@ -641,7 +670,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
         kat, ajan, istem: gorevIstemi(sirket, kat, ajan, lider, g, komut.yazmaIzni, komut),
         ekKlasorleri: komut.ekler?.length ? [depo.ekKlasoru(kat.id, komut.id)] : undefined,
         araclar: okumaAraclari(ajan, komut.yazmaIzni), yazma: komut.yazmaIzni,
-        butceUsd: sirket.ayarlar.kosuButcesiUsd, tur: 'gorev', sinyal
+        butceUsd: sirket.ayarlar.kosuButcesiUsd, tur: 'gorev', sinyal, cwd: calismaYolu
       })
       ekleMaliyet(sonuc.maliyetUsd)
       const basarili = !sonuc.hata || !!sonuc.metin
@@ -651,6 +680,17 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
       })
       if (sinyal.aborted) return
       if (!sim) depo.hafizayaEkle(kat.id, 'Learned', hafizaSatirlari(sonuc.metin))
+      const devralan = basarili && !g.devredenId && ajan.devret ? ekip.find((a) => a.id === ajan.devret && a.id !== ajan.id) : undefined
+      if (devralan) {
+        const yeni: Gorev = {
+          id: randomUUID(), ajanId: devralan.id, devredenId: ajan.id, durum: 'bekliyor',
+          baslik: t('handoffTitle', { name: ajan.ad, title: g.baslik }).slice(0, 120),
+          talimat: `${ajan.ad} (${ajan.rol}) finished "${g.baslik}" and handed it over to you for checking.\n\nTheir task:\n${g.talimat}\n\nTheir report:\n${(sonuc.metin ?? '').slice(0, 6000)}\n\nCheck the work in the project files: is it correct, complete and safe? ${komut.yazmaIzni ? 'You may fix small problems yourself.' : 'Do not change files; list what must be fixed.'} Report clearly what you verified and what is wrong.`
+        }
+        guncelle({ gorevler: [...komut.gorevler, yeni] })
+        kuyruk.push(yeni)
+        ajanGuncelle(kat.id, ajan.id, {}, t('evHandoff', { name: devralan.ad }))
+      }
       if (!basarili) {
         ajanGuncelle(kat.id, ajan.id, { durum: 'hata', hedef: 'masa' }, `⚠️ ${sonuc.hata}`)
         await bekle(BEKLEME_MS * 2, sinyal)
@@ -777,6 +817,91 @@ export async function yeniSohbet(katId: string, mesaj: string, yazma: boolean): 
     sohbetIptalleri.delete(anahtar)
     guncelle({ calisiyor: false })
   }
+}
+
+// --- maliyet ve kalite karşılaştırması ---------------------------------------------------
+
+/** Aynı görev iki araç/modelle, salt okuma ve aynı anda: sonuç, maliyet, süre ve token yan yana. */
+export async function karsilastir(katId: string, metin: string, secenekler: { saglayici: SaglayiciId; model: string }[]): Promise<void> {
+  const t = depo.ceviri()
+  if (canli.karsilastirmalar[katId]?.sonuclar.some((s) => s.calisiyor)) throw new Error(t('errFloorBusy'))
+  const kat = depo.katBul(katId)
+  const sirket = depo.profilOku()
+  const lider = depo.ajanlariOku(katId).find((a) => a.lider)
+  if (!lider) throw new Error(t('errNoAgents'))
+  const k: Karsilastirma = {
+    id: randomUUID(), katId, metin: metin.trim().slice(0, 8000), zaman: new Date().toISOString(),
+    sonuclar: secenekler.slice(0, 2).map((s) => ({ saglayici: s.saglayici, model: s.model, calisiyor: true }))
+  }
+  canli.karsilastirmalar = { ...canli.karsilastirmalar, [katId]: k }
+  yayinla()
+  const istem = `You are a senior engineer reviewing the project "${kat.ad}" for its owner.
+
+${hafizaBlogu(kat.id)}
+
+## Task
+<task>
+${k.metin}
+</task>
+
+${kurallar(false, sirket)}
+
+Answer the task directly and concisely. Mention the files you looked at.`
+  await Promise.all(k.sonuclar.map(async (s, i) => {
+    const bas = Date.now()
+    const sonuc = await ajaniKostur({
+      kat, ajan: { ...lider, id: `karsilastirma-${i}`, saglayici: s.saglayici, model: s.model }, istem,
+      araclar: ['Read', 'Glob', 'Grep'], yazma: false, butceUsd: sirket.ayarlar.kosuButcesiUsd, tur: 'gorev'
+    })
+    const simdiki = canli.karsilastirmalar[katId]
+    if (simdiki?.id !== k.id) return
+    simdiki.sonuclar[i] = { ...s, calisiyor: false, metin: sonuc.metin, hata: sonuc.hata, maliyetUsd: sonuc.maliyetUsd, sureMs: Date.now() - bas, token: sonuc.token }
+    canli.karsilastirmalar = { ...canli.karsilastirmalar, [katId]: { ...simdiki } }
+    yayinla()
+  }))
+}
+
+// --- değişiklik önizlemesi: fark, uygula, vazgeç, geri al ---------------------------------
+
+function komutBul(katId: string, komutId: string): Komut {
+  const k = depo.komutlariOku(katId).find((x) => x.id === komutId)
+  if (!k?.degisiklik) throw new Error('command')
+  return k
+}
+
+function komutKaydetVeYayinla(k: Komut): Komut {
+  depo.komutKaydet(k)
+  canli.aktifKomutlar = canli.aktifKomutlar.map((x) => (x.id === k.id ? k : x))
+  yayinla()
+  return k
+}
+
+export function degisiklikFarki(katId: string, komutId: string, yol: string): string {
+  komutBul(katId, komutId)
+  return calisma.dosyaFarki(depo.calismaKlasoru(katId, komutId), yol)
+}
+
+export function degisiklikUygula(katId: string, komutId: string, yollar?: string[]): Komut {
+  const k = komutBul(katId, komutId)
+  if (k.degisiklik?.durum !== 'bekliyor') return k
+  const kat = depo.katBul(katId)
+  const secilen = (yollar?.length ? yollar : k.degisiklik.dosyalar.map((d) => d.yol)).filter((y) => k.degisiklik!.dosyalar.some((d) => d.yol === y))
+  const sonuc = calisma.degisiklikleriUygula(depo.calismaKlasoru(katId, komutId), kat.yol, depo.yedekKlasoru(katId, komutId), secilen)
+  rmSync(depo.calismaKlasoru(katId, komutId), { recursive: true, force: true })
+  return komutKaydetVeYayinla({ ...k, degisiklik: { ...k.degisiklik, durum: 'uygulandi', uygulanan: sonuc.uygulanan, cakisan: sonuc.cakisan } })
+}
+
+export function degisiklikVazgec(katId: string, komutId: string): Komut {
+  const k = komutBul(katId, komutId)
+  rmSync(depo.calismaKlasoru(katId, komutId), { recursive: true, force: true })
+  return komutKaydetVeYayinla({ ...k, degisiklik: { ...k.degisiklik!, durum: 'vazgecildi' } })
+}
+
+export function degisiklikGeriAl(katId: string, komutId: string): Komut {
+  const k = komutBul(katId, komutId)
+  if (k.degisiklik?.durum !== 'uygulandi') return k
+  calisma.geriAl(depo.yedekKlasoru(katId, komutId), depo.katBul(katId).yol)
+  return komutKaydetVeYayinla({ ...k, degisiklik: { ...k.degisiklik, durum: 'geri-alindi' } })
 }
 
 export function sohbetDurdur(id: string): void {

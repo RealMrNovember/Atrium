@@ -26,7 +26,7 @@ export type Sayfa =
 
 const BOS_CANLI: CanliDurum = {
   ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {},
-  kullanim: {}, saglayiciLimitleri: {}, aktifSaglayicilar: []
+  kullanim: {}, saglayiciLimitleri: {}, aktifSaglayicilar: [], karsilastirmalar: {}
 }
 
 export function App(): ReactElement {

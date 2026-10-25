@@ -83,6 +83,29 @@ La page **Rapports** rassemble chaque commande de chaque étage avec le rapport 
 - **Plafond** est la propre **limite de sécurité quotidienne** d'Atrium. Les agents ne démarrent jamais un travail qui pourrait la dépasser. Si une exécution expire ou est annulée et que son coût ne peut pas être lu, le plafond complet par agent est comptabilisé, de sorte que le plafond quotidien n'est jamais sous-estimé.
 - Modifie les deux plafonds dans **Profil et réglages → Limites et sécurité**.
 
+## Vérifier les modifications avant de les appliquer
+Quand tu autorises les modifications de fichiers, l'équipe travaille sur une **copie** de ton projet. Rien n'est écrit dans tes fichiers tant que tu ne l'as pas décidé.
+- Quand la commande se termine, **Modifications proposées** liste chaque fichier nouveau, modifié ou supprimé avec ses lignes +/−. Clique sur un fichier pour voir les lignes exactes.
+- **Appliquer** écrit toutes les modifications ; décoche des fichiers et utilise **Appliquer les … sélectionnés** pour n'en appliquer qu'une partie ; **Rejeter** les jette.
+- Après l'application, **Annuler** remet chaque fichier tel qu'il était.
+- Si tu as modifié un fichier toi-même pendant que l'équipe travaillait, Atrium ne l'écrase pas et le marque **modifié par toi**.
+- Tu peux désactiver cela dans **Profil et réglages** (déconseillé).
+
+## Passages de relais entre agents
+Dans les réglages d'un agent, **Une fois terminé, passer le relais à** choisit un collègue qui vérifie le travail automatiquement — par exemple le développeur passe le relais au testeur QA. La tâche de vérification apparaît avec ↪ dans la liste des tâches. L'équipe par défaut et les modèles d'équipe sont livrés avec des relais judicieux.
+
+## Travail planifié
+L'onglet ⏰ d'un étage lance du travail tout seul : un **tour de statut** chaque matin, **mettre à jour la mémoire** chaque vendredi, ou n'importe quelle **commande** en lecture seule à heure fixe. Choisis les jours et l'heure. Les planifications s'exécutent tant qu'Atrium est ouvert ; s'il était occupé ou fermé, elles sont rattrapées dans les 30 minutes.
+
+## Comparer deux IA
+**⚖️ Comparer**, à côté de la zone de commande, lance la même tâche en lecture seule avec deux outils ou modèles d'IA à la fois — par exemple Claude et un modèle local — et affiche les réponses côte à côte avec le coût, le temps et les tokens. Idéal pour savoir où un modèle local gratuit suffit.
+
+## Modèles d'équipe
+Dans l'onglet **Équipe**, **Modèles d’équipe** installe une équipe toute prête en un clic : Agence web, Application mobile, Studio de contenu, Données et analyse ou Studio de jeux. Les agents utilisent l'outil d'IA par défaut de ton entreprise.
+
+## Partager un rapport
+Sous le rapport du chef de projet, **Partager** l'enregistre sous forme de page web soignée (avec le nom et le logo de ton entreprise) à envoyer à un client ou à ton équipe ; 📋 le copie en Markdown.
+
 ## Plusieurs entreprises
 Gère plus d’une entreprise dans Atrium — par exemple ton propre studio et un client. Chaque entreprise a **ses propres projets, son équipe, sa mémoire, ses rapports et son outil d’IA par défaut**.
 - Ouvre le menu **▾** à côté du nom de ton entreprise, en haut à gauche, pour changer d’entreprise ou ajouter une **Nouvelle entreprise**. Une nouvelle entreprise commence par l’assistant de configuration ; si tu changes d’avis, utilise **Retour à …** dans l’assistant.

@@ -4,6 +4,17 @@ export interface SurumNotu { surum: string; tarih: string; baslik: string; madde
 
 export const en: SurumNotu[] = [
   {
+    surum: '1.6.0', tarih: '2026-10-26', baslik: "You approve every change",
+    maddeler: [
+      "✅ Change preview: with file changes allowed, agents work on a copy of your project. Review every file and line, apply all or some, discard — and undo after applying.",
+      "↪ Hand-offs: when an agent finishes, a colleague checks the work automatically (developer → QA by default).",
+      "⏰ Scheduled work per floor: daily status rounds, weekly memory updates or any command at a set time.",
+      "⚖️ Compare two AIs side by side — answers, cost, time and tokens.",
+      "🧩 Team templates: Web agency, Mobile app, Content studio, Data & analytics, Game studio.",
+      "📤 Share the lead’s report as a clean web page."
+    ]
+  },
+  {
     surum: '1.5.0', tarih: '2026-10-26', baslik: "Many companies, one-click AI, built-in support",
     maddeler: [
       "🏙️ Run several companies — each with its own projects, team, memory and default AI tool. Switch from the ▾ menu next to the company name.",

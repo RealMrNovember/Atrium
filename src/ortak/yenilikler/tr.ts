@@ -2,6 +2,17 @@ import type { SurumNotu } from './en'
 
 export const tr: SurumNotu[] = [
   {
+    surum: '1.6.0', tarih: '2026-10-26', baslik: "Her değişikliği sen onaylarsın",
+    maddeler: [
+      "✅ Değişiklik önizlemesi: dosya değişikliğine izin verildiğinde ajanlar projenin bir kopyasında çalışır. Her dosyayı ve satırı incele, hepsini ya da bir kısmını uygula, vazgeç — uyguladıktan sonra geri al.",
+      "↪ Devir: bir ajan işini bitirince bir çalışma arkadaşı işi kendiliğinden kontrol eder (varsayılan: geliştirici → test uzmanı).",
+      "⏰ Kat başına zamanlanmış işler: her gün durum turu, her hafta hafıza güncellemesi ya da belirli saatte herhangi bir komut.",
+      "⚖️ İki yapay zekayı yan yana karşılaştır — yanıtlar, maliyet, süre ve token.",
+      "🧩 Hazır ekip şablonları: Web ajansı, Mobil uygulama, İçerik üretimi, Veri ve analitik, Oyun stüdyosu.",
+      "📤 Liderin raporunu temiz bir web sayfası olarak paylaş."
+    ]
+  },
+  {
     surum: '1.5.0', tarih: '2026-10-26', baslik: "Birçok şirket, tek tıkla yapay zeka, yerleşik destek",
     maddeler: [
       "🏙️ Birden fazla şirket yönet — her birinin kendi projeleri, ekibi, hafızası ve varsayılan yapay zeka aracı var. Şirket adının yanındaki ▾ menüsünden geçiş yap.",

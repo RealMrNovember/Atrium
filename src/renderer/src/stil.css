@@ -631,3 +631,53 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .kullanim-karti.sade .kullanim-deger { display: inline; }
 .kullanim-karti.sade .kullanim-deger small { margin-left: 4px; }
 .kullanim-gostergesi { justify-content: flex-start; margin-left: auto; }
+
+/* --- değişiklik önizlemesi --- */
+.degisiklik-paneli { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--yuzey-2); border: 1px solid var(--cizgi); display: grid; gap: 8px; }
+.degisiklik-paneli.bekliyor { border-color: rgba(242, 163, 58, .55); }
+.degisiklik-paneli.uygulandi { border-color: rgba(63, 191, 127, .45); }
+.degisiklik-ust { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.degisiklik-ust > span:empty { flex: 1; }
+.ekle-renk { color: #6fe0a6; } .sil-renk { color: #ff8aa0; }
+.degisen-dosyalar { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-height: 420px; overflow: auto; }
+.degisen-satir { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 6px; }
+.degisen-satir:hover { background: var(--yuzey); }
+.degisen-tur { width: 18px; text-align: center; font-weight: 700; }
+.degisen-tur.eklendi { color: #6fe0a6; } .degisen-tur.silindi { color: #ff8aa0; } .degisen-tur.degisti { color: #f6c27a; }
+.degisen-ad { flex: 1; min-width: 0; text-align: left; background: none; border: 0; font-family: ui-monospace, Consolas, monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--metin); }
+.fark { margin: 4px 0 8px 26px; padding: 8px 10px; border-radius: 8px; background: #0b0f1c; font-size: 12px; line-height: 1.45; overflow: auto; max-height: 360px; white-space: pre; }
+.fark .f-ekle { color: #6fe0a6; background: rgba(63, 191, 127, .08); display: inline-block; min-width: 100%; }
+.fark .f-sil { color: #ff8aa0; background: rgba(240, 80, 110, .08); display: inline-block; min-width: 100%; }
+.fark .f-baslik { color: #9d8bff; }
+
+/* --- zamanlama --- */
+.zamanlama-paneli { display: grid; gap: 12px; }
+.zamanlama-listesi { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.zamanlama-listesi li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--yuzey-2); border: 1px solid var(--cizgi); }
+.zamanlama-listesi li.kapali { opacity: .55; }
+.zamanlama-formu { padding: 12px; border-radius: 10px; border: 1px dashed var(--cizgi); }
+
+/* --- karşılaştırma --- */
+.karsilastirma-paneli { margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--yuzey-2); border: 1px solid rgba(124, 92, 255, .45); display: grid; gap: 8px; }
+.karsilastirma-secim { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.karsilastirma-secim > div { display: grid; gap: 4px; padding: 8px; border-radius: 8px; background: var(--yuzey); }
+.karsilastirma-secim .form-satir { grid-template-columns: 1fr; }
+.karsilastirma-sonuclari { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.karsilastirma-karti { display: grid; gap: 6px; align-content: start; padding: 10px; border-radius: 10px; background: var(--yuzey); border: 1px solid var(--cizgi); min-width: 0; }
+.karsilastirma-baslik { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.karsilastirma-olcu { display: flex; gap: 6px; flex-wrap: wrap; }
+.karsilastirma-metin { max-height: 420px; overflow: auto; font-size: 13px; }
+
+/* --- şablonlar ve rapor paylaşımı --- */
+.sablon-secici { margin-top: 10px; padding: 12px; border-radius: 12px; background: var(--yuzey-2); border: 1px solid var(--cizgi); display: grid; gap: 8px; }
+.sablon-kartlari { display: grid; gap: 8px; }
+.sablon-karti { display: grid; gap: 3px; text-align: left; padding: 10px 12px; border-radius: 10px; background: var(--yuzey); border: 1px solid var(--cizgi); }
+.sablon-karti:hover { border-color: var(--vurgu); }
+.sablon-ikon { font-size: 22px; }
+.sablon-roller { color: #c7b8ff; }
+.rapor-paylas { display: inline-flex; gap: 6px; align-items: center; margin: 6px 0; }
+.rapor-ust-dugmeler { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.degisen-satir input[type="checkbox"] { width: auto; flex: none; margin: 0; }
+.degisen-satir > .kucuk, .degisen-satir > .etiket { flex: none; white-space: nowrap; }
+.fark > div { white-space: pre; min-height: 1.45em; padding: 0 4px; }
+.fark .f-ekle, .fark .f-sil { display: block; min-width: 0; }
