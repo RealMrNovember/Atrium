@@ -46,6 +46,7 @@ export function SohbetListesi({ katId, aciklama, katlar, onKatSec, acik: ilkAcik
             {zamanMetni(s.son, t, dil)} · {t('messages', { n: s.mesajSayisi })}
             {s.altAjanSayisi > 0 && ` · ★ ${t('subagents', { n: s.altAjanSayisi })}`}
           </span>
+          {s.bekleyenSoru && <span className="karar-etiketi" title={s.bekleyenSoru}>⏳ {t('awaitingDecision')}: {s.bekleyenSoru}</span>}
           {katlar && (
             <span className={s.katId ? 'etiket' : 'etiket uyari'} onClick={(e) => { if (s.katId && onKatSec) { e.stopPropagation(); onKatSec(s.katId, s.id) } }}>
               {katAdi(s.katId)}
@@ -76,16 +77,21 @@ function SohbetOkuyucu({ sohbet, canli, onGeri }: { sohbet: Sohbet; canli?: Canl
   }, [calisiyor])
   useEffect(() => { alt.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }, [mesajlar?.length, kosu?.satirlar.length])
 
-  const gonder = async (): Promise<void> => {
-    if (!yazi.trim() || calisiyor) return
+  const gonder = async (metin = yazi): Promise<void> => {
+    if (!metin.trim() || calisiyor) return
     setHata('')
     try {
-      await window.sirket.sohbetDevam(sohbet.klasor, sohbet.id, yazi, yazma)
+      await window.sirket.sohbetDevam(sohbet.klasor, sohbet.id, metin, yazma)
       setYazi('')
     } catch (e) {
       setHata(hataMetni(e))
     }
   }
+  // son kutudan sonra kullanıcı yazmadıysa (ve şu an Atrium'dan çalışmıyorsa) düğmeleri cevaplanabilir
+  const gosterilen = mesajlar?.slice(-60) ?? []
+  const sonSen = gosterilen.map((m) => m.rol).lastIndexOf('sen')
+  const sonKutu = gosterilen.map((m) => m.rol).lastIndexOf('kutu')
+  const bekleyenKutu = !calisiyor && !(kosu && kosu.satirlar.length > 1) && sonKutu > sonSen ? sonKutu : -1
 
   return (
     <div className="sohbet-okuyucu">
@@ -93,7 +99,22 @@ function SohbetOkuyucu({ sohbet, canli, onGeri }: { sohbet: Sohbet; canli?: Canl
       <h3>{sohbet.baslik || t('untitled')}</h3>
       <p className="kucuk">{new Date(sohbet.ilk).toLocaleString(dil)} · {t('messages', { n: sohbet.mesajSayisi })}</p>
       {mesajlar === null && <p className="bos">{t('loadingChat')}</p>}
-      {mesajlar?.slice(-60).map((m, i) => (
+      {gosterilen.map((m, i) => m.rol === 'kutu' && m.kutu ? (
+        // Claude Desktop'taki "sıradaki adım" kutusu; bekleyen sorunun düğmeleri cevabı buradan gönderir
+        <div key={i} className={i === bekleyenKutu ? 'siradaki-kutu bekliyor' : 'siradaki-kutu'}>
+          <span className="mesaj-kim">{t('nextStep')}</span>
+          <p>{m.kutu.ozet}</p>
+          {m.kutu.soru && <b>{m.kutu.soru}</b>}
+          {m.kutu.dugmeler.length > 0 && (
+            <div className="kutu-dugmeleri">
+              {m.kutu.dugmeler.map((d, j) => (
+                <button key={j} className={j === 0 ? 'birincil' : 'ikincil'} disabled={i !== bekleyenKutu} title={d.mesaj}
+                  onClick={() => void gonder(d.mesaj)}>{d.etiket}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
         <div key={i} className={`mesaj ${m.rol}`}>
           <span className="mesaj-kim">{m.rol === 'sen' ? t('you') : t('claude')}</span>
           <Markdown metin={m.metin.length > 4000 ? m.metin.slice(0, 4000) + '…' : m.metin} />
@@ -118,6 +139,7 @@ function SohbetOkuyucu({ sohbet, canli, onGeri }: { sohbet: Sohbet; canli?: Canl
       <div className="sohbet-yazma">
         <textarea rows={3} value={yazi} disabled={calisiyor} placeholder={t('continueChatPlaceholder')}
           onChange={(e) => setYazi(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) void gonder() }} />
+        {bekleyenKutu >= 0 && <p className="kucuk">{t('awaitingDecisionHint')}</p>}
         <div className="komut-alt">
           <label className="onay"><input type="checkbox" checked={yazma} disabled={calisiyor} onChange={(e) => setYazma(e.target.checked)} /><span>{t('allowWrite')}</span></label>
           {calisiyor

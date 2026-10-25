@@ -224,12 +224,22 @@ export interface Sohbet {
   son: string
   mesajSayisi: number
   altAjanSayisi: number
+  /** Son "sıradaki adım" kutusu bir soru soruyor ve henüz cevaplanmadıysa o soru. */
+  bekleyenSoru?: string
+}
+
+/** Claude Desktop'ın "sıradaki adım" kutusu (sohbet kaydındaki wrap_up çağrısı). */
+export interface SiradakiAdim {
+  ozet: string
+  soru?: string
+  dugmeler: { etiket: string; mesaj: string }[]
 }
 
 export interface SohbetMesaji {
-  rol: 'sen' | 'claude'
+  rol: 'sen' | 'claude' | 'kutu'
   metin: string
   zaman: string
+  kutu?: SiradakiAdim
 }
 
 export interface SohbetOzeti {

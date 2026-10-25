@@ -3,7 +3,7 @@
 // (<oturum>/subagents/agent-*.jsonl) canlıysa katta "misafir ajan" olarak görünür.
 import { closeSync, existsSync, openSync, readFileSync, readSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import type { AktifSohbet, Kat, MisafirAjan, Sohbet, SohbetMesaji, SohbetOzeti } from '@ortak/tipler'
+import type { AktifSohbet, Kat, MisafirAjan, SiradakiAdim, Sohbet, SohbetMesaji, SohbetOzeti } from '@ortak/tipler'
 import type { Cevirmen } from '@ortak/i18n'
 import { aracSatiri, ATRIUM_ISARETI } from './claude'
 
@@ -36,6 +36,20 @@ export function katEsle(klasor: string, katlar: Kat[]): string | null {
   return en?.id ?? null
 }
 
+/** Asistan mesajındaki "sıradaki adım" kutusu (Claude Desktop'ın wrap_up aracı). */
+function siradakiAdim(icerik: unknown): SiradakiAdim | null {
+  if (!Array.isArray(icerik)) return null
+  const p = icerik.find((x) => x?.type === 'tool_use' && /wrap_up$/.test(String(x.name ?? '')))
+  const g = p?.input as { recap?: string; ask?: string; actions?: { label?: string; message?: string }[] } | undefined
+  if (!g?.recap) return null
+  return {
+    ozet: String(g.recap),
+    soru: g.ask ? String(g.ask) : undefined,
+    dugmeler: (g.actions ?? []).filter((a) => a?.label).slice(0, 3)
+      .map((a) => ({ etiket: String(a.label), mesaj: String(a.message || a.label) }))
+  }
+}
+
 function metinParcalari(icerik: unknown): string[] {
   if (typeof icerik === 'string') return [icerik]
   if (!Array.isArray(icerik)) return []
@@ -61,6 +75,7 @@ function sohbetiOku(kok: string, klasor: string, dosya: string): Omit<Sohbet, 'k
   let mesaj = 0
   let atrium = false
   let ilkKullanici = true
+  let bekleyenSoru = ''
   for (const satir of readFileSync(yol, 'utf-8').split('\n')) {
     if (!satir) continue
     let o: Record<string, any>
@@ -77,14 +92,20 @@ function sohbetiOku(kok: string, klasor: string, dosya: string): Omit<Sohbet, 'k
       if (ilkKullanici && yazilan[0].startsWith(ATRIUM_ISARETI)) atrium = true
       ilkKullanici = false
       ilkMetin ||= yazilan[0]
+      bekleyenSoru = '' // kullanıcı yazdıysa önceki soru cevaplanmıştır
       mesaj++
-    } else if (metinler.some((m) => m.trim())) mesaj++
+    } else {
+      if (metinler.some((m) => m.trim())) mesaj++
+      const kutu = siradakiAdim(o.message?.content)
+      if (kutu) bekleyenSoru = kutu.soru ?? ''
+    }
   }
   const id = dosya.replace(/\.jsonl$/, '')
   let altAjan = 0
   try { altAjan = readdirSync(join(kok, klasor, id, 'subagents')).filter((d) => d.endsWith('.jsonl')).length } catch { /* yok */ }
   const sohbet = atrium || !mesaj ? null : {
-    id, klasor, cwd, baslik: baslik || ilkMetin.replace(/\s+/g, ' ').slice(0, 90), ilk, son, mesajSayisi: mesaj, altAjanSayisi: altAjan
+    id, klasor, cwd, baslik: baslik || ilkMetin.replace(/\s+/g, ' ').slice(0, 90), ilk, son, mesajSayisi: mesaj, altAjanSayisi: altAjan,
+    bekleyenSoru: bekleyenSoru || undefined
   }
   onbellek.set(anahtar, { mtime: st.mtimeMs, boyut: st.size, sohbet })
   return sohbet
@@ -127,8 +148,9 @@ export function sohbetMesajlari(kok: string, klasor: string, id: string): Sohbet
     try { o = JSON.parse(satir) } catch { continue }
     if ((o.type !== 'user' && o.type !== 'assistant') || o.isSidechain) continue
     const parcalar = metinParcalari(o.message?.content).filter((m) => (o.type === 'user' ? kullaniciMetni(m) : m.trim()))
-    if (!parcalar.length) continue
-    mesajlar.push({ rol: o.type === 'user' ? 'sen' : 'claude', metin: parcalar.join('\n\n').slice(0, 12000), zaman: o.timestamp ?? '' })
+    if (parcalar.length) mesajlar.push({ rol: o.type === 'user' ? 'sen' : 'claude', metin: parcalar.join('\n\n').slice(0, 12000), zaman: o.timestamp ?? '' })
+    const kutu = o.type === 'assistant' ? siradakiAdim(o.message?.content) : null
+    if (kutu) mesajlar.push({ rol: 'kutu', metin: kutu.ozet, zaman: o.timestamp ?? '', kutu })
   }
   return mesajlar.slice(-400)
 }
