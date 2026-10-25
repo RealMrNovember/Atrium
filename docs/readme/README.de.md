@@ -99,7 +99,7 @@ Lade das Installationsprogramm für dein System von der [**neuesten Version**](h
 |---|---|
 | Windows 10/11 | `Atrium-Setup-x.y.z.exe` |
 | macOS | `Atrium-x.y.z-arm64.dmg` / `-x64.dmg` |
-| Linux | `Atrium-x.y.z-x64.AppImage` oder `.deb` |
+| Linux | `Atrium-x.y.z-x86_64.AppImage` oder `.deb` |
 
 > macOS-Builds sind noch nicht notarisiert: Beim ersten Mal die App per Rechtsklick → **Öffnen** starten.
 

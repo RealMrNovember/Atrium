@@ -99,7 +99,7 @@ flowchart LR
 |---|---|
 | Windows 10/11 | `Atrium-Setup-x.y.z.exe` |
 | macOS | `Atrium-x.y.z-arm64.dmg` / `-x64.dmg` |
-| Linux | `Atrium-x.y.z-x64.AppImage` veya `.deb` |
+| Linux | `Atrium-x.y.z-x86_64.AppImage` veya `.deb` |
 
 > macOS sürümleri henüz noter onaylı (notarized) değil: ilk seferde uygulamaya sağ tıkla → **Aç**.
 

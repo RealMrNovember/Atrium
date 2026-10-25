@@ -99,7 +99,7 @@ Télécharge l'installateur pour ton système depuis la [**dernière version**](
 |---|---|
 | Windows 10/11 | `Atrium-Setup-x.y.z.exe` |
 | macOS | `Atrium-x.y.z-arm64.dmg` / `-x64.dmg` |
-| Linux | `Atrium-x.y.z-x64.AppImage` ou `.deb` |
+| Linux | `Atrium-x.y.z-x86_64.AppImage` ou `.deb` |
 
 > Les versions macOS ne sont pas encore notarisées : la première fois, clic droit sur l'appli → **Ouvrir**.
 
