@@ -50,6 +50,7 @@ function varsayilanProfil(): SirketProfili {
     katSirasi: [],
     sohbetKlasoru: join(homedir(), '.claude', 'projects'),
     kurulumTamam: false,
+    sonGorulenSurum: '',
     ayarlar: {
       kosuButcesiUsd: 1,
       gunlukTavanUsd: 10,

@@ -450,6 +450,25 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .kilavuz-bolum { padding-top: 6px; scroll-margin-top: 12px; }
 .kilavuz-bolum h2 { color: #fff; border-bottom: 1px solid var(--cizgi); padding-bottom: 6px; }
 .kilavuz-bolum .md { font-size: 14.5px; line-height: 1.65; }
+.pencere-arka { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(6, 8, 16, .66); backdrop-filter: blur(4px); animation: belir .2s ease-out; }
+.yenilikler-penceresi {
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 80px); overflow-y: auto; padding: 26px 28px 18px;
+  border-radius: 20px; border: 1px solid #3a3f78; box-shadow: 0 30px 90px rgba(0, 0, 0, .55);
+  background: radial-gradient(circle at 0% 0%, rgba(124, 92, 255, .35), transparent 55%), linear-gradient(180deg, #1b2140, #141a2e);
+  animation: pencere-gir .35s cubic-bezier(.2, 1.3, .4, 1);
+}
+@keyframes pencere-gir { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+.yenilikler-ust { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+.yenilikler-ust h2 { margin: 2px 0; font-size: 22px; }
+.yenilikler-baslik { color: #c9cbff; }
+.yenilikler-maddeler { list-style: none; padding: 0; margin: 6px 0 16px; display: grid; gap: 8px; }
+.yenilikler-maddeler li { padding: 10px 12px; border-radius: 12px; background: rgba(14, 18, 32, .45); border: 1px solid var(--cizgi); animation: belir .4s both; }
+.yenilikler-uzak { margin-bottom: 12px; padding: 8px 14px; border-radius: 12px; background: rgba(14, 18, 32, .45); border: 1px solid var(--cizgi); }
+.gecmis-baslik { margin: 18px 0 8px; font-size: 13px; color: var(--soluk); text-transform: uppercase; letter-spacing: .06em; }
+.surum-notu { margin: 6px 0; padding: 8px 12px; border-radius: 10px; background: var(--yuzey-2); border: 1px solid var(--cizgi); }
+.surum-notu summary { cursor: pointer; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.surum-notu ul { margin: 8px 0 2px; padding-left: 4px; list-style: none; display: grid; gap: 4px; font-size: 13px; color: #c4cae0; }
+.surum-notu.yeni { border-color: rgba(255, 215, 106, .45); }
 .alan { display: grid; gap: 6px; }
 .alan-etiket { font-size: 12px; color: var(--soluk); }
 .kurulum-bitis { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; background: radial-gradient(ellipse at 50% 60%, #1a2140, #0b0e19 70%); }
@@ -459,3 +478,7 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .yukselen-kat span { color: #ffd76a; margin-right: 6px; font-variant-numeric: tabular-nums; }
 .yukselen-lobi { display: flex; gap: 10px; align-items: center; background: linear-gradient(90deg, #4a3bb0, #3f6fd0); color: #fff; font-weight: 700; padding: 10px 12px; }
 @keyframes yuksel { from { opacity: 0; transform: translateY(16px) scaleY(.6); } }
+
+.yenilikler-indirme { display: grid; gap: 6px; margin: 4px 0 12px; }
+.yenilikler-indirme .cubuk { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+.yenilikler-indirme .cubuk span { display: block; height: 100%; background: var(--vurgu, #f5b942); transition: width .4s; }

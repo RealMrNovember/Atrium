@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type DragEvent, type ReactElement } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent, type ReactElement } from 'react'
 import type { CanliDurum, GuncellemeDurumu, Kat, SirketProfili } from '@ortak/tipler'
 import { AtriumIsareti, SirketLogosu } from './bilesenler/Kimlik'
 import { PlanGostergesi } from './bilesenler/PlanGostergesi'
+import { YeniliklerPenceresi } from './bilesenler/YeniliklerPenceresi'
 import { acikSayisi, calisanSayisi, katCagrisi } from './sahne/Bina'
 import { DilSaglayici, useDil } from './dil'
 import { AnaSayfa } from './sayfalar/AnaSayfa'
@@ -44,6 +45,22 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
   const [abonelik, setAbonelik] = useState(false)
   const [guncelleme, setGuncelleme] = useState<GuncellemeDurumu | null>(null)
   const [surukle, setSurukle] = useState<string | null>(null)
+  // "Neler yeni?": kurulu sürüm için (güncellemeden sonra ilk açılış) ya da kurulmayı bekleyen sürüm için
+  const [yenilik, setYenilik] = useState<{ surum: string; bekleyen: boolean } | null>(
+    profil.sonGorulenSurum !== SURUM ? { surum: SURUM, bekleyen: false } : null)
+  const gosterilenGuncelleme = useRef<string | null>(null)
+  useEffect(() => {
+    // yeni sürüm fark edildiği anda (daha inmeden) notlarını bir kez kendiliğinden göster
+    const v = guncelleme?.yeniSurum
+    if (v && (guncelleme?.durum === 'indiriliyor' || guncelleme?.durum === 'hazir' || guncelleme?.durum === 'mevcut') && gosterilenGuncelleme.current !== v) {
+      gosterilenGuncelleme.current = v
+      setYenilik({ surum: v, bekleyen: true })
+    }
+  }, [guncelleme?.durum, guncelleme?.yeniSurum])
+  const yenilikKapat = (): void => {
+    if (yenilik && !yenilik.bekleyen && profil.sonGorulenSurum !== SURUM) void onKaydet({ ...profil, sonGorulenSurum: SURUM })
+    setYenilik(null)
+  }
 
   const katlariYenile = useCallback(() => { void window.sirket.katlar().then(setKatlar) }, [])
   useEffect(katlariYenile, [katlariYenile, profil.projeKlasoru, profil.haricTutulan.length, profil.ekProjeler.length])
@@ -154,6 +171,7 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
         {guncelleme && (guncelleme.durum === 'hazir' || guncelleme.durum === 'mevcut') && (
           <div className="guncelleme-seridi">
             <span>🎉 {t('updateReady', { v: guncelleme.yeniSurum ?? '' })}</span>
+            <button className="ikincil mini-buyuk" onClick={() => setYenilik({ surum: guncelleme.yeniSurum ?? '', bekleyen: true })}>✨ {t('whatsNew')}</button>
             {guncelleme.durum === 'hazir'
               ? <button className="birincil mini-buyuk" onClick={() => void window.sirket.guncellemeKur()}>{t('updateRestart')}</button>
               : <button className="birincil mini-buyuk" onClick={() => void window.sirket.disBaglanti(`${GITHUB}/releases/latest`)}>{t('updateDownload')}</button>}
@@ -195,6 +213,15 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
         {sayfa.tur === 'ayarlar' && <AyarlarSayfasi profil={profil} guncelleme={guncelleme} onKaydet={onKaydet} />}
         {sayfa.tur === 'kilavuz' && <KilavuzSayfasi />}
       </main>
+      {yenilik && (
+        <YeniliklerPenceresi surum={yenilik.surum} bekleyen={yenilik.bekleyen}
+          uzakNotlar={yenilik.bekleyen ? guncelleme?.yeniNotlar : undefined}
+          dilliNotlar={yenilik.bekleyen ? guncelleme?.yeniNotlarDilli : undefined}
+          onKapat={yenilikKapat}
+          onGecmis={() => { yenilikKapat(); setSayfa({ tur: 'ayarlar' }) }}
+          onKur={yenilik.bekleyen && guncelleme?.durum === 'hazir' ? () => void window.sirket.guncellemeKur() : undefined}
+          indirme={yenilik.bekleyen && guncelleme?.durum === 'indiriliyor' ? guncelleme.yuzde ?? 0 : undefined} />
+      )}
     </div>
   )
 }

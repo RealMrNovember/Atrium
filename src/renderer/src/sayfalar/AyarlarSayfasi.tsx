@@ -3,6 +3,8 @@ import type { GuncellemeDurumu, SirketAyarlari, SirketProfili } from '@ortak/tip
 import { DILLER, type Dil } from '@ortak/i18n'
 import { SirketLogosu } from '../bilesenler/Kimlik'
 import { ProjeSecici } from '../bilesenler/ProjeSecici'
+import { Markdown } from '../bilesenler/Markdown'
+import { surumNotlari } from '@ortak/yenilikler'
 import { useDil } from '../dil'
 import { GITHUB, logoOku, SURUM } from '../yardimci'
 import { ClaudeAdimi } from './Kurulum'
@@ -139,6 +141,26 @@ export function AyarlarSayfasi({ profil, guncelleme, onKaydet }: {
           {guncelleme?.durum === 'mevcut' && <button className="birincil" onClick={() => void window.sirket.disBaglanti(`${GITHUB}/releases/latest`)}>{t('updateDownload')}</button>}
         </div>
         <p className="kucuk">{t('updHint')}</p>
+        {(guncelleme?.yeniNotlarDilli || guncelleme?.yeniNotlar) && (guncelleme.durum === 'indiriliyor' || guncelleme.durum === 'hazir' || guncelleme.durum === 'mevcut') && (() => {
+          const dilli = guncelleme.yeniNotlarDilli?.[dil] ?? guncelleme.yeniNotlarDilli?.en
+          return (
+            <details className="surum-notu yeni" open>
+              <summary><b>✨ {guncelleme.yeniSurum}</b> {dilli && <>· {dilli.baslik}</>} <span className="kucuk">{t('whatsNew')}</span></summary>
+              {dilli ? <ul>{dilli.maddeler.map((m, i) => <li key={i}>{m}</li>)}</ul> : <Markdown metin={guncelleme.yeniNotlar ?? ''} />}
+            </details>
+          )
+        })()}
+        <h3 className="gecmis-baslik">📜 {t('versionHistory')}</h3>
+        {surumNotlari(dil).map((n) => (
+          <details key={n.surum} className="surum-notu" open={n.surum === SURUM}>
+            <summary>
+              <b>{n.surum}</b> · {n.baslik} <span className="kucuk">· {new Date(n.tarih).toLocaleDateString(dil)}</span>
+              {n.surum === SURUM && <span className="etiket iyi">{t('installed')}</span>}
+            </summary>
+            <ul>{n.maddeler.map((m, i) => <li key={i}>{m}</li>)}</ul>
+          </details>
+        ))}
+        <button className="ikincil" onClick={() => void window.sirket.disBaglanti(`${GITHUB}/releases`)}>{t('releaseNotesOnline')} ↗</button>
       </section>
 
       <div className="kaydet-cubugu">

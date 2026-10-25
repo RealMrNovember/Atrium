@@ -41,7 +41,8 @@ function Sihirbaz({ p, setP, onBitti }: { p: SirketProfili; setP: (p: SirketProf
   const bitir = async (): Promise<void> => {
     setBitiyor(true)
     await new Promise((r) => setTimeout(r, 2400))
-    await onBitti({ ...p, ad: p.ad.trim(), kurulumTamam: true })
+    // ilk kurulumda "Neler yeni?" gösterilmez; sonraki güncellemelerde gösterilir
+    await onBitti({ ...p, ad: p.ad.trim(), kurulumTamam: true, sonGorulenSurum: __SURUM__ })
   }
 
   if (bitiyor) {

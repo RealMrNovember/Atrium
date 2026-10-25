@@ -22,6 +22,8 @@ export interface SirketProfili {
   /** Claude Code sohbet kayıtlarının klasörü (~/.claude/projects). */
   sohbetKlasoru: string
   kurulumTamam: boolean
+  /** "Neler yeni?" penceresinin en son gösterildiği sürüm. */
+  sonGorulenSurum: string
   ayarlar: SirketAyarlari
 }
 
@@ -58,6 +60,10 @@ export interface GuncellemeDurumu {
   durum: 'yok' | 'denetleniyor' | 'guncel' | 'mevcut' | 'indiriliyor' | 'hazir' | 'hata'
   mevcutSurum: string
   yeniSurum?: string
+  /** Yeni sürümün GitHub sürüm notları (Markdown) — dilli not yoksa yedek. */
+  yeniNotlar?: string
+  /** Yeni sürümün 6 dildeki notları (showroom/yenilikler.json'dan), dil kodu → not. */
+  yeniNotlarDilli?: Record<string, { baslik: string; maddeler: string[] }>
   yuzde?: number
   sonDenetim?: string
   hata?: string
