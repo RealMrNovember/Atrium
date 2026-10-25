@@ -6,9 +6,10 @@ import { yerelMetinler } from '@ortak/yerel/metinler'
 import { useSaglayicilar } from '../bilesenler/SaglayiciSecici'
 import { useDil } from '../dil'
 
-const TURLER: { id: ModelTuru | 'hepsi'; anahtar: 'catAll' | 'catGeneral' | 'catCode' | 'catReason' | 'catVision' | 'catEmbed' }[] = [
+const TURLER: { id: ModelTuru | 'hepsi'; anahtar: 'catAll' | 'catGeneral' | 'catCode' | 'catReason' | 'catVision' | 'catUncensored' | 'catEmbed' }[] = [
   { id: 'hepsi', anahtar: 'catAll' }, { id: 'genel', anahtar: 'catGeneral' }, { id: 'kod', anahtar: 'catCode' },
-  { id: 'akil', anahtar: 'catReason' }, { id: 'gorsel', anahtar: 'catVision' }, { id: 'gomme', anahtar: 'catEmbed' }
+  { id: 'akil', anahtar: 'catReason' }, { id: 'gorsel', anahtar: 'catVision' }, { id: 'sansursuz', anahtar: 'catUncensored' },
+  { id: 'gomme', anahtar: 'catEmbed' }
 ]
 const UYGUNLUK: Record<Uygunluk, { anahtar: 'fitFast' | 'fitSlow' | 'fitNo' | 'fitDisk'; sinif: string; ikon: string }> = {
   hizli: { anahtar: 'fitFast', sinif: 'iyi', ikon: '🟢' },
@@ -146,6 +147,7 @@ export function YerelYzSayfasi(): ReactElement {
             <span>{t('mdOnlyFits')}</span>
           </label>
         </div>
+        {tur === 'sansursuz' && <p className="yerel-uyari">⚠️ {t('uncensoredNote')}</p>}
         <div className="model-kartlari">
           {gorunen.map((m) => {
             const u = donanim ? uygunluk(m, donanim) : null
@@ -166,6 +168,7 @@ export function YerelYzSayfasi(): ReactElement {
                     <span className="etiket" title={m.arac ? t('agentCapableHint') : t('agentNoHint')}>{m.arac ? `🤖 ${t('agentCapable')}` : `💬 ${t('agentNo')}`}</span>
                   )}
                   {m.gorsel && <span className="etiket">🖼️</span>}
+                  {m.tur === 'sansursuz' && <span className="etiket uyari" title={t('uncensoredNote')}>🔓 {t('catUncensored')}</span>}
                   <span className="kucuk">{t('mdNeeds', { gb: gerekenBellek(m) })}</span>
                 </div>
                 <div className="model-alt">

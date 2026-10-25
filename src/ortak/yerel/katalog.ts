@@ -2,7 +2,7 @@
 // Boyutlar Ollama'nın varsayılan 4 bit sürümlerine göredir (GB, yaklaşık).
 import type { Donanim } from '../tipler'
 
-export type ModelTuru = 'genel' | 'kod' | 'akil' | 'gorsel' | 'gomme'
+export type ModelTuru = 'genel' | 'kod' | 'akil' | 'gorsel' | 'sansursuz' | 'gomme'
 
 export interface KatalogModeli {
   /** `ollama pull` adı */
@@ -47,6 +47,14 @@ export const KATALOG: KatalogModeli[] = [
   { id: 'deepseek-r1:32b', aile: 'DeepSeek-R1', parametre: 32, boyutGb: 20, tur: 'akil', arac: false },
   { id: 'qwen2.5vl:7b', aile: 'Qwen 2.5 VL', parametre: 7, boyutGb: 6.0, tur: 'gorsel', arac: false, gorsel: true },
   { id: 'llava:7b', aile: 'LLaVA', parametre: 7, boyutGb: 4.7, tur: 'gorsel', arac: false, gorsel: true },
+  // sansürsüz (reddetmeleri azaltılmış) topluluk ince ayarları — Ollama kütüphanesinde herkese açık
+  { id: 'dolphin-phi:2.7b', aile: 'Dolphin Phi', parametre: 2.7, boyutGb: 1.6, tur: 'sansursuz', arac: false },
+  { id: 'llama2-uncensored:7b', aile: 'Llama 2 Uncensored', parametre: 7, boyutGb: 3.8, tur: 'sansursuz', arac: false },
+  { id: 'dolphin-mistral:7b', aile: 'Dolphin Mistral', parametre: 7, boyutGb: 4.1, tur: 'sansursuz', arac: false },
+  { id: 'dolphin-llama3:8b', aile: 'Dolphin Llama 3', parametre: 8, boyutGb: 4.7, tur: 'sansursuz', arac: false },
+  { id: 'dolphin3:8b', aile: 'Dolphin 3.0', parametre: 8, boyutGb: 4.9, tur: 'sansursuz', arac: false },
+  { id: 'wizard-vicuna-uncensored:13b', aile: 'Wizard Vicuna Uncensored', parametre: 13, boyutGb: 7.4, tur: 'sansursuz', arac: false },
+  { id: 'dolphin-mixtral:8x7b', aile: 'Dolphin Mixtral', parametre: 47, boyutGb: 26, tur: 'sansursuz', arac: false },
   { id: 'nomic-embed-text', aile: 'Nomic Embed', parametre: 0.14, boyutGb: 0.3, tur: 'gomme', arac: false },
   { id: 'mxbai-embed-large', aile: 'mxbai Embed', parametre: 0.34, boyutGb: 0.7, tur: 'gomme', arac: false }
 ]
@@ -75,7 +83,7 @@ export function uygunluk(m: { boyutGb: number }, d: Donanim): Uygunluk {
 
 /** Rahat ve yavaş çalışan en büyük parametre sayıları (özet satırı için). */
 export function sinirlar(d: Donanim): { hizli: number; yavas: number } {
-  const genel = KATALOG.filter((m) => m.tur !== 'gomme')
+  const genel = KATALOG.filter((m) => m.tur !== 'gomme' && m.tur !== 'sansursuz')
   const enBuyuk = (u: Uygunluk[]): number => Math.max(0, ...genel.filter((m) => u.includes(uygunluk(m, d))).map((m) => m.parametre))
   return { hizli: enBuyuk(['hizli']), yavas: enBuyuk(['hizli', 'yavas']) }
 }

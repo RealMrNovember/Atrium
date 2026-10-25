@@ -4,6 +4,13 @@ export interface SurumNotu { surum: string; tarih: string; baslik: string; madde
 
 export const en: SurumNotu[] = [
   {
+    surum: '1.4.1', tarih: '2026-10-25', baslik: "Uncensored models in Local AI",
+    maddeler: [
+      "🔓 New “Uncensored” filter in the Local AI catalog with seven community models (Dolphin, Llama 2 Uncensored, Wizard Vicuna), each with a clear note on what that means.",
+      "🛠️ Cancelling the Ollama download now cleans up the half-downloaded file."
+    ]
+  },
+  {
     surum: '1.4.0', tarih: '2026-10-25', baslik: 'Many AIs, one office — plus local AI',
     maddeler: [
       "🤝 Agents can now run on Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama or any OpenAI-compatible server — mixed on the same floor.",

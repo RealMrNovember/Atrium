@@ -30,6 +30,13 @@ export const tr: YerelMetinler = {
     'deepseek-r1:32b': 'Zor problemler için derin akıl yürütme; 24 GB kart ister.',
     'qwen2.5vl:7b': 'Ekran görüntüsü, belge ve grafik okur; metin tanıma (OCR) iyi.',
     'llava:7b': 'Klasik görsel model; resimleri anlatır, onlarla ilgili soruları yanıtlar.',
+    'dolphin-phi:2.7b': "Microsoft Phi-2 tabanlı küçük sansürsüz model; neredeyse her bilgisayarda çalışır.",
+    'llama2-uncensored:7b': "Klasik sansürsüz Llama 2 ince ayarı; ahlak dersi vermeden doğrudan yanıtlar.",
+    'dolphin-mistral:7b': "Eric Hartford’un popüler sansürsüz Mistral 7B’si; sohbet ve yaratıcı yazıda iyi.",
+    'dolphin-llama3:8b': "Sansürsüz Llama 3 8B; Llama 2 sürümlerinden akıllı, talimat ve kodda iyi.",
+    'dolphin3:8b': "Llama 3.1 üzerinde Dolphin 3.0: bu listedeki en yeni genel amaçlı sansürsüz model.",
+    'wizard-vicuna-uncensored:13b': "Daha büyük sansürsüz sohbet modeli; daha uzun, ayrıntılı yanıtlar, ~9 GB ister.",
+    'dolphin-mixtral:8x7b': "Mixtral üzerinde sansürsüz uzmanlar karışımı; buradaki en güçlüsü, 32 GB üzeri makineler için.",
     'nomic-embed-text': 'Metni arama için vektöre çevirir (RAG); sohbet modeli değildir.',
     'mxbai-embed-large': 'Anlamsal arama için kaliteli gömme modeli; sohbet modeli değildir.'
   },

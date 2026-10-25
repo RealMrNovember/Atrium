@@ -30,6 +30,13 @@ export const de: YerelMetinler = {
     'deepseek-r1:32b': 'Tiefes Nachdenken für schwierige Probleme; braucht eine 24-GB-Karte.',
     'qwen2.5vl:7b': 'Liest Screenshots, Dokumente und Diagramme; gute Texterkennung (OCR).',
     'llava:7b': 'Klassisches Bildmodell; beschreibt Bilder und beantwortet Fragen dazu.',
+    'dolphin-phi:2.7b': "Kleines unzensiertes Modell auf Basis von Microsoft Phi-2; läuft auf fast jedem Computer.",
+    'llama2-uncensored:7b': "Klassische unzensierte Llama-2-Feinabstimmung; antwortet direkt, ohne zu moralisieren.",
+    'dolphin-mistral:7b': "Beliebtes unzensiertes Mistral 7B von Eric Hartford; gut für Chat und kreatives Schreiben.",
+    'dolphin-llama3:8b': "Unzensiertes Llama 3 8B; klüger als die Llama-2-Versionen, gut bei Anweisungen und Code.",
+    'dolphin3:8b': "Dolphin 3.0 auf Llama 3.1: das neueste unzensierte Allzweckmodell in dieser Liste.",
+    'wizard-vicuna-uncensored:13b': "Größeres unzensiertes Chatmodell; längere, ausführlichere Antworten, braucht etwa 9 GB.",
+    'dolphin-mixtral:8x7b': "Unzensiertes Mixture-of-Experts auf Mixtral; das stärkste hier, für Rechner mit 32 GB+.",
     'nomic-embed-text': 'Wandelt Text für die Suche in Vektoren um (RAG); kein Chat-Modell.',
     'mxbai-embed-large': 'Hochwertiges Embedding-Modell für semantische Suche; kein Chat-Modell.'
   },

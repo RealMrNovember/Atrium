@@ -2,6 +2,13 @@ import type { SurumNotu } from './en'
 
 export const tr: SurumNotu[] = [
   {
+    surum: '1.4.1', tarih: '2026-10-25', baslik: "Yerel YZ’de sansürsüz modeller",
+    maddeler: [
+      "🔓 Yerel YZ kataloğunda yeni “Sansürsüz” filtresi: yedi topluluk modeli (Dolphin, Llama 2 Uncensored, Wizard Vicuna), ne anlama geldiğini anlatan açık bir notla.",
+      "🛠️ Ollama indirmesi iptal edildiğinde yarım inen dosya artık temizleniyor."
+    ]
+  },
+  {
     surum: '1.4.0', tarih: '2026-10-25', baslik: 'Birçok yapay zeka, tek ofis — üstelik yerel YZ',
     maddeler: [
       "🤝 Ajanlar artık Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ya da OpenAI uyumlu herhangi bir sunucuyla çalışabilir — aynı katta karışık.",

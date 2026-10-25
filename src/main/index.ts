@@ -6,6 +6,7 @@ import { claudeDurumuOku, claudeGirisBaslat, terminaldeCalistir } from './claude
 import { donanimOku } from './donanim'
 import { cliBul, saglayiciDurumu, uyumluModeller } from './saglayicilar'
 import * as yerel from './yerel'
+import * as erisim from './erisim'
 import * as depo from './depo'
 import * as guncelleme from './guncelleme'
 import * as motor from './motor'
@@ -177,6 +178,9 @@ function kanallar(): void {
     return saglayiciDurumlari()
   })
   const ollamaAyari = (): SaglayiciAyari | undefined => depo.profilOku().ayarlar.saglayicilar?.ollama
+  ipcMain.handle('erisimDurumu', () => erisim.erisimDurumu())
+  ipcMain.handle('erisimDenetle', () => erisim.erisimDenetle())
+  ipcMain.handle('lisansEtkinlestir', (_e, anahtar: string) => erisim.lisansEtkinlestir(String(anahtar ?? '')))
   ipcMain.handle('donanim', () => donanimOku())
   ipcMain.handle('ollamaKur', () => { void yerel.ollamaKur(ollamaAyari()) })
   ipcMain.handle('ollamaBaslat', () => yerel.ollamaBaslat(ollamaAyari()))
@@ -207,6 +211,7 @@ function misafirTaramasi(): void {
 
 app.whenReady().then(() => {
   depo.depoBaslat(join(app.getPath('userData'), 'data'), app.getAppPath(), app.getLocale())
+  erisim.erisimBaslat(depo.veriKlasoru(), () => depo.profilOku().dil, (d) => pencere?.webContents.send('erisim', d))
   motor.motorBaslat((d) => pencere?.webContents.send('canli', d), apiAnahtariOku, sohbetBaglami)
   yerel.yerelBaslat(depo.veriKlasoru(), (d) => pencere?.webContents.send('indirme', d))
   kanallar()

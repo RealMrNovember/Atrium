@@ -30,6 +30,13 @@ export const it: YerelMetinler = {
     'deepseek-r1:32b': 'Ragionamento profondo per problemi difficili; richiede una scheda da 24 GB.',
     'qwen2.5vl:7b': 'Legge screenshot, documenti e grafici; buon riconoscimento del testo (OCR).',
     'llava:7b': 'Classico modello per immagini; descrive le foto e risponde a domande su di esse.',
+    'dolphin-phi:2.7b': "Piccolo modello senza censura basato su Microsoft Phi-2; gira su quasi ogni computer.",
+    'llama2-uncensored:7b': "Classica messa a punto senza censura di Llama 2; risponde in modo diretto, senza fare la morale.",
+    'dolphin-mistral:7b': "Popolare Mistral 7B senza censura di Eric Hartford; bravo nella chat e nella scrittura creativa.",
+    'dolphin-llama3:8b': "Llama 3 8B senza censura; più intelligente delle versioni Llama 2, bravo con istruzioni e codice.",
+    'dolphin3:8b': "Dolphin 3.0 su Llama 3.1: il modello senza censura generico più recente di questa lista.",
+    'wizard-vicuna-uncensored:13b': "Modello di chat senza censura più grande; risposte più lunghe e dettagliate, servono circa 9 GB.",
+    'dolphin-mixtral:8x7b': "Mixture-of-experts senza censura su Mixtral; il più potente qui, per macchine da 32 GB in su.",
     'nomic-embed-text': 'Trasforma il testo in vettori per la ricerca (RAG); non è un modello di chat.',
     'mxbai-embed-large': 'Modello di embedding di alta qualità per la ricerca semantica; non è un modello di chat.'
   },

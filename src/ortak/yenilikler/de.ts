@@ -2,6 +2,13 @@ import type { SurumNotu } from './en'
 
 export const de: SurumNotu[] = [
   {
+    surum: '1.4.1', tarih: '2026-10-25', baslik: "Unzensierte Modelle in Lokale KI",
+    maddeler: [
+      "🔓 Neuer Filter „Unzensiert“ im Katalog von Lokale KI mit sieben Community-Modellen (Dolphin, Llama 2 Uncensored, Wizard Vicuna), jeweils mit einem klaren Hinweis, was das bedeutet.",
+      "🛠️ Wird der Ollama-Download abgebrochen, wird die halb geladene Datei jetzt entfernt."
+    ]
+  },
+  {
     surum: '1.4.0', tarih: '2026-10-25', baslik: 'Viele KIs, ein Büro – plus lokale KI',
     maddeler: [
       "🤝 Agenten laufen jetzt mit Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama oder jedem OpenAI-kompatiblen Server – gemischt auf derselben Etage.",

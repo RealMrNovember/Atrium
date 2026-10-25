@@ -97,6 +97,16 @@ export interface Donanim {
   birlesikBellek: boolean
 }
 
+/** Açılışta sunucudan alınan erişim kararı. */
+export interface ErisimDurumu {
+  durum: 'acik' | 'kilitli' | 'guncelleme-gerekli'
+  /** Sunucudan gelen, kullanıcının dilindeki mesaj. */
+  mesaj?: string
+  satinAl?: string
+  enAzSurum?: string
+  lisansVar: boolean
+}
+
 /** Uygulama içinden Ollama ya da model indirme ilerlemesi. */
 export interface Indirme {
   /** 'ollama' ya da model adı. */
@@ -370,7 +380,11 @@ export interface SirketApi {
   indirmeIptal(hedef: string): Promise<void>
   /** Yerel modelle tek mesajlık deneme sohbeti; yanıt metnini döndürür. */
   yerelDene(model: string, mesajlar: { rol: 'sen' | 'model'; metin: string }[]): Promise<string>
+  erisimDurumu(): Promise<ErisimDurumu>
+  erisimDenetle(): Promise<ErisimDurumu>
+  lisansEtkinlestir(anahtar: string): Promise<{ basarili: boolean; durum: ErisimDurumu }>
   canliDinle(cb: (d: CanliDurum) => void): () => void
   guncellemeDinle(cb: (d: GuncellemeDurumu) => void): () => void
   indirmeDinle(cb: (d: Record<string, Indirme>) => void): () => void
+  erisimDinle(cb: (d: ErisimDurumu) => void): () => void
 }

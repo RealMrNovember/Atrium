@@ -2,6 +2,13 @@ import type { SurumNotu } from './en'
 
 export const ru: SurumNotu[] = [
   {
+    surum: '1.4.1', tarih: '2026-10-25', baslik: "Модели без цензуры в «Локальном ИИ»",
+    maddeler: [
+      "🔓 Новый фильтр «Без цензуры» в каталоге «Локального ИИ»: семь моделей сообщества (Dolphin, Llama 2 Uncensored, Wizard Vicuna) с понятным пояснением, что это значит.",
+      "🛠️ При отмене загрузки Ollama недокачанный файл теперь удаляется."
+    ]
+  },
+  {
     surum: '1.4.0', tarih: '2026-10-25', baslik: 'Много ИИ, один офис — и локальный ИИ',
     maddeler: [
       "🤝 Агенты теперь работают на Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama или любом OpenAI-совместимом сервере — вперемешку на одном этаже.",

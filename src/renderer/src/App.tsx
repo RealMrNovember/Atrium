@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent, type ReactElement } from 'react'
-import type { CanliDurum, GuncellemeDurumu, Kat, SirketProfili } from '@ortak/tipler'
+import type { CanliDurum, ErisimDurumu, GuncellemeDurumu, Kat, SirketProfili } from '@ortak/tipler'
+import { KilitEkrani } from './bilesenler/KilitEkrani'
 import { AtriumIsareti, SirketLogosu } from './bilesenler/Kimlik'
 import { PlanGostergesi } from './bilesenler/PlanGostergesi'
 import { YeniliklerPenceresi } from './bilesenler/YeniliklerPenceresi'
@@ -26,13 +27,19 @@ const BOS_CANLI: CanliDurum = {
 
 export function App(): ReactElement {
   const [profil, setProfil] = useState<SirketProfili | null>(null)
+  const [erisim, setErisim] = useState<ErisimDurumu | null>(null)
   useEffect(() => { void window.sirket.profil().then(setProfil) }, [])
+  useEffect(() => {
+    void window.sirket.erisimDurumu().then(setErisim)
+    return window.sirket.erisimDinle(setErisim)
+  }, [])
 
   if (!profil) return <div className="yukleniyor"><AtriumIsareti boyut={48} /></div>
   const kaydet = async (p: SirketProfili): Promise<void> => setProfil(await window.sirket.profilKaydet(p))
   return (
     <DilSaglayici dil={profil.dil}>
-      {profil.kurulumTamam ? <Sirket profil={profil} onKaydet={kaydet} /> : <Kurulum baslangic={profil} onBitti={kaydet} />}
+      {erisim && erisim.durum !== 'acik' ? <KilitEkrani erisim={erisim} onDegisti={setErisim} />
+        : profil.kurulumTamam ? <Sirket profil={profil} onKaydet={kaydet} /> : <Kurulum baslangic={profil} onBitti={kaydet} />}
     </DilSaglayici>
   )
 }

@@ -81,8 +81,10 @@ async function dosyaIndir(url: string, hedefDosya: string, hedef: string, sinyal
         guncelle(hedef, { yuzde: Math.round((inen / toplam) * 100), mesaj: `${(inen / 1e6).toFixed(0)} / ${(toplam / 1e6).toFixed(0)} MB` })
       }
     })
-    akis.on('error', ret)
-    yazici.on('error', ret)
+    // hata ya da iptalde dosya kapatılmadan bırakılırsa Windows silmeye izin vermez
+    const kapatVeReddet = (e: Error): void => { akis.destroy(); yazici.destroy(); yazici.once('close', () => ret(e)) }
+    akis.on('error', kapatVeReddet)
+    yazici.on('error', kapatVeReddet)
     yazici.on('finish', () => coz())
     akis.pipe(yazici)
   })
@@ -122,7 +124,7 @@ export async function ollamaKur(ayar?: SaglayiciAyari): Promise<void> {
     guncelle('ollama', { durum: denetim.signal.aborted ? 'iptal' : 'hata', mesaj: String((e as Error).message).slice(0, 200) })
   } finally {
     iptaller.delete('ollama')
-    rmSync(gecici, { recursive: true, force: true })
+    try { rmSync(gecici, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 }) } catch { /* bir sonraki açılışta işletim sistemi temizler */ }
   }
 }
 

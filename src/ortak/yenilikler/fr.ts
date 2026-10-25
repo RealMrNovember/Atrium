@@ -2,6 +2,13 @@ import type { SurumNotu } from './en'
 
 export const fr: SurumNotu[] = [
   {
+    surum: '1.4.1', tarih: '2026-10-25', baslik: "Modèles non censurés dans IA locale",
+    maddeler: [
+      "🔓 Nouveau filtre « Non censuré » dans le catalogue IA locale avec sept modèles communautaires (Dolphin, Llama 2 Uncensored, Wizard Vicuna), avec une note claire sur ce que cela implique.",
+      "🛠️ Annuler le téléchargement d’Ollama supprime désormais le fichier à moitié téléchargé."
+    ]
+  },
+  {
     surum: '1.4.0', tarih: '2026-10-25', baslik: 'Plusieurs IA, un seul bureau — et l’IA locale',
     maddeler: [
       "🤝 Les agents fonctionnent désormais avec Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ou tout serveur compatible OpenAI — mélangés sur le même étage.",
