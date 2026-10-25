@@ -30,9 +30,10 @@ export interface KosuSonucu {
   hata?: string
 }
 
-// Ajan hiçbir koşulda gizli dosya okuyamaz, kabuk komutu çalıştıramaz.
+// Ajan hiçbir koşulda gizli dosya okuyamaz, kabuk komutu çalıştıramaz, kendi alt ajanını açamaz
+// (alt ajan bütçe ve denetimin dışına taşar; iş bölmeyi lider yapar).
 const YASAK_ARACLAR = [
-  'Bash', 'PowerShell',
+  'Bash', 'PowerShell', 'Agent', 'Task',
   'Read(**/.env)', 'Read(**/.env.*)', 'Read(**/*.pem)', 'Read(**/*.key)', 'Read(**/id_rsa*)', 'Read(**/id_ed25519*)',
   'Edit(**/.env*)', 'Write(**/.env*)'
 ]
@@ -140,15 +141,20 @@ export function aracSatiri(ad: string, girdi: Record<string, unknown>, t: Cevirm
 
 export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
   const { komut, kabuk } = claudeBul(s.claudeYolu)
+  // salt okuma koşusunda yazma araçları açıkça yasak (izin listesine güvenmek yetmez)
+  const yasak = s.yazma ? YASAK_ARACLAR : [...YASAK_ARACLAR, 'Write', 'Edit', 'MultiEdit', 'NotebookEdit']
   const args = [
     '-p', '--output-format', 'stream-json', '--verbose',
     '--model', s.model,
     '--max-budget-usd', String(s.butceUsd),
     '--permission-mode', s.yazma ? 'acceptEdits' : 'default',
+    '--no-session-persistence', // ajan koşuları kullanıcının Claude Code sohbet geçmişine düşmesin
     '--allowedTools', s.araclar.join(','),
-    '--disallowedTools', YASAK_ARACLAR.join(',')
+    '--disallowedTools', yasak.join(',')
   ]
-  const ortam = temizOrtam(s.apiAnahtari ? { ANTHROPIC_API_KEY: s.apiAnahtari } : {})
+  // Claude Code'un yerleşik otomatik hafızası kapalı: ajan ~/.claude altına kendi hafıza dosyalarını
+  // yazmasın, proje hafızası yalnızca Atrium'da dursun.
+  const ortam = temizOrtam({ CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1', ...(s.apiAnahtari ? { ANTHROPIC_API_KEY: s.apiAnahtari } : {}) })
 
   return new Promise((coz) => {
     let bitti = false
