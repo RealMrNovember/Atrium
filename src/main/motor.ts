@@ -86,8 +86,8 @@ export function aktifSohbetleriGuncelle(dosyadan: Record<string, AktifSohbet[]>)
     const liste = (birlesik[k.katId] ??= [])
     const var_ = liste.find((s) => s.id === k.id)
     const son = [...k.satirlar].reverse().find((s) => s.rol === 'arac')?.metin
-    if (var_) Object.assign(var_, { atriumdan: true, etkinlik: son ?? var_.etkinlik })
-    else liste.push({ id: k.id, klasor: '', baslik: '', etkinlik: son, atriumdan: true })
+    if (var_) Object.assign(var_, { atriumdan: true, durum: 'calisiyor', bekleyenSoru: undefined, etkinlik: son ?? var_.etkinlik })
+    else liste.push({ id: k.id, klasor: '', baslik: '', etkinlik: son, atriumdan: true, durum: 'calisiyor' })
   }
   if (JSON.stringify(birlesik) === JSON.stringify(canli.aktifSohbetler)) return
   canli.aktifSohbetler = birlesik

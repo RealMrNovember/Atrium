@@ -44,8 +44,14 @@ export const SES = {
   isAlim: () => [523.3, 659.3, 784, 1046.5].forEach((f, i) => ton(f, 0.25, 0.035, 'triangle', i * 0.09)),
   rapor: () => { ton(880, 0.18, 0.035, 'triangle'); ton(1318.5, 0.35, 0.03, 'triangle', 0.12) },
   bitti: () => [659.3, 784, 987.8].forEach((f, i) => ton(f, 0.4, 0.035, 'sine', i * 0.12)),
-  hata: () => { ton(220, 0.25, 0.04, 'sawtooth'); ton(196, 0.3, 0.035, 'sawtooth', 0.15) }
+  hata: () => { ton(220, 0.25, 0.04, 'sawtooth'); ton(196, 0.3, 0.035, 'sawtooth', 0.15) },
+  // "hey!" — pencereden seslenen ajan: yükselen iki kısa nota
+  seslen: () => { ton(740, 0.12, 0.045, 'triangle'); ton(1108.7, 0.22, 0.045, 'triangle', 0.13) }
 }
+
+const cagriSayisi = (c: CanliDurum): number =>
+  Object.values(c.aktifSohbetler).reduce((n, l) => n + l.filter((s) => s.bekleyenSoru && s.durum === 'acik').length, 0) +
+  Object.values(c.ajanlar).filter((a) => a.durum === 'hata').length
 
 /**
  * Canlı durumdaki değişimleri sese çevirir. Adım ve klavye sesleri yalnız açık kattaki ajanlar için;
@@ -78,6 +84,7 @@ export function useSesler(canli: CanliDurum, acik: boolean, katId: string | null
     if (bitenler.length) SES.bitti()
     else if (rapor) SES.rapor()
     if (hata) SES.hata()
+    else if (cagriSayisi(canli) > cagriSayisi(o)) SES.seslen()
   }, [canli, acik])
 
   // sürekli sesler: yürüyen varsa adım, çalışan varsa klavye

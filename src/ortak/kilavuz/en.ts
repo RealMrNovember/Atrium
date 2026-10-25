@@ -19,6 +19,8 @@ You can run the wizard again any time from **Profile & Settings**.
 - **Lit windows** mean someone is working on that floor: an Atrium agent, a guest sub-agent, or a Claude Code chat that is active right now.
 - **Reorder floors**: drag a floor in the left list, or use the ▲ ▼ buttons that appear when you hover it.
 - Your **logo** stands on the roof once you upload it.
+- **Bright windows** mean someone is working right now; **warm, dim windows** mean a Claude Code chat is open in the Claude app but idle.
+- When something needs you — a chat waiting for your decision or an agent with a problem — an agent leans out of that floor's window, waves and calls you. Click it to jump straight to that chat.
 
 ## Inside a floor
 A floor has eight rooms around a corridor. Room 1 belongs to the **project lead** (the one with the crown). The default team is a developer, a UI/UX designer, test & quality, a researcher and a memory keeper.

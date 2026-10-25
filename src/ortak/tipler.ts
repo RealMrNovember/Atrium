@@ -156,6 +156,8 @@ export interface MisafirAjan {
   etkinlik?: string
   sohbetBasligi: string
   sonEtkinlik: string
+  /** Açık ama boşta (Claude uygulamasında duran sohbet): karakter masasında oturur, ekranı sönük. */
+  bosta?: boolean
 }
 
 /** Claude Code'da şu an aktif bir sohbet (son dakikada yazılmış ya da Atrium'dan sürdürülen). */
@@ -166,6 +168,10 @@ export interface AktifSohbet {
   etkinlik?: string
   /** Atrium içinden sürdürülüyor mu. */
   atriumdan: boolean
+  /** 'calisiyor': şu an çalışıyor · 'acik': Claude uygulamasında açık, boşta */
+  durum?: 'calisiyor' | 'acik'
+  /** Son "sıradaki adım" kutusundaki cevaplanmamış soru — katta bir ajan pencereden seslenir. */
+  bekleyenSoru?: string
 }
 
 /** Atrium'dan sürdürülen bir sohbetin canlı çıktısı. */

@@ -6,6 +6,7 @@ import { join } from 'node:path'
 import type { AktifSohbet, Kat, MisafirAjan, SiradakiAdim, Sohbet, SohbetMesaji, SohbetOzeti } from '@ortak/tipler'
 import type { Cevirmen } from '@ortak/i18n'
 import { aracSatiri, ATRIUM_ISARETI } from './claude'
+import type { AcikOturum } from './oturumlar'
 
 const GUVENLI_AD = /^[A-Za-z0-9._-]+$/
 const CANLI_MS = 40_000
@@ -189,10 +190,19 @@ function sonEtkinlik(yol: string, t: Cevirmen): string | undefined {
 
 const AKTIF_SOHBET_MS = 60_000
 
-/** Şu an aktif Claude Code sohbetleri (son dakikada yazılmış), katlara göre. Atrium'un kendi koşuları hariç. */
-export function aktifSohbetleriTara(kok: string, katlar: Kat[], t: Cevirmen): Record<string, AktifSohbet[]> {
-  const sonuc: Record<string, AktifSohbet[]> = {}
+/**
+ * Claude Code'da şu an açık ya da çalışan sohbetler, katlara göre (Atrium'un kendi koşuları hariç).
+ * - çalışıyor: kaydı son dakikada yazılmış
+ * - açık: Claude Desktop / IDE'de oturumu açık (süreç listesinden), ama o an boşta
+ */
+export function aktifSohbetleriTara(kok: string, katlar: Kat[], t: Cevirmen, acik: AcikOturum[] = []): Record<string, AktifSohbet[]> {
   const simdi = Date.now()
+  const kimlikli = new Set(acik.filter((o) => o.id).map((o) => o.id!))
+  const kimliksiz = acik.filter((o) => !o.id && o.baslangic).sort((a, b) => a.baslangic - b.baslangic)
+  const enEski = kimliksiz.length ? kimliksiz[0].baslangic - 10_000 : Infinity
+
+  // adaylar: son dakikada yazılmışlar, kimliği açık listede olanlar ve kimliksiz süreçlerden sonra başlamış olanlar
+  const adaylar: { katId: string; klasor: string; yol: string; mtime: number; sohbet: Omit<Sohbet, 'katId'> }[] = []
   for (const klasor of klasorler(kok)) {
     const katId = katEsle(klasor, katlar)
     if (!katId) continue
@@ -200,11 +210,36 @@ export function aktifSohbetleriTara(kok: string, katlar: Kat[], t: Cevirmen): Re
     try { dosyalar = readdirSync(join(kok, klasor)).filter((d) => d.endsWith('.jsonl') && GUVENLI_AD.test(d)) } catch { continue }
     for (const d of dosyalar) {
       const yol = join(kok, klasor, d)
-      try { if (simdi - statSync(yol).mtimeMs > AKTIF_SOHBET_MS) continue } catch { continue }
+      let mtime = 0
+      try { mtime = statSync(yol).mtimeMs } catch { continue }
+      const id = d.replace(/\.jsonl$/, '')
+      if (simdi - mtime > AKTIF_SOHBET_MS && !kimlikli.has(id) && mtime < enEski) continue
       const sohbet = sohbetiOku(kok, klasor, d)
-      if (!sohbet) continue // Atrium'un kendi koşusu ya da boş
-      ;(sonuc[katId] ??= []).push({ id: sohbet.id, klasor, baslik: sohbet.baslik, etkinlik: sonEtkinlik(yol, t), atriumdan: false })
+      if (sohbet) adaylar.push({ katId, klasor, yol, mtime, sohbet })
     }
+  }
+
+  const secilen = new Map<string, (typeof adaylar)[number]>()
+  for (const a of adaylar) if (simdi - a.mtime <= AKTIF_SOHBET_MS || kimlikli.has(a.sohbet.id)) secilen.set(a.sohbet.id, a)
+  // yeni açılan oturumlar: Claude Desktop süreci ilk mesajla başlatır, kayıt da hemen ardından açılır.
+  // Her süreç, başlangıcından sonraki 2 dakika içinde başlamış, ona en yakın eşleşmemiş sohbete eşlenir.
+  for (const o of kimliksiz) {
+    const fark = (a: (typeof adaylar)[number]): number => Date.parse(a.sohbet.ilk) - o.baslangic
+    const aday = adaylar
+      .filter((a) => !secilen.has(a.sohbet.id) && a.sohbet.ilk && fark(a) >= -10_000 && fark(a) <= 120_000)
+      .sort((a, b) => Math.abs(fark(a)) - Math.abs(fark(b)))[0]
+    if (aday) secilen.set(aday.sohbet.id, aday)
+  }
+
+  const sonuc: Record<string, AktifSohbet[]> = {}
+  for (const a of secilen.values()) {
+    const calisiyor = simdi - a.mtime <= AKTIF_SOHBET_MS
+    ;(sonuc[a.katId] ??= []).push({
+      id: a.sohbet.id, klasor: a.klasor, baslik: a.sohbet.baslik, atriumdan: false,
+      durum: calisiyor ? 'calisiyor' : 'acik',
+      etkinlik: calisiyor ? sonEtkinlik(a.yol, t) : undefined,
+      bekleyenSoru: a.sohbet.bekleyenSoru
+    })
   }
   return sonuc
 }

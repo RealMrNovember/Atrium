@@ -19,6 +19,8 @@ Tu peux relancer l'assistant à tout moment depuis **Profil et paramètres**.
 - Les **fenêtres allumées** signifient que quelqu'un travaille à cet étage : un agent Atrium, un sous-agent invité, ou une discussion Claude Code active en ce moment.
 - **Réorganiser les étages** : fais glisser un étage dans la liste de gauche, ou utilise les boutons ▲ ▼ qui apparaissent quand tu le survoles.
 - Ton **logo** se dresse sur le toit une fois que tu l'as téléversé.
+- Les **fenêtres vives** signifient que quelqu’un travaille en ce moment ; les **fenêtres chaudes et tamisées** indiquent un chat Claude Code ouvert dans l’app Claude mais inactif.
+- Quand on a besoin de toi — un chat attend ta décision ou un agent a un problème — un agent se penche à la fenêtre de cet étage, te fait signe et t’appelle. Clique dessus pour aller directement à ce chat.
 
 ## Dans un étage
 Un étage compte huit pièces autour d'un couloir. La pièce 1 appartient au **chef de projet** (celui qui porte la couronne). L'équipe par défaut comprend un développeur, un designer UI/UX, un responsable tests et qualité, un chercheur et un gardien de la mémoire.

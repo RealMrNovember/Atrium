@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type DragEvent, type ReactEl
 import type { CanliDurum, GuncellemeDurumu, Kat, SirketProfili } from '@ortak/tipler'
 import { AtriumIsareti, SirketLogosu } from './bilesenler/Kimlik'
 import { PlanGostergesi } from './bilesenler/PlanGostergesi'
+import { acikSayisi, calisanSayisi, katCagrisi } from './sahne/Bina'
 import { DilSaglayici, useDil } from './dil'
 import { AnaSayfa } from './sayfalar/AnaSayfa'
 import { AyarlarSayfasi } from './sayfalar/AyarlarSayfasi'
@@ -56,9 +57,16 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
   }, [])
   useSesler(canli, profil.ayarlar.ses, sayfa.tur === 'kat' ? sayfa.id : null)
 
-  const aktifKat = (katId: string): number =>
-    Object.entries(canli.ajanlar).filter(([k, a]) => k.startsWith(katId + '/') && a.durum !== 'bosta').length +
-    (canli.misafirler[katId]?.length ?? 0) + (canli.aktifSohbetler[katId]?.length ?? 0)
+  // yan menüdeki nokta: seslenen (sarı) · çalışan (yeşil) · Claude'da açık (turuncu) · hafızalı (gri)
+  const katNoktasi = (k: Kat): { sinif: string; baslik: string } | null => {
+    const cagri = katCagrisi(canli, k.id)
+    if (cagri) return { sinif: 'nokta cagri', baslik: cagri.metin }
+    const calisan = calisanSayisi(canli, k.id)
+    if (calisan) return { sinif: 'nokta aktif', baslik: t('workingCount', { n: calisan }) }
+    const acik = acikSayisi(canli, k.id)
+    if (acik) return { sinif: 'nokta acik', baslik: t('openCount', { n: acik }) }
+    return k.hafizaVar ? { sinif: 'nokta hafiza', baslik: '' } : null
+  }
 
   const suzulmus = useMemo(() => {
     const a = ara.trim().toLocaleLowerCase()
@@ -68,8 +76,7 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
   const ayarDegistir = (yama: Partial<SirketProfili['ayarlar']>): void => { void onKaydet({ ...profil, ayarlar: { ...profil.ayarlar, ...yama } }) }
   const harcamaOrani = Math.min(1, canli.bugunHarcanan / Math.max(0.01, profil.ayarlar.gunlukTavanUsd))
   const seciliKat = sayfa.tur === 'kat' ? katlar.find((k) => k.id === sayfa.id) : undefined
-  const calisanAjan = Object.values(canli.ajanlar).filter((a) => a.durum !== 'bosta').length +
-    Object.values(canli.misafirler).reduce((n, l) => n + l.length, 0) + Object.values(canli.aktifSohbetler).reduce((n, l) => n + l.length, 0)
+  const calisanAjan = katlar.reduce((n, k) => n + calisanSayisi(canli, k.id), 0)
   const katSec = (id: string, sohbet?: string): void => setSayfa({ tur: 'kat', id, sohbet })
 
   // kat sırası: katlar alttan üste; listede üstteki kat en üstte görünür
@@ -116,14 +123,15 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
         <input className="ara" placeholder={t('searchProjects')} value={ara} onChange={(e) => setAra(e.target.value)} />
         <ul className="kat-listesi">
           {[...suzulmus].reverse().map((k) => {
-            const aktif = aktifKat(k.id)
+            const nokta = katNoktasi(k)
+            const cagri = katCagrisi(canli, k.id)
             return (
               <li key={k.id} draggable={!ara} onDragStart={() => setSurukle(k.id)} onDragEnd={() => setSurukle(null)}
                 onDragOver={(e) => e.preventDefault()} onDrop={(e) => birak(e, k.id)} className={surukle === k.id ? 'surukleniyor' : ''}>
-                <button className={sayfa.tur === 'kat' && sayfa.id === k.id ? 'etkin' : ''} onClick={() => katSec(k.id)}>
+                <button className={sayfa.tur === 'kat' && sayfa.id === k.id ? 'etkin' : ''} onClick={() => katSec(k.id, cagri?.sohbetId)}>
                   <span className="kat-no">{String(k.no).padStart(2, '0')}</span>
                   <span className="kat-ad">{k.ad}</span>
-                  {aktif > 0 ? <span className="nokta aktif" title={t('workingCount', { n: aktif })} /> : k.hafizaVar ? <span className="nokta hafiza" /> : null}
+                  {nokta && <span className={nokta.sinif} title={nokta.baslik} />}
                 </button>
                 {!ara && (
                   <span className="sira-dugmeleri">

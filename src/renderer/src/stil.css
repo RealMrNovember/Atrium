@@ -70,6 +70,9 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .nokta { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .nokta.aktif { background: var(--iyi); box-shadow: 0 0 0 3px rgba(63, 191, 127, .2); animation: nabiz 1.4s infinite; }
 .nokta.hafiza { background: #4c5a85; }
+.nokta.acik { background: #f2b56b; }
+.nokta.cagri { background: #ffd76a; box-shadow: 0 0 0 3px rgba(255, 215, 106, .25); animation: nabiz-sari 1.2s infinite; }
+@keyframes nabiz-sari { 50% { box-shadow: 0 0 0 6px rgba(255, 215, 106, 0); } }
 @keyframes nabiz { 50% { box-shadow: 0 0 0 6px rgba(63, 191, 127, 0); } }
 
 .icerik { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
@@ -163,6 +166,20 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .bina-pencere { fill: #1d2a4a; transition: fill .3s; }
 .bina-pencere.yanik { fill: #ffd76a; filter: drop-shadow(0 0 4px rgba(255, 215, 106, .7)); animation: titrek 3s infinite; }
 @keyframes titrek { 50% { fill: #ffe9a8; } }
+.bina-pencere.los { fill: #8a6a3a; filter: drop-shadow(0 0 3px rgba(255, 190, 110, .35)); }
+.bina-acik { fill: #f2b56b; font-size: 12px; }
+.bina-cagri { fill: #ffd76a; animation: yanip 1s infinite; }
+.seslenen { cursor: pointer; animation: seslenen-gir .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.seslenen-pencere { fill: #ffe9a8; filter: drop-shadow(0 0 8px rgba(255, 215, 106, .9)); animation: titrek 1.6s infinite; }
+.seslenen-hale { fill: none; stroke: #ffd76a; stroke-width: 1.5; opacity: .7; transform-box: fill-box; transform-origin: center; animation: hale 1.8s ease-out infinite; }
+.seslenen-kol { transform-box: fill-box; transform-origin: 50% 100%; animation: el-salla .45s ease-in-out infinite alternate; }
+.seslenen-balon { animation: balon-zipla 1.4s ease-in-out infinite; }
+.seslenen-yazi { font-size: 8.5px; font-weight: 700; fill: #1d2233; }
+.seslenen:hover .seslenen-balon rect:first-child { fill: #fff8dc; }
+@keyframes el-salla { from { transform: rotate(-28deg); } to { transform: rotate(22deg); } }
+@keyframes balon-zipla { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes hale { from { transform: scale(.6); opacity: .9; } to { transform: scale(1.8); opacity: 0; } }
+@keyframes seslenen-gir { from { opacity: 0; transform: translateY(8px); } }
 .bina-etiket { fill: #aab3cf; font-size: 13px; }
 .bina-etiket.isik { fill: #fff; font-weight: 600; }
 .bina-no { fill: #6c76a0; font-variant-numeric: tabular-nums; }

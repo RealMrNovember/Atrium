@@ -9,7 +9,7 @@ interface Props {
   profil: SirketProfili
   katlar: Kat[]
   canli: CanliDurum
-  onKatSec: (id: string) => void
+  onKatSec: (id: string, sohbet?: string) => void
 }
 
 export function AnaSayfa({ profil, katlar, canli, onKatSec }: Props): ReactElement {

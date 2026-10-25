@@ -19,6 +19,8 @@ Puoi rieseguire la procedura in qualsiasi momento da **Profilo e impostazioni**.
 - Le **finestre illuminate** indicano che qualcuno sta lavorando a quel piano: un agente di Atrium, un sub-agente ospite o una chat di Claude Code attiva in questo momento.
 - **Riordinare i piani**: trascina un piano nell'elenco a sinistra, oppure usa i pulsanti ▲ ▼ che compaiono quando ci passi sopra.
 - Il tuo **logo** sta sul tetto una volta caricato.
+- Le **finestre luminose** indicano che qualcuno sta lavorando adesso; le **finestre calde e soffuse** indicano una chat di Claude Code aperta nell’app Claude ma inattiva.
+- Quando serve il tuo intervento — una chat attende la tua decisione o un agente ha un problema — un agente si sporge dalla finestra di quel piano, saluta e ti chiama. Cliccalo per andare subito a quella chat.
 
 ## Dentro un piano
 Un piano ha otto stanze attorno a un corridoio. La stanza 1 appartiene al **capo progetto** (quello con la corona). Il team predefinito è composto da uno sviluppatore, un designer UI/UX, test e qualità, un ricercatore e un custode della memoria.

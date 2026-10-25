@@ -100,7 +100,7 @@ export function KatSahnesi({ katId, ajanlar, canli, misafirler, seciliAjan, onAj
   const misafirOdasi = new Map(misafirListesi.filter((x) => !x.ayriliyor).map((x) => [x.ajan.oda, x]))
   const canliOf = (a: Ajan): AjanCanli | undefined => canli[ajanAnahtari(katId, a.id)]
   const misafirCanli = (ayriliyor: boolean, m: MisafirAjan): AjanCanli =>
-    ({ durum: ayriliyor ? 'yuruyor' : 'calisiyor', hedef: 'masa', etkinlik: ayriliyor ? undefined : m.etkinlik, gunluk: [] })
+    ({ durum: ayriliyor ? 'yuruyor' : m.bosta ? 'bosta' : 'calisiyor', hedef: 'masa', etkinlik: ayriliyor ? undefined : m.etkinlik, gunluk: [] })
 
   // hedefler: masa, liderin önü ya da (ayrılan misafir için) asansör
   const ziyaretciler = ajanlar.filter((a) => !a.lider && canliOf(a)?.hedef === 'lider').sort((a, b) => a.oda - b.oda)
@@ -134,7 +134,7 @@ export function KatSahnesi({ katId, ajanlar, canli, misafirler, seciliAjan, onAj
     }
 
     const sahip = odaSahibi.get(no) ?? misafirOdasi.get(no)?.ajan
-    const calisiyor = odaSahibi.has(no) ? canliOf(sahip!)?.durum === 'calisiyor' : misafirOdasi.has(no)
+    const calisiyor = odaSahibi.has(no) ? canliOf(sahip!)?.durum === 'calisiyor' : !!misafirOdasi.get(no) && !misafirOdasi.get(no)!.m.bosta
     const { masa, koltuk } = oda
     const masaRengi = sahip?.lider ? '#6b4f3a' : '#8a6a4f'
     const mg = sahip?.lider ? 2 : 1.6
@@ -188,7 +188,7 @@ export function KatSahnesi({ katId, ajanlar, canli, misafirler, seciliAjan, onAj
   const gen = (m: string): number => Math.max(70, Math.min(34, m.length) * 6.2 + 20)
   const balonlar = ciziliAjanlar
     .map(({ ajan, c }) => ({ ajan, c, k: konumlar[ajan.id] }))
-    .filter((b) => !!b.k && !!b.c?.etkinlik && b.c.durum !== 'bosta')
+    .filter((b) => !!b.k && !!b.c?.etkinlik && (b.c.durum !== 'bosta' || b.c.etkinlik.startsWith('❓')))
     .map((b) => ({ ...b, metin: b.c!.etkinlik!, p: iso(b.k!.nokta.x, b.k!.nokta.y), yukari: 0 }))
     .sort((a, b) => b.p.sy - a.p.sy)
   balonlar.forEach((b, i) => {

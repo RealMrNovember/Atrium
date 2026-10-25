@@ -19,6 +19,8 @@ Sihirbazı istediğin zaman **Profil & Ayarlar**'dan yeniden çalıştırabilirs
 - **Yanan pencereler** o katta birinin çalıştığını gösterir: bir Atrium ajanı, misafir bir alt ajan ya da o an aktif bir Claude Code sohbeti.
 - **Katları sırala**: soldaki listede bir katı sürükle ya da üzerine gelince çıkan ▲ ▼ düğmelerini kullan.
 - **Logon**, yükledikten sonra çatıdaki tabelada durur.
+- **Parlak pencereler** şu an birinin çalıştığını, **sıcak ve loş pencereler** ise Claude uygulamasında açık ama boşta duran bir Claude Code sohbetini gösterir.
+- Sana ihtiyaç olduğunda — kararını bekleyen bir sohbet ya da sorun yaşayan bir ajan — o katın penceresinden bir ajan uzanır, el sallar ve sana seslenir. Tıklayınca doğrudan o sohbete gidersin.
 
 ## Katın içi
 Bir katta koridorun çevresinde sekiz oda vardır. 1. oda **proje liderinindir** (taçlı olan). Varsayılan ekip: yazılım geliştirici, UI/UX tasarımcı, test & kalite, araştırmacı ve hafıza sorumlusu.

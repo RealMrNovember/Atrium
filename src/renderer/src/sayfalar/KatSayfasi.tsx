@@ -39,7 +39,10 @@ export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti }: 
   // (oda sınırlı: sohbetin kendisi alt ajanlarından önce yer alır)
   const misafirler: MisafirAjan[] = [
     ...(canli.aktifSohbetler[katId] ?? []).map((s) => ({
-      id: `sohbet-${s.id}`, tur: 'Claude', aciklama: s.baslik, etkinlik: s.etkinlik, sohbetBasligi: s.baslik, sonEtkinlik: ''
+      id: `sohbet-${s.id}`, tur: 'Claude', aciklama: s.baslik, sohbetBasligi: s.baslik, sonEtkinlik: '',
+      bosta: s.durum === 'acik',
+      // kararını bekleyen sohbet balonla sorusunu sorar
+      etkinlik: s.bekleyenSoru && s.durum === 'acik' ? `❓ ${s.bekleyenSoru}` : s.etkinlik
     })),
     ...(canli.misafirler[katId] ?? [])
   ]

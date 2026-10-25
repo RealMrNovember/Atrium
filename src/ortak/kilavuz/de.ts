@@ -19,6 +19,8 @@ Du kannst den Assistenten jederzeit über **Profil & Einstellungen** erneut star
 - **Beleuchtete Fenster** bedeuten, dass auf dieser Etage jemand arbeitet: ein Atrium-Agent, ein Gast-Subagent oder ein Claude-Code-Chat, der gerade aktiv ist.
 - **Etagen umsortieren**: Ziehe eine Etage in der Liste links oder nutze die Schaltflächen ▲ ▼, die erscheinen, wenn du mit der Maus darüberfährst.
 - Dein **Logo** steht auf dem Dach, sobald du es hochgeladen hast.
+- **Helle Fenster** bedeuten, dass gerade jemand arbeitet; **warme, gedimmte Fenster** zeigen einen Claude-Code-Chat, der in der Claude-App offen ist, aber ruht.
+- Wenn du gebraucht wirst — ein Chat wartet auf deine Entscheidung oder ein Agent hat ein Problem — lehnt sich ein Agent aus dem Fenster dieser Etage, winkt und ruft dich. Klick darauf, um direkt zu diesem Chat zu springen.
 
 ## In einer Etage
 Eine Etage hat acht Räume rund um einen Flur. Raum 1 gehört dem **Projektleiter** (dem mit der Krone). Das Standardteam besteht aus einem Entwickler, einem UI/UX-Designer, Test & Qualität, einem Rechercheur und einem Gedächtnis-Verwalter.

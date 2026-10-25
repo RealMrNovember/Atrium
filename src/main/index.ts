@@ -6,6 +6,7 @@ import { claudeDurumuOku, claudeGirisBaslat } from './claude'
 import * as depo from './depo'
 import * as guncelleme from './guncelleme'
 import * as motor from './motor'
+import * as oturumlar from './oturumlar'
 import * as sohbet from './sohbetler'
 
 let pencere: BrowserWindow | null = null
@@ -148,12 +149,14 @@ function misafirTaramasi(): void {
     const p = depo.profilOku()
     if (!p.kurulumTamam) return
     if (Date.now() - katOnbellek.zaman > 60_000) katOnbellek = { zaman: Date.now(), katlar: depo.katlariTara() }
-    try {
-      motor.misafirleriGuncelle(sohbet.misafirleriTara(p.sohbetKlasoru, katOnbellek.katlar, depo.ceviri()))
-      motor.aktifSohbetleriGuncelle(sohbet.aktifSohbetleriTara(p.sohbetKlasoru, katOnbellek.katlar, depo.ceviri()))
-    } catch {
-      /* okunamayan kayıt — bir sonraki turda tekrar */
-    }
+    void oturumlar.acikOturumlar().then((acik) => {
+      try {
+        motor.misafirleriGuncelle(sohbet.misafirleriTara(p.sohbetKlasoru, katOnbellek.katlar, depo.ceviri()))
+        motor.aktifSohbetleriGuncelle(sohbet.aktifSohbetleriTara(p.sohbetKlasoru, katOnbellek.katlar, depo.ceviri(), acik))
+      } catch {
+        /* okunamayan kayıt — bir sonraki turda tekrar */
+      }
+    })
   }, 3000)
 }
 
