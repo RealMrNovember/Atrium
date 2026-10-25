@@ -378,6 +378,8 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
   background: linear-gradient(90deg, rgba(124, 92, 255, .35), rgba(63, 169, 245, .3)); border-bottom: 1px solid #3b3f7a;
 }
 .mini-buyuk { padding: 5px 12px; font-size: 12px; }
+.kenar-alt .kahve-dugmesi { color: #ffdd55; }
+.kenar-alt .kahve-dugmesi:hover { color: #ffe680; background: rgba(255, 221, 0, .08); }
 .bilgi-i { color: var(--vurgu-2); cursor: help; }
 .abonelik-notu { color: #f6c27a; font-size: 10.5px; }
 .ikon-dugme { width: 34px; height: 34px; border-radius: 10px; background: var(--yuzey-2); font-size: 16px; }

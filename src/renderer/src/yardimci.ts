@@ -44,6 +44,7 @@ export const RENKLER = ['#7c5cff', '#2f9e6e', '#e8590c', '#1c7ed6', '#c2255c', '
 export const GITHUB = 'https://github.com/RealMrNovember/Atrium'
 export const CICIBYTE = 'https://cicibyte.com'
 export const SHOWROOM = 'https://atrium.cicibyte.com'
+export const KAHVE = 'https://buymeacoffee.com/mikeross'
 export const SURUM = __SURUM__
 
 /** Hata mesajından Electron'un IPC önekini temizler. */

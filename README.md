@@ -14,6 +14,7 @@ and come back with a single clear report. All your projects, all your Claude Cod
 [![Languages](https://img.shields.io/badge/languages-6-2f9e6e)](#-six-languages)
 [![License](https://img.shields.io/badge/license-Atrium%20License-orange)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/RealMrNovember/Atrium?style=flat&color=ffd76a)](https://github.com/RealMrNovember/Atrium/stargazers)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-ffdd00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/mikeross)
 
 **English** · [Türkçe](docs/readme/README.tr.md) · [Deutsch](docs/readme/README.de.md) · [Français](docs/readme/README.fr.md) · [Italiano](docs/readme/README.it.md) · [Русский](docs/readme/README.ru.md)
 
@@ -170,7 +171,7 @@ Atrium is free and will stay free. If it saves you time:
 - ⭐ **Star this repository** — it really helps.
 - 📣 **Share it** with a friend or your team.
 - 🐛 **Report bugs** and suggest features in [Issues](https://github.com/RealMrNovember/Atrium/issues).
-- ☕ **Sponsor** — donation links are on the [showroom](https://atrium.cicibyte.com/#support).
+- ☕ **Buy me a coffee** — [buymeacoffee.com/mikeross](https://buymeacoffee.com/mikeross) keeps Atrium free.
 
 ## License
 

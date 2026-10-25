@@ -14,6 +14,7 @@
 [![Languages](https://img.shields.io/badge/languages-6-2f9e6e)](#-шесть-языков)
 [![License](https://img.shields.io/badge/license-Atrium%20License-orange)](../../LICENSE)
 [![Stars](https://img.shields.io/github/stars/RealMrNovember/Atrium?style=flat&color=ffd76a)](https://github.com/RealMrNovember/Atrium/stargazers)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-ffdd00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/mikeross)
 
 [English](../../README.md) · [Türkçe](README.tr.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Italiano](README.it.md) · **Русский**
 
@@ -170,7 +171,7 @@ Atrium бесплатен и останется бесплатным. Если �
 - ⭐ **Поставь звезду этому репозиторию** — это действительно помогает.
 - 📣 **Поделись** с другом или командой.
 - 🐛 **Сообщай об ошибках** и предлагай функции в [Issues](https://github.com/RealMrNovember/Atrium/issues).
-- ☕ **Спонсорство** — ссылки для пожертвований есть в [шоуруме](https://atrium.cicibyte.com/#support).
+- ☕ **Угости меня кофе** — на [buymeacoffee.com/mikeross](https://buymeacoffee.com/mikeross), чтобы Atrium оставался бесплатным.
 
 ## Лицензия
 

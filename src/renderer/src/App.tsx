@@ -10,7 +10,7 @@ import { Kurulum } from './sayfalar/Kurulum'
 import { RaporlarSayfasi } from './sayfalar/RaporlarSayfasi'
 import { SohbetlerSayfasi } from './sayfalar/SohbetlerSayfasi'
 import { useSesler } from './ses'
-import { CICIBYTE, GITHUB, SURUM, usd } from './yardimci'
+import { CICIBYTE, GITHUB, KAHVE, SURUM, usd } from './yardimci'
 
 export type Sayfa =
   | { tur: 'ana' } | { tur: 'kat'; id: string; sohbet?: string } | { tur: 'raporlar' } | { tur: 'sohbetler' }
@@ -135,7 +135,8 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
           })}
         </ul>
         <div className="kenar-alt">
-          <button onClick={() => void window.sirket.disBaglanti(GITHUB)} title={t('support')}><AtriumIsareti boyut={18} /> Atrium {SURUM}</button>
+          <button onClick={() => void window.sirket.disBaglanti(GITHUB)} title="GitHub"><AtriumIsareti boyut={18} /> Atrium {SURUM}</button>
+          <button className="kahve-dugmesi" onClick={() => void window.sirket.disBaglanti(KAHVE)}>☕ {t('support')}</button>
           <button onClick={() => void window.sirket.disBaglanti(CICIBYTE)}>{t('madeBy')}</button>
         </div>
       </aside>

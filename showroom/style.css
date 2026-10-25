@@ -102,7 +102,8 @@ select {
 .destek span { font-size: 28px; }
 .destek b { display: block; margin: 10px 0 6px; font-size: 17px; }
 .destek p { margin: 0; color: var(--soluk); font-size: 14px; }
-.destek .yakinda { opacity: .75; border-style: dashed; }
+.destek .kahve { border-color: rgba(255, 221, 0, .45); background: linear-gradient(180deg, rgba(255, 221, 0, .08), var(--yuzey)); }
+.destek .kahve:hover { border-color: #ffdd00; transform: translateY(-2px); }
 
 footer {
   display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center;
