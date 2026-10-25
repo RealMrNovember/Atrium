@@ -7,3 +7,6 @@ veri/
 .env
 .env.*
 ROADMAP.md
+
+# sunucu tarafı (lisans) — repoda tutulmaz
+server/

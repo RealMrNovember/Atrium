@@ -9,16 +9,18 @@ export function KilitEkrani({ erisim, onDegisti }: { erisim: ErisimDurumu; onDeg
   const { t } = useDil()
   const [anahtar, setAnahtar] = useState('')
   const [bekliyor, setBekliyor] = useState(false)
-  const [hata, setHata] = useState(false)
+  const [hata, setHata] = useState<string | null>(null)
   const guncelleme = erisim.durum === 'guncelleme-gerekli'
 
   const etkinlestir = async (): Promise<void> => {
     setBekliyor(true)
-    setHata(false)
+    setHata(null)
     const sonuc = await window.sirket.lisansEtkinlestir(anahtar)
     setBekliyor(false)
     if (sonuc.basarili) onDegisti(sonuc.durum)
-    else setHata(true)
+    else setHata(sonuc.neden === 'makine-siniri' ? t('lockMachineLimit', { n: sonuc.sinir ?? '?' })
+      : sonuc.neden === 'suresi-doldu' ? t('lockExpired')
+      : sonuc.neden === 'iptal' ? t('lockRevoked') : t('lockInvalid'))
   }
 
   return (
@@ -37,7 +39,7 @@ export function KilitEkrani({ erisim, onDegisti }: { erisim: ErisimDurumu; onDeg
                 onKeyDown={(e) => { if (e.key === 'Enter' && anahtar.trim()) void etkinlestir() }} />
               <button className="ikincil" disabled={bekliyor || !anahtar.trim()} onClick={() => void etkinlestir()}>{t('lockActivate')}</button>
             </div>
-            {hata && <p className="hata-metni">{t('lockInvalid')}</p>}
+            {hata && <p className="hata-metni">{hata}</p>}
           </>
         )}
         <button className="ikincil" onClick={() => void window.sirket.erisimDenetle().then(onDegisti)}>↻ {t('lockRetry')}</button>

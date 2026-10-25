@@ -382,7 +382,7 @@ export interface SirketApi {
   yerelDene(model: string, mesajlar: { rol: 'sen' | 'model'; metin: string }[]): Promise<string>
   erisimDurumu(): Promise<ErisimDurumu>
   erisimDenetle(): Promise<ErisimDurumu>
-  lisansEtkinlestir(anahtar: string): Promise<{ basarili: boolean; durum: ErisimDurumu }>
+  lisansEtkinlestir(anahtar: string): Promise<{ basarili: boolean; durum: ErisimDurumu; neden?: string; sinir?: number }>
   canliDinle(cb: (d: CanliDurum) => void): () => void
   guncellemeDinle(cb: (d: GuncellemeDurumu) => void): () => void
   indirmeDinle(cb: (d: Record<string, Indirme>) => void): () => void

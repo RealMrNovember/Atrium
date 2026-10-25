@@ -84,20 +84,29 @@ function ayarla(d: ErisimDurumu): void {
 
 export const erisimDurumu = (): ErisimDurumu => durum
 
-async function lisansiSunucudaDogrula(s: SunucuDurumu, anahtar: string): Promise<boolean | null> {
+interface Dogrulama {
+  /** true/false: sunucu karar verdi · null: karar verilemedi (çevrimdışı, hız sınırı, sunucu hatası) */
+  sonuc: boolean | null
+  neden?: string
+  sinir?: number
+}
+
+async function lisansiSunucudaDogrula(s: SunucuDurumu, anahtar: string): Promise<Dogrulama> {
   // yalnız https; geliştirmede yerel test sunucusuna da izin var
   const guvenli = /^https:\/\//.test(s.lisansDogrula ?? '') || (!app.isPackaged && /^http:\/\/127\.0\.0\.1[:/]/.test(s.lisansDogrula ?? ''))
-  if (!s.lisansDogrula || !guvenli) return null
+  if (!s.lisansDogrula || !guvenli) return { sonuc: null }
   try {
     const yanit = await fetch(s.lisansDogrula, {
       method: 'POST', signal: AbortSignal.timeout(10_000), headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ anahtar, makine: makineKimligi(), surum: app.getVersion() })
     })
-    if (!yanit.ok) return yanit.status >= 500 ? null : false
-    const veri = (await yanit.json()) as { gecerli?: boolean }
-    return veri.gecerli === true
+    // yalnız 200 + JSON karardır; 429 (hız sınırı), 4xx/5xx kayıtlı lisansı asla silmez
+    if (!yanit.ok) return { sonuc: null }
+    const veri = (await yanit.json()) as { gecerli?: boolean; neden?: string; sinir?: number }
+    if (typeof veri.gecerli !== 'boolean') return { sonuc: null }
+    return { sonuc: veri.gecerli, neden: veri.neden, sinir: veri.sinir }
   } catch {
-    return null // çevrimdışı: karar verilemedi
+    return { sonuc: null } // çevrimdışı: karar verilemedi
   }
 }
 
@@ -112,7 +121,7 @@ export async function erisimDenetle(): Promise<ErisimDurumu> {
       // ücretli dönemde kayıtlı lisans her denetimde yeniden doğrulanır (iptal edilen lisans kapanır)
       const anahtar = lisansOku()
       if (sunucu.erisim === 'lisans' && anahtar) {
-        const sonuc = await lisansiSunucudaDogrula(sunucu, anahtar)
+        const { sonuc } = await lisansiSunucudaDogrula(sunucu, anahtar)
         if (sonuc === true) o.lisansDogrulandi = new Date().toISOString()
         else if (sonuc === false) { o.lisansDogrulandi = undefined; rmSync(lisansDosyasi(), { force: true }) }
       }
@@ -126,12 +135,12 @@ export async function erisimDenetle(): Promise<ErisimDurumu> {
 }
 
 /** Kullanıcının girdiği lisans anahtarını doğrular ve şifreli saklar. */
-export async function lisansEtkinlestir(anahtar: string): Promise<{ basarili: boolean; durum: ErisimDurumu }> {
+export async function lisansEtkinlestir(anahtar: string): Promise<{ basarili: boolean; durum: ErisimDurumu; neden?: string; sinir?: number }> {
   const temiz = String(anahtar ?? '').trim().slice(0, 200)
   const o = onbellekOku()
   if (!temiz || !o) return { basarili: false, durum }
-  const sonuc = await lisansiSunucudaDogrula(o.sunucu, temiz)
-  if (sonuc !== true || !safeStorage.isEncryptionAvailable()) return { basarili: false, durum }
+  const { sonuc, neden, sinir } = await lisansiSunucudaDogrula(o.sunucu, temiz)
+  if (sonuc !== true || !safeStorage.isEncryptionAvailable()) return { basarili: false, durum, neden: sonuc === null ? 'baglanti' : neden, sinir }
   writeFileSync(lisansDosyasi(), safeStorage.encryptString(temiz))
   onbellekYaz({ ...o, lisansDogrulandi: new Date().toISOString() })
   ayarla(hesapla(onbellekOku()))
