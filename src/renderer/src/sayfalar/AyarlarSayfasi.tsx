@@ -2,6 +2,7 @@ import { useState, type ReactElement } from 'react'
 import type { SirketAyarlari, SirketProfili } from '@ortak/tipler'
 import { DILLER, type Dil } from '@ortak/i18n'
 import { SirketLogosu } from '../bilesenler/Kimlik'
+import { ProjeSecici } from '../bilesenler/ProjeSecici'
 import { useDil } from '../dil'
 import { logoOku } from '../yardimci'
 import { ClaudeAdimi } from './Kurulum'
@@ -17,7 +18,7 @@ export function AyarlarSayfasi({ profil, onKaydet }: { profil: SirketProfili; on
     setKaydedildi(true)
     setTimeout(() => setKaydedildi(false), 1800)
   }
-  const klasorSec = async (alan: 'projeKlasoru' | 'sohbetKlasoru'): Promise<void> => {
+  const klasorSec = async (alan: 'sohbetKlasoru'): Promise<void> => {
     const klasor = await window.sirket.klasorSec(f[alan])
     if (klasor) setF({ ...f, [alan]: klasor })
   }
@@ -49,12 +50,10 @@ export function AyarlarSayfasi({ profil, onKaydet }: { profil: SirketProfili; on
               {DILLER.map((d) => <option key={d.kod} value={d.kod}>{d.bayrak} {d.ad}</option>)}
             </select>
           </label>
-          <label>{t('projectFolder')} <small>{t('projectFolderHint')}</small>
-            <div className="klasor-satir">
-              <input readOnly value={f.projeKlasoru} onClick={() => void klasorSec('projeKlasoru')} />
-              <button className="ikincil" onClick={() => void klasorSec('projeKlasoru')}>{t('choose')}</button>
-            </div>
-          </label>
+          <div className="alan">
+            <span className="alan-etiket">{t('projectFolder')} <small>{t('projectFolderHint')}</small></span>
+            <ProjeSecici p={f} setP={setF} />
+          </div>
           <label>{t('chatsFolder')}
             <div className="klasor-satir">
               <input readOnly value={f.sohbetKlasoru} onClick={() => void klasorSec('sohbetKlasoru')} />

@@ -93,9 +93,9 @@ function kanallar(): void {
   ipcMain.handle('tumRaporlar', () => depo.tumKomutlar())
   ipcMain.handle('canli', () => motor.canliDurum())
   ipcMain.handle('klasorAc', (_e, yol: string) => {
-    // yalnız proje klasörü altındaki yollar açılır
-    const kok = resolve(depo.profilOku().projeKlasoru).toLowerCase()
-    if (kok && resolve(yol).toLowerCase().startsWith(kok)) void shell.openPath(yol)
+    // yalnız bir katın klasörü açılır
+    const istenen = resolve(yol).toLowerCase()
+    if (depo.katlariTara().some((k) => resolve(k.yol).toLowerCase() === istenen)) void shell.openPath(yol)
   })
   ipcMain.handle('klasorSec', async (_e, baslangic?: string) => {
     const sonuc = await dialog.showOpenDialog(pencere!, { properties: ['openDirectory'], defaultPath: baslangic || undefined })
@@ -112,12 +112,7 @@ function kanallar(): void {
     rmSync(anahtarDosyasi(), { force: true })
     return claudeDurumu()
   })
-  ipcMain.handle('sohbetOzeti', (_e, projeKlasoru: string, sohbetKlasoru: string) => {
-    const katlar = depo.katAdlari(projeKlasoru).map((ad, i) => ({
-      id: depo.slug(ad), ad, yol: join(projeKlasoru, ad), no: i + 1, etiketler: [], hafizaVar: false
-    }))
-    return sohbet.sohbetOzeti(sohbetKlasoru, katlar)
-  })
+  ipcMain.handle('sohbetOzeti', (_e, p: SirketProfili) => sohbet.sohbetOzeti(p.sohbetKlasoru, depo.katlariTara(p)))
   // katId: string → o kat, null → hiçbir kata eşlenmeyenler, undefined → hepsi
   ipcMain.handle('sohbetler', (_e, katId?: string | null) =>
     sohbet.sohbetleriListele(depo.profilOku().sohbetKlasoru, depo.katlariTara(), katId === undefined ? undefined : { katId }))

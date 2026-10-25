@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactElement } from 'react'
 import type { ClaudeDurumu, SirketProfili, SohbetOzeti } from '@ortak/tipler'
 import { cevirmen, DILLER, type Dil } from '@ortak/i18n'
 import { AtriumIsareti, SirketLogosu } from '../bilesenler/Kimlik'
+import { ProjeSecici, seciliProjeler, useKlasordekiler } from '../bilesenler/ProjeSecici'
 import { DilSaglayici, useDil } from '../dil'
 import { CICIBYTE, hataMetni, logoOku } from '../yardimci'
 
@@ -31,16 +32,11 @@ export function Kurulum({ baslangic, onBitti }: { baslangic: SirketProfili; onBi
 function Sihirbaz({ p, setP, onBitti }: { p: SirketProfili; setP: (p: SirketProfili) => void; onBitti: (p: SirketProfili) => Promise<void> }): ReactElement {
   const { t } = useDil()
   const [adim, setAdim] = useState(0)
-  const [katlar, setKatlar] = useState<string[]>([])
   const [bitiyor, setBitiyor] = useState(false)
-
-  useEffect(() => {
-    if (p.projeKlasoru) void window.sirket.katOnizle(p.projeKlasoru).then(setKatlar)
-    else setKatlar([])
-  }, [p.projeKlasoru])
+  const katlar = seciliProjeler(p, useKlasordekiler(p.projeKlasoru))
 
   const basliklar = [t('wzLangTitle'), t('wzCompanyTitle'), t('wzProjectsTitle'), t('wzClaudeTitle'), t('wzChatsTitle'), t('wzLimitsTitle')]
-  const ilerleyebilir = adim === 1 ? !!p.ad.trim() : adim === 2 ? !!p.projeKlasoru : true
+  const ilerleyebilir = adim === 1 ? !!p.ad.trim() : adim === 2 ? katlar.length > 0 : true
 
   const bitir = async (): Promise<void> => {
     setBitiyor(true)
@@ -92,7 +88,12 @@ function Sihirbaz({ p, setP, onBitti }: { p: SirketProfili; setP: (p: SirketProf
             </div>
           )}
           {adim === 1 && <SirketAdimi p={p} setP={setP} />}
-          {adim === 2 && <ProjeAdimi p={p} setP={setP} katlar={katlar} />}
+          {adim === 2 && (
+            <div className="form">
+              <p className="kucuk">{t('wzProjectsHint')}</p>
+              <ProjeSecici p={p} setP={setP} />
+            </div>
+          )}
           {adim === 3 && <ClaudeAdimi p={p} setP={setP} />}
           {adim === 4 && <SohbetAdimi p={p} setP={setP} />}
           {adim === 5 && <TavanAdimi p={p} setP={setP} />}
@@ -132,31 +133,6 @@ function SirketAdimi({ p, setP }: AdimProps): ReactElement {
         <label>{t('owner')}<input value={p.kurucu} onChange={(e) => setP({ ...p, kurucu: e.target.value })} /></label>
         <label>{t('foundedYear')}<input value={p.kurulus} onChange={(e) => setP({ ...p, kurulus: e.target.value })} /></label>
       </div>
-    </div>
-  )
-}
-
-function ProjeAdimi({ p, setP, katlar }: AdimProps & { katlar: string[] }): ReactElement {
-  const { t } = useDil()
-  const sec = async (): Promise<void> => {
-    const klasor = await window.sirket.klasorSec(p.projeKlasoru)
-    if (klasor) setP({ ...p, projeKlasoru: klasor })
-  }
-  return (
-    <div className="form">
-      <p className="kucuk">{t('wzProjectsHint')}</p>
-      <div className="klasor-satir">
-        <input readOnly value={p.projeKlasoru} placeholder={t('wzNoFolder')} onClick={() => void sec()} />
-        <button className="ikincil" onClick={() => void sec()}>{t('choose')}</button>
-      </div>
-      {p.projeKlasoru && (
-        <>
-          <b className="iyi-metin">{t('wzFoundFloors', { n: katlar.length })}</b>
-          <div className="kat-onizleme">
-            {katlar.map((k, i) => <span key={k} className="etiket"><span className="kat-no">{String(i + 1).padStart(2, '0')}</span> {k}</span>)}
-          </div>
-        </>
-      )}
     </div>
   )
 }
@@ -224,8 +200,8 @@ function SohbetAdimi({ p, setP }: AdimProps): ReactElement {
   const [ozet, setOzet] = useState<SohbetOzeti | null>(null)
   useEffect(() => {
     setOzet(null)
-    void window.sirket.sohbetOzeti(p.projeKlasoru, p.sohbetKlasoru).then(setOzet)
-  }, [p.projeKlasoru, p.sohbetKlasoru])
+    void window.sirket.sohbetOzeti(p).then(setOzet)
+  }, [p.projeKlasoru, p.sohbetKlasoru, p.haricTutulan.length, p.ekProjeler.length])
   const sec = async (): Promise<void> => {
     const klasor = await window.sirket.klasorSec(p.sohbetKlasoru)
     if (klasor) setP({ ...p, sohbetKlasoru: klasor })

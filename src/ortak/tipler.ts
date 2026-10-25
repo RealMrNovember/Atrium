@@ -13,6 +13,10 @@ export interface SirketProfili {
   dil: Dil
   /** Projelerin bulunduğu kök klasör; her alt klasör bir kat olur. */
   projeKlasoru: string
+  /** Proje klasöründe olup kat yapılmayacak alt klasör adları. */
+  haricTutulan: string[]
+  /** Proje klasörünün dışından eklenen projelerin tam yolları. */
+  ekProjeler: string[]
   /** Claude Code sohbet kayıtlarının klasörü (~/.claude/projects). */
   sohbetKlasoru: string
   kurulumTamam: boolean
@@ -175,6 +179,7 @@ export interface SirketApi {
   profil(): Promise<SirketProfili>
   profilKaydet(p: SirketProfili): Promise<SirketProfili>
   katlar(): Promise<Kat[]>
+  /** Klasördeki aday proje adları (hariç tutulanlar dahil — seçim ekranı için). */
   katOnizle(klasor: string): Promise<string[]>
   katDetayi(katId: string): Promise<KatDetayi>
   ajanKaydet(katId: string, ajan: Ajan): Promise<Ajan[]>
@@ -191,7 +196,8 @@ export interface SirketApi {
   claudeGiris(): Promise<void>
   apiAnahtariKaydet(anahtar: string): Promise<ClaudeDurumu>
   apiAnahtariSil(): Promise<ClaudeDurumu>
-  sohbetOzeti(projeKlasoru: string, sohbetKlasoru: string): Promise<SohbetOzeti>
+  /** Taslak profile göre (kurulum sırasında) kaç sohbet bulunduğu ve kaçının katlara eşlendiği. */
+  sohbetOzeti(p: SirketProfili): Promise<SohbetOzeti>
   /** katId verilirse o kat, null ise hiçbir kata eşlenmeyenler, hiç verilmezse hepsi. */
   sohbetler(katId?: string | null): Promise<Sohbet[]>
   sohbetMesajlari(klasor: string, id: string): Promise<SohbetMesaji[]>

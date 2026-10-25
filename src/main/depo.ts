@@ -2,7 +2,7 @@
 // Her şey kullanıcının uygulama veri klasöründe düz JSON / Markdown dosyası olarak durur.
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
 import type { Ajan, Kat, Komut, SirketProfili } from '@ortak/tipler'
 import { cevirmen, dilSec, type Cevirmen, type Dil } from '@ortak/i18n'
 
@@ -45,6 +45,8 @@ function varsayilanProfil(): SirketProfili {
     logo: '',
     dil,
     projeKlasoru: '',
+    haricTutulan: [],
+    ekProjeler: [],
     sohbetKlasoru: join(homedir(), '.claude', 'projects'),
     kurulumTamam: false,
     ayarlar: {
@@ -141,10 +143,27 @@ export function katAdlari(klasor: string): string[] {
   }
 }
 
-export function katlariTara(): Kat[] {
-  const { projeKlasoru } = profilOku()
+type KatKaynagi = Pick<SirketProfili, 'projeKlasoru' | 'haricTutulan' | 'ekProjeler'>
+
+/** Kat olacak projeler (ad + yol): klasördekiler − hariç tutulanlar + dışarıdan eklenenler, ada göre sıralı. */
+export function projeListesi(p: KatKaynagi): { ad: string; yol: string }[] {
+  const haric = new Set(p.haricTutulan ?? [])
+  const klasordekiler = katAdlari(p.projeKlasoru).filter((ad) => !haric.has(ad)).map((ad) => ({ ad, yol: join(p.projeKlasoru, ad) }))
+  const gorulen = new Set(klasordekiler.map((k) => resolve(k.yol).toLowerCase()))
+  const ekler = (p.ekProjeler ?? [])
+    .filter((yol) => {
+      const anahtar = resolve(yol).toLowerCase()
+      if (gorulen.has(anahtar) || anahtar === UYGULAMA) return false
+      gorulen.add(anahtar)
+      try { return statSync(yol).isDirectory() } catch { return false }
+    })
+    .map((yol) => ({ ad: basename(yol), yol }))
+  return [...klasordekiler, ...ekler].sort((a, b) => a.ad.localeCompare(b.ad))
+}
+
+export function katlariTara(kaynak: KatKaynagi = profilOku()): Kat[] {
   const kullanilan = new Set<string>()
-  return katAdlari(projeKlasoru).map((ad, i) => {
+  return projeListesi(kaynak).map(({ ad, yol }, i) => {
     let id = slug(ad)
     while (kullanilan.has(id)) id += '-2'
     kullanilan.add(id)
@@ -153,9 +172,9 @@ export function katlariTara(): Kat[] {
     return {
       id,
       ad,
-      yol: join(projeKlasoru, ad),
+      yol,
       no: i + 1,
-      etiketler: etiketleriBul(join(projeKlasoru, ad)),
+      etiketler: etiketleriBul(yol),
       hafizaVar,
       hafizaGuncelleme: hafizaVar ? statSync(hafizaYolu).mtime.toISOString() : undefined
     }
