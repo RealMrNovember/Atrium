@@ -1,0 +1,19 @@
+name: 💡 Feature request
+description: Suggest an idea for Atrium
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How would it look or work?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered

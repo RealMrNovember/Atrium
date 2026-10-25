@@ -1,0 +1,90 @@
+Atrium License
+Version 1.0 — October 2026
+
+Copyright (c) 2026 CiciByte Technology, Inc. (https://cicibyte.com)
+All rights reserved.
+
+"Atrium" and the Atrium logo are trademarks of CiciByte Technology, Inc.
+
+1. Definitions
+
+   "Software" means the Atrium application, its source code, object code,
+   documentation, artwork, translations and any accompanying files in this
+   repository and in official releases.
+
+   "Licensor" means CiciByte Technology, Inc.
+
+   "You" means any individual or legal entity exercising the rights granted
+   by this License.
+
+2. What you may do (free of charge)
+
+   a) Download, install and run official releases of the Software on any
+      number of devices.
+   b) Use the Software for any lawful purpose, including personal,
+      educational and commercial use inside your own organization.
+   c) Read and study the source code.
+   d) Fork this repository on GitHub and make changes in that fork solely
+      for the purpose of submitting a contribution (pull request) back to
+      the official repository at https://github.com/RealMrNovember/Atrium,
+      as described in CONTRIBUTING.md.
+
+3. What you may not do without prior written permission from the Licensor
+
+   a) Copy, reproduce or redistribute the Software, in whole or in part, in
+      source or binary form, except as allowed in Section 2.
+   b) Modify, adapt, translate or create derivative works of the Software,
+      except as allowed in Section 2(d).
+   c) Publish, distribute, sublicense, sell, rent, lease or offer the
+      Software, or any modified version of it, as a product or service
+      under any name.
+   d) Remove or alter any copyright, trademark, license or attribution
+      notice, including the "by CiciByte Technology" attribution.
+   e) Use the "Atrium" name or logo to promote a different product.
+
+4. Contributions
+
+   By submitting a contribution (code, documentation, translation, artwork
+   or any other material) to the official repository, You confirm that You
+   have the right to do so and You grant the Licensor a perpetual,
+   worldwide, non-exclusive, royalty-free, irrevocable license to use,
+   reproduce, modify, distribute and sublicense Your contribution as part of
+   the Software under this License or any other license the Licensor
+   chooses. The contributor agreement in CLA.md applies.
+
+5. Third-party components
+
+   The Software depends on third-party open-source components that remain
+   under their own licenses. Nothing in this License restricts Your rights
+   under those licenses for those components.
+
+6. Termination
+
+   This License terminates automatically if You breach any of its terms.
+   Upon termination You must stop using and delete all copies of the
+   Software in Your possession.
+
+7. Disclaimer of warranty
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+
+8. Limitation of liability
+
+   IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE. YOU ARE SOLELY RESPONSIBLE FOR ANY COSTS YOU
+   INCUR WITH THIRD-PARTY SERVICES (SUCH AS AI MODEL PROVIDERS) WHILE USING
+   THE SOFTWARE.
+
+For permissions beyond this License, contact: info@cicibyte.com
+
+----------------------------------------------------------------------------
+Türkçe özet (bağlayıcı olan yukarıdaki İngilizce metindir):
+Atrium'u indirmek, kurmak ve kullanmak ücretsizdir; ticari kullanım dahil.
+Kaynak kodu okunabilir. CiciByte Technology, Inc.'in yazılı izni olmadan
+kopyalanamaz, değiştirilemez, türev ürün yapılamaz, başka ad altında
+dağıtılamaz ve satılamaz. Tek istisna: resmî repoya katkı (pull request)
+göndermek amacıyla GitHub'da fork edip değişiklik yapmaktır.

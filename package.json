@@ -1,0 +1,103 @@
+{
+  "name": "atrium",
+  "productName": "Atrium",
+  "version": "1.0.0",
+  "description": "Atrium — your AI agent office. Every project is a floor, every agent has a room.",
+  "author": {
+    "name": "CiciByte Technology, Inc.",
+    "email": "info@cicibyte.com",
+    "url": "https://cicibyte.com"
+  },
+  "homepage": "https://atrium.cicibyte.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RealMrNovember/Atrium.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true,
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "icons": "node scripts/icons.mjs",
+    "dist": "electron-vite build && electron-builder --publish never",
+    "dist:win": "electron-vite build && electron-builder --win --publish never",
+    "dist:mac": "electron-vite build && electron-builder --mac --publish never",
+    "dist:linux": "electron-vite build && electron-builder --linux --publish never"
+  },
+  "build": {
+    "appId": "com.cicibyte.atrium",
+    "productName": "Atrium",
+    "copyright": "Copyright © 2026 CiciByte Technology, Inc.",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "RealMrNovember",
+        "repo": "Atrium",
+        "releaseType": "release"
+      }
+    ],
+    "files": [
+      "out/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Atrium-Setup-${version}.${ext}",
+      "license": "LICENSE"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.developer-tools",
+      "icon": "build/icon.png",
+      "artifactName": "Atrium-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Development",
+      "icon": "build/icon.png",
+      "maintainer": "CiciByte Technology, Inc. <info@cicibyte.com>",
+      "artifactName": "Atrium-${version}-${arch}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^44.9.3",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "png-to-ico": "^3.0.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.3.7"
+  }
+}

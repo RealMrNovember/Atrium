@@ -1,0 +1,8 @@
+node_modules/
+out/
+dist/
+veri/
+.superpowers/
+*.log
+.env
+.env.*
