@@ -1,7 +1,7 @@
 // Ajan motoru: komut → lider planı (gerekirse işe alım) → görevler → raporlar → sahibine tek rapor + hafıza.
 // Canlı durum (kim nerede, ne yapıyor) burada tutulur ve her değişiklikte arayüze yollanır.
 import { randomUUID } from 'node:crypto'
-import type { Ajan, AjanCanli, CanliDurum, Gorev, Kat, Komut, MisafirAjan, SirketProfili } from '@ortak/tipler'
+import type { Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, MisafirAjan, SirketProfili } from '@ortak/tipler'
 import { ajanAnahtari } from '@ortak/tipler'
 import { dilAdiIngilizce, type Cevirmen } from '@ortak/i18n'
 import { claudeKos, type KosuSonucu } from './claude'
@@ -14,7 +14,10 @@ const GUNLUK_SATIR = 40
 const ODA_SAYISI = 8
 const RENK_PALETI = ['#f08c00', '#0c8599', '#9c36b5', '#5c940d', '#e64980', '#4263eb', '#d9480f', '#2b8a3e']
 
-const canli: CanliDurum = { ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {} }
+const canli: CanliDurum = {
+  ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {}
+}
+const sohbetIptalleri = new Map<string, AbortController>()
 const iptaller = new Map<string, AbortController>()
 let yayinci: (d: CanliDurum) => void = () => {}
 let yayinBekliyor = false
@@ -37,6 +40,23 @@ export const canliDurum = (): CanliDurum => canli
 export function misafirleriGuncelle(m: Record<string, MisafirAjan[]>): void {
   if (JSON.stringify(m) === JSON.stringify(canli.misafirler)) return
   canli.misafirler = m
+  yayinla()
+}
+
+/** Claude Code'da aktif sohbetler + Atrium'dan sürdürülenler (onlar dosyaya yazılmadan önce de görünsün). */
+export function aktifSohbetleriGuncelle(dosyadan: Record<string, AktifSohbet[]>): void {
+  const birlesik: Record<string, AktifSohbet[]> = {}
+  for (const [katId, liste] of Object.entries(dosyadan)) birlesik[katId] = [...liste]
+  for (const k of Object.values(canli.sohbetKosulari)) {
+    if (!k.calisiyor || !k.katId) continue
+    const liste = (birlesik[k.katId] ??= [])
+    const var_ = liste.find((s) => s.id === k.id)
+    const son = [...k.satirlar].reverse().find((s) => s.rol === 'arac')?.metin
+    if (var_) Object.assign(var_, { atriumdan: true, etkinlik: son ?? var_.etkinlik })
+    else liste.push({ id: k.id, klasor: '', baslik: '', etkinlik: son, atriumdan: true })
+  }
+  if (JSON.stringify(birlesik) === JSON.stringify(canli.aktifSohbetler)) return
+  canli.aktifSohbetler = birlesik
   yayinla()
 }
 
@@ -142,11 +162,29 @@ function kurallar(yazma: boolean, s: SirketProfili): string {
 }
 
 function kimlik(s: SirketProfili, kat: Kat, ajan: Ajan): string {
-  return `You are an AI agent working at ${s.ad || 'the company'}: ${ajan.ad}, ${ajan.rol} of the "${kat.ad}" project.\n${ajan.gorevTanimi}\nYour working directory is this project's folder.`
+  const odak = ajan.odak?.length
+    ? `\nYour focus folders: ${ajan.odak.join(', ')} — start there and stay inside them; open files elsewhere only if the task truly needs it.`
+    : ''
+  return `You are an AI agent working at ${s.ad || 'the company'}: ${ajan.ad}, ${ajan.rol} of the "${kat.ad}" project.\n${ajan.gorevTanimi}\nYour working directory is this project's folder.${odak}`
+}
+
+/** Hafıza belgesindeki "## Agent focus" bölümünden ajan → klasör eşlemesi. */
+export function odakAyristir(metin: string, ekip: Ajan[]): Map<string, string[]> {
+  const sonuc = new Map<string, string[]>()
+  const bolum = metin.split(/^## /m).find((b) => /^agent focus/i.test(b.trim()))
+  if (!bolum) return sonuc
+  for (const satir of bolum.split('\n')) {
+    const m = satir.match(/^\s*[-*]\s*`?([a-z0-9-]+)`?\s*:\s*(.+)$/i)
+    if (!m || !ekip.some((a) => a.id === m[1])) continue
+    const klasorler = m[2].split(/[,;]/).map((k) => k.replace(/[`*]/g, '').trim()).filter((k) => k && k.length < 120 && !k.includes('..')).slice(0, 6)
+    if (klasorler.length) sonuc.set(m[1], klasorler)
+  }
+  return sonuc
 }
 
 function planIstemi(s: SirketProfili, kat: Kat, lider: Ajan, ekip: Ajan[], komut: Komut, bosOda: number): string {
-  const ekipSatirlari = ekip.map((a) => `- id: ${a.id} · ${a.ad} · ${a.rol} — ${a.gorevTanimi.split(/(?<=\.)\s/)[0]}`).join('\n')
+  const ekipSatirlari = ekip.map((a) => `- id: ${a.id} · ${a.ad} · ${a.rol} — ${a.gorevTanimi.split(/(?<=\.)\s/)[0]}` +
+    (a.odak?.length ? ` (focus: ${a.odak.join(', ')})` : '')).join('\n')
   return `${kimlik(s, kat, lider)}
 
 ${hafizaBlogu(kat.id)}
@@ -170,7 +208,25 @@ run commands, tests or builds — never assign that; ask for a code review of th
 If — and only if — no one on the team fits a needed skill, you may hire new specialists (at most ${Math.min(2, bosOda)}; ${bosOda} empty rooms on this floor). Give each hire a short lowercase id, a first name, a role and a job description, then assign tasks to them by that id.
 Return ONLY this JSON, nothing else:
 {"plan":"one paragraph: how you will handle it","hire":[{"id":"seo","name":"Lina","role":"SEO Specialist","duty":"job description","model":"sonnet","web":true}],"tasks":[{"agent":"<team or hire id>","title":"short title","instructions":"detailed instructions"}]}
-Use "hire":[] when nobody needs to be hired.`
+Use "hire":[] when nobody needs to be hired.
+If the owner is only asking for a status / progress report from the team (not for work to be done), return
+{"mode":"tour"} instead — you will then walk desk to desk and collect a status report from every agent.`
+}
+
+function turIstemi(s: SirketProfili, kat: Kat, ajan: Ajan, lider: Ajan, komut: Komut): string {
+  return `${kimlik(s, kat, ajan)}
+
+${hafizaBlogu(kat.id)}
+
+## ${lider.ad} (${lider.rol}) is doing a status round and stopped at your desk
+The owner asked: <command>${komut.metin}</command>
+
+${kurallar(false, s)}
+
+## Your job
+Report the current state of the project from your role's point of view, briefly (5-8 bullet points):
+what is done, what is in progress, risks or problems you see, and what should come next.
+Trust the project memory; look only at a few files in your focus folders to confirm. Do not do new work.`
 }
 
 function gorevIstemi(s: SirketProfili, kat: Kat, ajan: Ajan, lider: Ajan, gorev: Gorev, yazma: boolean): string {
@@ -215,7 +271,8 @@ Use these five sections, with the headings translated into that language:
 ## Next steps`
 }
 
-function hafizaIstemi(s: SirketProfili, kat: Kat, ajan: Ajan, eski: string, sohbetler: string): string {
+function hafizaIstemi(s: SirketProfili, kat: Kat, ajan: Ajan, eski: string, sohbetler: string, ekip: Ajan[]): string {
+  const ekipListesi = ekip.map((a) => `- ${a.id}: (${a.rol})`).join('\n')
   return `${kimlik(s, kat, ajan)}
 
 ## Your job
@@ -239,18 +296,22 @@ Use these headings, translated into that language:
 ## Owner's goals and decisions
 ## Watch out
 ## Recent work
-## Learned`
+## Learned
+## Agent focus
+(keep this heading in English; one line per agent, only real folders of this project, relative to its root, e.g. "- gelistirici: src/api, src/lib")
+${ekipListesi}`
 }
 
 // --- plan ayrıştırma ---------------------------------------------------------
 
 interface HamPlan {
+  mode?: string
   plan?: string
   hire?: { id?: string; name?: string; role?: string; duty?: string; model?: string; web?: boolean }[]
   tasks?: { agent?: string; title?: string; instructions?: string }[]
 }
 
-export interface Plan { plan: string; gorevler: Gorev[]; yeniAjanlar: Ajan[] }
+export interface Plan { plan: string; gorevler: Gorev[]; yeniAjanlar: Ajan[]; tur: boolean }
 
 export function planiAyristir(metin: string, ekip: Ajan[], komutMetni: string, t: Cevirmen, bosOdalar: number[]): Plan {
   let ham: HamPlan = {}
@@ -259,6 +320,7 @@ export function planiAyristir(metin: string, ekip: Ajan[], komutMetni: string, t
   if (bas >= 0 && son > bas) {
     try { ham = JSON.parse(metin.slice(bas, son + 1)) as HamPlan } catch { ham = {} }
   }
+  if (ham.mode === 'tour') return { plan: ham.plan || t('tourPlan'), gorevler: [], yeniAjanlar: [], tur: true }
   // işe alımlar: boş odalara yerleşir; plan içindeki kısa id → gerçek id
   const kullanilanRenk = new Set(ekip.map((a) => a.renk))
   const odalar = [...bosOdalar]
@@ -294,7 +356,7 @@ export function planiAyristir(metin: string, ekip: Ajan[], komutMetni: string, t
   }
   // görevi olmayan işe alım iptal
   const gorevli = new Set(gorevler.map((g) => g.ajanId))
-  return { plan: ham.plan || t('planFallback'), gorevler, yeniAjanlar: yeniAjanlar.filter((a) => gorevli.has(a.id)) }
+  return { plan: ham.plan || t('planFallback'), gorevler, yeniAjanlar: yeniAjanlar.filter((a) => gorevli.has(a.id)), tur: false }
 }
 
 const hafizaSatirlari = (metin: string): string[] =>
@@ -302,7 +364,12 @@ const hafizaSatirlari = (metin: string): string[] =>
 
 // --- komut akışı -------------------------------------------------------------
 
-export async function komutVer(katId: string, metin: string, yazmaIzni: boolean): Promise<Komut> {
+export const komutVer = (katId: string, metin: string, yazmaIzni: boolean): Promise<Komut> => komutBaslat(katId, metin, yazmaIzni, false)
+
+/** Lider masa masa dolaşıp her ajandan durum raporu toplar, sonunda tek rapor sunar. */
+export const durumTuru = (katId: string): Promise<Komut> => komutBaslat(katId, depo.ceviri()('tourCommand'), false, true)
+
+async function komutBaslat(katId: string, metin: string, yazmaIzni: boolean, turZorla: boolean): Promise<Komut> {
   const t = depo.ceviri()
   const kat = depo.katBul(katId)
   const ekip = depo.ajanlariOku(katId)
@@ -310,7 +377,7 @@ export async function komutVer(katId: string, metin: string, yazmaIzni: boolean)
   if (!lider) throw new Error(t('errNoAgents'))
   if (canli.aktifKomutlar.some((k) => k.katId === katId)) throw new Error(t('errFloorBusy'))
   const komut: Komut = {
-    id: randomUUID(), katId, metin: metin.trim(), yazmaIzni, durum: 'planlaniyor',
+    id: randomUUID(), katId, metin: metin.trim(), yazmaIzni, durum: 'planlaniyor', tur: turZorla ? 'tur' : 'gorev',
     zaman: new Date().toISOString(), gorevler: [], maliyetUsd: 0
   }
   canli.aktifKomutlar = [...canli.aktifKomutlar, komut]
@@ -318,7 +385,7 @@ export async function komutVer(katId: string, metin: string, yazmaIzni: boolean)
   yayinla()
   const iptal = new AbortController()
   iptaller.set(komut.id, iptal)
-  void yurut(komut, kat, ekip, lider, iptal.signal).finally(() => {
+  void yurut(komut, kat, ekip, lider, iptal.signal, turZorla).finally(() => {
     iptaller.delete(komut.id)
     canli.aktifKomutlar = canli.aktifKomutlar.filter((k) => k.id !== komut.id)
     yayinla()
@@ -330,7 +397,7 @@ export function komutIptal(komutId: string): void {
   iptaller.get(komutId)?.abort()
 }
 
-async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, sinyal: AbortSignal): Promise<void> {
+async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, sinyal: AbortSignal, turZorla: boolean): Promise<void> {
   const sirket = depo.profilOku()
   const t = depo.ceviri()
   const sim = sirket.ayarlar.simulasyon // simülasyon gerçek hafızaya yazmaz
@@ -342,20 +409,95 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
   }
   const ekleMaliyet = (usd: number): void => guncelle({ maliyetUsd: Math.round((komut.maliyetUsd + usd) * 10000) / 10000 })
 
+  const ekipUyeleri = ekip.filter((a) => !a.lider)
   try {
-    // 1 · plan
-    ajanGuncelle(kat.id, lider.id, { durum: 'calisiyor', hedef: 'masa', komutId: komut.id }, t('evPlanning'))
-    const ekipUyeleri = ekip.filter((a) => !a.lider)
-    const bosOdalar = Array.from({ length: ODA_SAYISI }, (_, i) => i).filter((i) => !ekip.some((a) => a.oda === i))
-    const plan = await ajaniKostur({
-      kat, ajan: lider, istem: planIstemi(sirket, kat, lider, ekipUyeleri, komut, bosOdalar.length), araclar: ['Read', 'Glob', 'Grep'],
-      yazma: false, butceUsd: Math.min(0.5, sirket.ayarlar.kosuButcesiUsd), tur: 'plan', sinyal
-    })
-    ekleMaliyet(plan.maliyetUsd)
-    if (sinyal.aborted) throw new Error(t('errCancelled'))
-    if (plan.hata && !plan.metin) throw new Error(t('errPlan', { e: plan.hata }))
-    const { plan: planMetni, gorevler, yeniAjanlar } = planiAyristir(plan.metin, ekipUyeleri.length ? ekipUyeleri : ekip, komut.metin, t, bosOdalar)
+    // 1 · plan (durum turu düğmesiyle gelindiyse plan yok, doğrudan tur)
+    let planSonucu: Plan = { plan: t('tourPlan'), gorevler: [], yeniAjanlar: [], tur: true }
+    if (!turZorla) {
+      ajanGuncelle(kat.id, lider.id, { durum: 'calisiyor', hedef: 'masa', komutId: komut.id }, t('evPlanning'))
+      const bosOdalar = Array.from({ length: ODA_SAYISI }, (_, i) => i).filter((i) => !ekip.some((a) => a.oda === i))
+      const plan = await ajaniKostur({
+        kat, ajan: lider, istem: planIstemi(sirket, kat, lider, ekipUyeleri, komut, bosOdalar.length), araclar: ['Read', 'Glob', 'Grep'],
+        yazma: false, butceUsd: Math.min(0.5, sirket.ayarlar.kosuButcesiUsd), tur: 'plan', sinyal
+      })
+      ekleMaliyet(plan.maliyetUsd)
+      if (sinyal.aborted) throw new Error(t('errCancelled'))
+      if (plan.hata && !plan.metin) throw new Error(t('errPlan', { e: plan.hata }))
+      planSonucu = planiAyristir(plan.metin, ekipUyeleri.length ? ekipUyeleri : ekip, komut.metin, t, bosOdalar)
+    }
 
+    if (planSonucu.tur) {
+      await durumTurunuYurut(planSonucu.plan)
+    } else {
+      await gorevleriYurut(planSonucu)
+    }
+    if (sinyal.aborted) throw new Error(t('errCancelled'))
+    await raporla()
+  } catch (e) {
+    const mesaj = e instanceof Error ? e.message : String(e)
+    guncelle({ durum: sinyal.aborted ? 'iptal' : 'hata', hata: mesaj,
+      gorevler: komut.gorevler.map((g) => (g.durum === 'bekliyor' || g.durum === 'calisiyor' ? { ...g, durum: 'iptal' } : g)) })
+    for (const a of ekip) ajanGuncelle(kat.id, a.id, { durum: 'bosta', hedef: 'masa', gorevId: undefined, komutId: undefined, etkinlik: undefined })
+    ajanGuncelle(kat.id, lider.id, {}, sinyal.aborted ? t('evCancelled') : `⚠️ ${mesaj}`)
+  }
+
+  function gorevYamasi(id: string, yama: Partial<Gorev>): void {
+    guncelle({ gorevler: komut.gorevler.map((x) => (x.id === id ? { ...x, ...yama } : x)) })
+  }
+
+  // 2a · durum turu: bütün durum raporları hemen başlar (salt okuma, küçük bütçe); lider masa masa dolaşır,
+  // her masada o ajanın raporu hazır olana kadar dinler.
+  async function durumTurunuYurut(planMetni: string): Promise<void> {
+    const ziyaret = ekipUyeleri.slice().sort((a, b) => a.oda - b.oda)
+    guncelle({
+      tur: 'tur', plan: planMetni, durum: 'yurutuluyor',
+      gorevler: ziyaret.map((a) => ({ id: randomUUID(), ajanId: a.id, baslik: t('tourTaskTitle'), talimat: komut.metin, durum: 'bekliyor' }))
+    })
+    const butce = Math.min(0.3, sirket.ayarlar.kosuButcesiUsd)
+    let bosYer = Math.max(3, sirket.ayarlar.esZamanli)
+    const bekleyenler: (() => void)[] = []
+    const yerAl = async (): Promise<void> => {
+      if (bosYer > 0) { bosYer--; return }
+      await new Promise<void>((coz) => bekleyenler.push(coz))
+    }
+    const yerBirak = (): void => { const s = bekleyenler.shift(); if (s) s(); else bosYer++ }
+    const raporlar = new Map(ziyaret.map((a) => {
+      const gorev = komut.gorevler.find((g) => g.ajanId === a.id)!
+      return [a.id, (async () => {
+        await yerAl()
+        try {
+          if (sinyal.aborted) return
+          ajanGuncelle(kat.id, a.id, { durum: 'calisiyor', hedef: 'masa', komutId: komut.id }, t('evTourPreparing'))
+          gorevYamasi(gorev.id, { durum: 'calisiyor', baslangic: new Date().toISOString() })
+          const s = await ajaniKostur({ kat, ajan: a, istem: turIstemi(sirket, kat, a, lider, komut), araclar: ['Read', 'Glob', 'Grep'],
+            yazma: false, butceUsd: butce, tur: 'gorev', sinyal })
+          ekleMaliyet(s.maliyetUsd)
+          gorevYamasi(gorev.id, { durum: sinyal.aborted ? 'iptal' : s.metin ? 'tamam' : 'hata', sonuc: s.metin || s.hata,
+            maliyetUsd: s.maliyetUsd, bitis: new Date().toISOString() })
+          ajanGuncelle(kat.id, a.id, { durum: s.metin ? 'bosta' : 'hata', etkinlik: undefined }, s.metin ? t('evTourReady') : `⚠️ ${s.hata}`)
+        } finally {
+          yerBirak()
+        }
+      })()]
+    }))
+    for (const a of ziyaret) {
+      if (sinyal.aborted) return
+      ajanGuncelle(kat.id, lider.id, { durum: 'yuruyor', hedef: 'ziyaret', ziyaretOda: a.oda, komutId: komut.id }, t('evTourWalk', { name: a.ad }))
+      await bekle(YURUME_MS, sinyal)
+      ajanGuncelle(kat.id, lider.id, { durum: 'emir-aliyor', hedef: 'ziyaret', ziyaretOda: a.oda }, t('evTourListening', { name: a.ad }))
+      await raporlar.get(a.id)
+      if (sinyal.aborted) return
+      ajanGuncelle(kat.id, a.id, { durum: 'rapor-veriyor', hedef: 'masa' }, t('evReported'))
+      await bekle(BEKLEME_MS, sinyal)
+      ajanGuncelle(kat.id, a.id, { durum: 'bosta', hedef: 'masa', komutId: undefined, etkinlik: undefined })
+    }
+    ajanGuncelle(kat.id, lider.id, { durum: 'yuruyor', hedef: 'masa' }, t('evBackToDesk'))
+    await bekle(YURUME_MS, sinyal)
+    await Promise.all(raporlar.values())
+  }
+
+  // 2b · görevler: lider işi böler, gerekirse işe alır
+  async function gorevleriYurut({ plan: planMetni, gorevler, yeniAjanlar }: Plan): Promise<void> {
     // işe alım: yeni ajanlar kata eklenir, asansörden odalarına yürür
     if (yeniAjanlar.length) {
       ekip = depo.ajanlariYaz(kat.id, [...depo.ajanlariOku(kat.id), ...yeniAjanlar])
@@ -374,9 +516,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
     const kuyruk = [...komut.gorevler]
     const goreviYurut = async (g: Gorev): Promise<void> => {
       const ajan = ekip.find((a) => a.id === g.ajanId)!
-      const gorevYama = (yama: Partial<Gorev>): void => {
-        guncelle({ gorevler: komut.gorevler.map((x) => (x.id === g.id ? { ...x, ...yama } : x)) })
-      }
+      const gorevYama = (yama: Partial<Gorev>): void => gorevYamasi(g.id, yama)
       const ak = { gorevId: g.id, komutId: komut.id }
       ajanGuncelle(kat.id, ajan.id, { durum: 'yuruyor', hedef: 'lider', ...ak }, t('evWalkToLead', { lead: lider.ad }))
       await bekle(YURUME_MS, sinyal)
@@ -420,9 +560,10 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
       }
     }
     await Promise.all(Array.from({ length: Math.min(paralel, komut.gorevler.length) }, isci))
-    if (sinyal.aborted) throw new Error(t('errCancelled'))
+  }
 
-    // 3 · rapor
+  // 3 · rapor
+  async function raporla(): Promise<void> {
     guncelle({ durum: 'raporlaniyor' })
     ajanGuncelle(kat.id, lider.id, { durum: 'calisiyor', hedef: 'masa' }, t('evMerging'))
     const rapor = await ajaniKostur({
@@ -437,13 +578,58 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
     const ozet = (sonRapor.split(/\n## /)[1] ?? sonRapor).split('\n').slice(1).find((s) => s.trim()) ?? ''
     if (!sim) depo.hafizayaEkle(kat.id, 'Recent work', [`- ${depo.bugun()} · ${komut.metin.slice(0, 80)} → ${ozet.trim().slice(0, 160)}`])
     ajanGuncelle(kat.id, lider.id, { durum: 'bosta', hedef: 'masa', komutId: undefined, etkinlik: undefined }, t('evDelivered'))
-  } catch (e) {
-    const mesaj = e instanceof Error ? e.message : String(e)
-    guncelle({ durum: sinyal.aborted ? 'iptal' : 'hata', hata: mesaj,
-      gorevler: komut.gorevler.map((g) => (g.durum === 'bekliyor' || g.durum === 'calisiyor' ? { ...g, durum: 'iptal' } : g)) })
-    for (const a of ekip) ajanGuncelle(kat.id, a.id, { durum: 'bosta', hedef: 'masa', gorevId: undefined, komutId: undefined, etkinlik: undefined })
-    ajanGuncelle(kat.id, lider.id, {}, sinyal.aborted ? t('evCancelled') : `⚠️ ${mesaj}`)
   }
+}
+
+// --- Claude Code sohbetine Atrium'dan devam -----------------------------------------
+
+export interface SohbetHedefi { katId: string | null; cwd: string }
+
+/** Kullanıcının bir Claude Code oturumunu (`--resume`) sürdürür; çıktı canlı olarak sohbet ekranına
+ *  ve kattaki "Claude" karakterine akar. Kabuk yine kapalıdır; dosya değişikliği yalnız izinle. */
+export async function sohbetDevam(id: string, hedef: SohbetHedefi, mesaj: string, yazma: boolean): Promise<void> {
+  const t = depo.ceviri()
+  if (canli.sohbetKosulari[id]?.calisiyor) throw new Error(t('errChatBusy'))
+  const { ayarlar } = depo.profilOku()
+  // devam edilen oturum önceki konuşmanın tamamını bağlam olarak yükler; uzun sohbetlerde ilk yanıt bile
+  // ajan başına tavanı aşabilir, bu yüzden en az 2 USD (günlük tavan yine geçerli)
+  const butce = Math.max(ayarlar.kosuButcesiUsd, 2)
+  if (depo.bugunHarcanan() + butce > ayarlar.gunlukTavanUsd + 1e-9) {
+    throw new Error(t('errDailyCap', { spent: depo.bugunHarcanan().toFixed(2), run: butce, cap: ayarlar.gunlukTavanUsd }))
+  }
+  const kosu = { id, katId: hedef.katId, calisiyor: true, satirlar: [{ rol: 'sen' as const, metin: mesaj }] }
+  canli.sohbetKosulari = { ...canli.sohbetKosulari, [id]: kosu }
+  const ekle = (rol: 'claude' | 'arac' | 'hata', metin: string): void => {
+    const k = canli.sohbetKosulari[id]
+    canli.sohbetKosulari = { ...canli.sohbetKosulari, [id]: { ...k, satirlar: [...k.satirlar, { rol, metin }].slice(-200) } }
+    aktifSohbetleriGuncelle(Object.fromEntries(Object.entries(canli.aktifSohbetler).map(([k2, l]) => [k2, l.filter((s) => !s.atriumdan)])))
+    yayinla()
+  }
+  aktifSohbetleriGuncelle(Object.fromEntries(Object.entries(canli.aktifSohbetler).map(([k2, l]) => [k2, l.filter((s) => !s.atriumdan)])))
+  const iptal = new AbortController()
+  sohbetIptalleri.set(id, iptal)
+  try {
+    const sonuc = await claudeKos({
+      cwd: hedef.cwd, istem: mesaj, model: 'sonnet', butceUsd: butce,
+      araclar: ['Read', 'Glob', 'Grep', 'TodoWrite', 'WebSearch', 'WebFetch', ...(yazma ? ['Edit', 'Write', 'MultiEdit'] : [])],
+      yazma, sureMs: ayarlar.kosuSuresiDk * 60_000, claudeYolu: ayarlar.claudeYolu, apiAnahtari: apiAnahtari(), t,
+      sinyal: iptal.signal, devam: id,
+      etkinlik: (s) => { if (!s.startsWith('💬')) ekle('arac', s) },
+      metinParcasi: (m) => ekle('claude', m)
+    })
+    harcamaYaz(sonuc.maliyetUsd)
+    if (sonuc.hata) ekle('hata', sonuc.hata)
+  } finally {
+    sohbetIptalleri.delete(id)
+    const k = canli.sohbetKosulari[id]
+    canli.sohbetKosulari = { ...canli.sohbetKosulari, [id]: { ...k, calisiyor: false } }
+    aktifSohbetleriGuncelle(Object.fromEntries(Object.entries(canli.aktifSohbetler).map(([k2, l]) => [k2, l.filter((s) => !s.atriumdan)])))
+    yayinla()
+  }
+}
+
+export function sohbetDurdur(id: string): void {
+  sohbetIptalleri.get(id)?.abort()
 }
 
 // --- hafıza çıkarma ----------------------------------------------------------
@@ -460,7 +646,7 @@ export async function hafizaCikar(katId: string): Promise<void> {
   ajanGuncelle(katId, ajan.id, { durum: 'calisiyor', hedef: 'masa' }, t('evMemoryStart'))
   try {
     const sonuc = await ajaniKostur({
-      kat, ajan, istem: hafizaIstemi(sirket, kat, ajan, depo.hafizaOku(katId), sohbetBaglami(katId)), araclar: ['Read', 'Glob', 'Grep'],
+      kat, ajan, istem: hafizaIstemi(sirket, kat, ajan, depo.hafizaOku(katId), sohbetBaglami(katId), ekip), araclar: ['Read', 'Glob', 'Grep'],
       yazma: false, butceUsd: sirket.ayarlar.kosuButcesiUsd, tur: 'hafiza'
     })
     const metin = sonuc.metin.trim()
@@ -469,6 +655,11 @@ export async function hafizaCikar(katId: string): Promise<void> {
       ajanGuncelle(katId, ajan.id, { durum: 'bosta', etkinlik: undefined }, t('evMemorySim'))
     } else if (bas >= 0) {
       depo.hafizaYaz(katId, metin.slice(bas))
+      // odak klasörleri: elle ayarlanmamış ajanlara hafızadaki öneri yazılır
+      const odaklar = odakAyristir(metin, ekip)
+      if (odaklar.size) {
+        depo.ajanlariYaz(katId, depo.ajanlariOku(katId).map((a) => (!a.odakElle && odaklar.has(a.id) ? { ...a, odak: odaklar.get(a.id) } : a)))
+      }
       ajanGuncelle(katId, ajan.id, { durum: 'bosta', etkinlik: undefined }, `${t('evMemoryDone')} · ${sonuc.maliyetUsd.toFixed(3)} USD`)
     } else {
       ajanGuncelle(katId, ajan.id, { durum: 'hata' }, t('evMemoryFail', { e: sonuc.hata ?? t('errUnknown') }))

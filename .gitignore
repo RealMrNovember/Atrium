@@ -6,3 +6,4 @@ veri/
 *.log
 .env
 .env.*
+ROADMAP.md

@@ -17,6 +17,8 @@ export interface SirketProfili {
   haricTutulan: string[]
   /** Proje klasörünün dışından eklenen projelerin tam yolları. */
   ekProjeler: string[]
+  /** Kullanıcının belirlediği kat sırası (proje yolları, alttan üste). Listede olmayanlar sona, ada göre. */
+  katSirasi: string[]
   /** Claude Code sohbet kayıtlarının klasörü (~/.claude/projects). */
   sohbetKlasoru: string
   kurulumTamam: boolean
@@ -36,6 +38,8 @@ export interface SirketAyarlari {
   simulasyon: boolean
   /** Boşsa otomatik bulunur. */
   claudeYolu: string
+  /** Ses efektleri açık mı. */
+  ses: boolean
 }
 
 export interface ClaudeDurumu {
@@ -45,6 +49,15 @@ export interface ClaudeDurumu {
   yontem?: string
   /** Atrium'a kaydedilmiş bir API anahtarı var mı (değeri arayüze hiç gelmez). */
   apiAnahtari: boolean
+}
+
+export interface GuncellemeDurumu {
+  durum: 'yok' | 'denetleniyor' | 'guncel' | 'mevcut' | 'indiriliyor' | 'hazir' | 'hata'
+  mevcutSurum: string
+  yeniSurum?: string
+  yuzde?: number
+  sonDenetim?: string
+  hata?: string
 }
 
 export type AjanDurumu =
@@ -68,6 +81,10 @@ export interface Ajan {
   web?: boolean
   /** Lider tarafından bir komut sırasında işe alındıysa zamanı. */
   iseAlindi?: string
+  /** Ajanın asıl çalıştığı klasörler (proje köküne göre). Ajan önce bunlarda arar → daha az token. */
+  odak?: string[]
+  /** Odak klasörlerini kullanıcı elle belirlediyse hafıza çıkarımı üzerine yazmaz. */
+  odakElle?: boolean
   /** Kattaki oda numarası (0-7). */
   oda: number
 }
@@ -104,6 +121,8 @@ export interface Komut {
   metin: string
   yazmaIzni: boolean
   durum: KomutDurumu
+  /** 'gorev': lider işi böler · 'tur': lider masa masa dolaşıp durum raporu toplar. */
+  tur?: 'gorev' | 'tur'
   zaman: string
   plan?: string
   gorevler: Gorev[]
@@ -114,8 +133,10 @@ export interface Komut {
 
 export interface AjanCanli {
   durum: AjanDurumu
-  /** Karakterin gittiği / durduğu yer. */
-  hedef: 'masa' | 'lider'
+  /** Karakterin gittiği / durduğu yer: kendi masası, liderin odası ya da (durum turunda) başka bir oda. */
+  hedef: 'masa' | 'lider' | 'ziyaret'
+  /** hedef 'ziyaret' iken gidilen oda. */
+  ziyaretOda?: number
   /** Şu an ne yapıyor — tek satır ("📄 App.tsx okunuyor"). */
   etkinlik?: string
   gorevId?: string
@@ -134,6 +155,25 @@ export interface MisafirAjan {
   sonEtkinlik: string
 }
 
+/** Claude Code'da şu an aktif bir sohbet (son dakikada yazılmış ya da Atrium'dan sürdürülen). */
+export interface AktifSohbet {
+  id: string
+  klasor: string
+  baslik: string
+  etkinlik?: string
+  /** Atrium içinden sürdürülüyor mu. */
+  atriumdan: boolean
+}
+
+/** Atrium'dan sürdürülen bir sohbetin canlı çıktısı. */
+export interface SohbetKosusu {
+  id: string
+  katId: string | null
+  calisiyor: boolean
+  /** Bu turda gönderilen mesaj ve gelen yanıtlar (araç satırları dahil). */
+  satirlar: { rol: 'sen' | 'claude' | 'arac' | 'hata'; metin: string }[]
+}
+
 /** Arayüze gönderilen canlı durum fotoğrafı. */
 export interface CanliDurum {
   ajanlar: Record<string, AjanCanli> // anahtar: `${katId}/${ajanId}`
@@ -141,6 +181,8 @@ export interface CanliDurum {
   bugunHarcanan: number
   hafizaCalisan: string[] // hafızası çıkarılan katlar
   misafirler: Record<string, MisafirAjan[]> // anahtar: katId
+  aktifSohbetler: Record<string, AktifSohbet[]> // anahtar: katId
+  sohbetKosulari: Record<string, SohbetKosusu> // anahtar: sohbet id
 }
 
 export interface KatDetayi {
@@ -155,6 +197,8 @@ export interface Sohbet {
   /** Sohbet klasörü altındaki proje klasörünün adı. */
   klasor: string
   katId: string | null
+  /** Sohbetin çalıştığı klasör (kayıttan) — devam ederken burada çalıştırılır. */
+  cwd: string
   baslik: string
   ilk: string
   son: string
@@ -202,5 +246,13 @@ export interface SirketApi {
   sohbetler(katId?: string | null): Promise<Sohbet[]>
   sohbetMesajlari(klasor: string, id: string): Promise<SohbetMesaji[]>
   disBaglanti(url: string): Promise<void>
+  katSirala(siraliYollar: string[]): Promise<Kat[]>
+  durumTuru(katId: string): Promise<Komut>
+  sohbetDevam(klasor: string, id: string, mesaj: string, yazma: boolean): Promise<void>
+  sohbetDurdur(id: string): Promise<void>
+  guncellemeDurumu(): Promise<GuncellemeDurumu>
+  guncellemeDenetle(): Promise<GuncellemeDurumu>
+  guncellemeKur(): Promise<void>
   canliDinle(cb: (d: CanliDurum) => void): () => void
+  guncellemeDinle(cb: (d: GuncellemeDurumu) => void): () => void
 }

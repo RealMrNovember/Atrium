@@ -27,6 +27,8 @@ const komutuBul = (istem: string): string => istem.match(/<command>\s*([\s\S]*?)
 function sahtePlan(istem: string, t: Cevirmen): string {
   const komut = komutuBul(istem)
   const k = komut.toLocaleLowerCase()
+  // durum sorusu → lider masa masa tur atar
+  if (/ne durumda|durum|status|progress|how is|where .* stand|stato|état|statut|статус|sorup|ask every/.test(k)) return JSON.stringify({ mode: 'tour' })
   const ekip = new Set([...istem.matchAll(/^- id: (\S+)/gm)].map((m) => m[1]))
   const bosOda = Number(istem.match(/(\d+) empty rooms/)?.[1] ?? 0)
   const gorevler: { agent: string; title: string; instructions: string }[] = []

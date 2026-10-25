@@ -11,15 +11,18 @@ type Sekme = 'komut' | 'ajan' | 'raporlar' | 'hafiza' | 'sohbetler'
 
 interface Props {
   katId: string
+  /** Açılınca doğrudan bu Claude sohbeti açılsın (sohbet id). */
+  acilacakSohbet?: string
   profil: SirketProfili
   canli: CanliDurum
   onDegisti: () => void
 }
 
-export function KatSayfasi({ katId, profil, canli, onDegisti }: Props): ReactElement {
+export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti }: Props): ReactElement {
   const { t, dil } = useDil()
   const [detay, setDetay] = useState<KatDetayi | null>(null)
-  const [sekme, setSekme] = useState<Sekme>('komut')
+  const [sekme, setSekme] = useState<Sekme>(acilacakSohbet ? 'sohbetler' : 'komut')
+  const [acikSohbet, setAcikSohbet] = useState<string | undefined>(acilacakSohbet)
   const [seciliAjan, setSeciliAjan] = useState<string | null>(null)
   const [taslakAjan, setTaslakAjan] = useState<Ajan | null>(null)
 
@@ -32,7 +35,14 @@ export function KatSayfasi({ katId, profil, canli, onDegisti }: Props): ReactEle
 
   if (!detay) return <div className="yukleniyor">{t('floorLoading')}</div>
   const { kat, ajanlar } = detay
-  const misafirler = canli.misafirler[katId] ?? []
+  // misafirler: sohbetlerde açılan alt ajanlar + o an aktif Claude Code sohbetlerinin kendisi
+  // (oda sınırlı: sohbetin kendisi alt ajanlarından önce yer alır)
+  const misafirler: MisafirAjan[] = [
+    ...(canli.aktifSohbetler[katId] ?? []).map((s) => ({
+      id: `sohbet-${s.id}`, tur: 'Claude', aciklama: s.baslik, etkinlik: s.etkinlik, sohbetBasligi: s.baslik, sonEtkinlik: ''
+    })),
+    ...(canli.misafirler[katId] ?? [])
+  ]
 
   const ajanSec = (id: string | null): void => {
     setSeciliAjan(id)
@@ -88,7 +98,8 @@ export function KatSayfasi({ katId, profil, canli, onDegisti }: Props): ReactEle
           <div className="panel-icerik">
             {sekme === 'komut' && <KomutPaneli detay={detay} canli={canli} profil={profil} onAjanSec={ajanSec} />}
             {sekme === 'ajan' && (seciliMisafir
-              ? <MisafirPaneli m={seciliMisafir} onGeri={() => ajanSec(null)} />
+              ? <MisafirPaneli m={seciliMisafir} onGeri={() => ajanSec(null)}
+                  onSohbetAc={seciliMisafir.id.startsWith('sohbet-') ? () => { setAcikSohbet(seciliMisafir.id.slice(7)); setSekme('sohbetler') } : undefined} />
               : <EkipPaneli detay={detay} canli={canli} seciliAjan={seciliAjan} taslak={taslakAjan}
                   onSec={ajanSec} onYeni={() => {
                     const bos = [0, 1, 2, 3, 4, 5, 6, 7].find((n) => !ajanlar.some((a) => a.oda === n))
@@ -97,7 +108,7 @@ export function KatSayfasi({ katId, profil, canli, onDegisti }: Props): ReactEle
                   onKaydedildi={(id) => { setTaslakAjan(null); setSeciliAjan(id); yenile(); onDegisti() }} />)}
             {sekme === 'raporlar' && <KatRaporlari detay={detay} />}
             {sekme === 'hafiza' && <HafizaPaneli detay={detay} calisiyor={hafizaCalisiyor} onCikar={hafizaCikar} onKaydedildi={() => { yenile(); onDegisti() }} />}
-            {sekme === 'sohbetler' && <SohbetListesi katId={katId} aciklama={t('chatsExplain')} />}
+            {sekme === 'sohbetler' && <SohbetListesi key={acikSohbet ?? 'liste'} katId={katId} aciklama={t('chatsExplain')} acik={acikSohbet} canli={canli} />}
           </div>
         </aside>
       </div>
@@ -142,7 +153,10 @@ function KomutPaneli({ detay, canli, profil, onAjanSec }: { detay: KatDetayi; ca
         <span className="kucuk">
           {profil.ayarlar.simulasyon ? `🧪 ${t('simNoSpend')}` : t('perAgentCap', { cap: usd(profil.ayarlar.kosuButcesiUsd) })} · Ctrl+Enter
         </span>
-        <button className="birincil" disabled={!!aktif || !metin.trim()} onClick={() => void gonder()}>{t('send')}</button>
+        <span className="komut-dugmeleri">
+          <button className="ikincil" disabled={!!aktif} title={t('tourHint')} onClick={() => void window.sirket.durumTuru(detay.kat.id).catch((e) => setHata(hataMetni(e)))}>📋 {t('tourButton')}</button>
+          <button className="birincil" disabled={!!aktif || !metin.trim()} onClick={() => void gonder()}>{t('send')}</button>
+        </span>
       </div>
       {hata && <p className="hata-metni">{hata}</p>}
 
@@ -150,6 +164,7 @@ function KomutPaneli({ detay, canli, profil, onAjanSec }: { detay: KatDetayi; ca
         <div className="komut-kart">
           <div className="komut-kart-ust">
             <span className={`rozet ${komut.durum} ${aktif ? 'canli' : ''}`}>{t(KOMUT_ANAHTARI[komut.durum])}</span>
+            {komut.tur === 'tur' && <span className="rozet tur">📋 {t('tourBadge')}</span>}
             <span className="kucuk">{zamanMetni(komut.zaman, t, dil)} · {usd(komut.maliyetUsd)}</span>
             {aktif && <button className="tehlike mini" onClick={() => void window.sirket.komutIptal(aktif.id)}>{t('stop')}</button>}
           </div>
@@ -187,22 +202,24 @@ function KomutPaneli({ detay, canli, profil, onAjanSec }: { detay: KatDetayi; ca
 
 // --- Misafir -------------------------------------------------------------------
 
-function MisafirPaneli({ m, onGeri }: { m: MisafirAjan; onGeri: () => void }): ReactElement {
+function MisafirPaneli({ m, onGeri, onSohbetAc }: { m: MisafirAjan; onGeri: () => void; onSohbetAc?: () => void }): ReactElement {
   const { t } = useDil()
+  const sohbet = !!onSohbetAc
   return (
     <div className="ajan-formu">
       <button className="geri" onClick={onGeri}>{t('backTeam')}</button>
       <div className="ajan-kimlik">
-        <span className="avatar buyuk misafir">★</span>
+        <span className={sohbet ? 'avatar buyuk claude' : 'avatar buyuk misafir'}>{sohbet ? 'C' : '★'}</span>
         <div>
-          <h3>{m.tur}</h3>
-          <span className="kucuk">{t('guestAgent')} · {t('guestFrom')}</span>
+          <h3>{sohbet ? t('claudeChat') : m.tur}</h3>
+          <span className="kucuk">{sohbet ? t('claudeChatLive') : `${t('guestAgent')} · ${t('guestFrom')}`}</span>
           <div className="durum calisiyor">{t('stWorking')}</div>
         </div>
       </div>
       {m.etkinlik && <div className="canli-kutu">{m.etkinlik}</div>}
-      {m.aciklama && <p>{m.aciklama}</p>}
+      {!sohbet && m.aciklama && <p>{m.aciklama}</p>}
       {m.sohbetBasligi && <p className="kucuk">💬 {m.sohbetBasligi}</p>}
+      {onSohbetAc && <button className="birincil" onClick={onSohbetAc}>💬 {t('openChat')}</button>}
     </div>
   )
 }
@@ -232,7 +249,7 @@ function EkipPaneli({ detay, canli, seciliAjan, taslak, onSec, onYeni, onKaydedi
               <span className="avatar" style={{ background: a.renk }}>{a.ad[0]}</span>
               <span>
                 <b>{a.ad}</b> {a.lider && '👑'} {a.iseAlindi && '🎉'}<br />
-                <span className="kucuk">{a.rol} · {a.model}</span>
+                <span className="kucuk">{a.rol} · {a.model}{a.odak?.length ? ` · 📁 ${a.odak.slice(0, 2).join(', ')}` : ''}</span>
               </span>
               <span className={`durum ${c?.durum ?? 'bosta'}`}>{t(DURUM_ANAHTARI[c?.durum ?? 'bosta'])}</span>
             </button>
@@ -308,6 +325,10 @@ function AjanFormu({ katId, ajan, yeni, canli, doluOdalar, onGeri, onKaydedildi 
         </label>
         <label>{t('fDuty')}
           <textarea rows={7} value={f.gorevTanimi} onChange={(e) => setF({ ...f, gorevTanimi: e.target.value })} />
+        </label>
+        <label>{t('fFocus')} <small>{t('fFocusHint')}</small>
+          <input value={(f.odak ?? []).join(', ')} placeholder="src/api, src/lib"
+            onChange={(e) => setF({ ...f, odak: e.target.value.split(',').map((s) => s.trim()).filter(Boolean), odakElle: true })} />
         </label>
         <div className="form-dugmeler">
           {!yeni && !ajan.lider && <button className="tehlike" onClick={() => void sil()}>{t('remove')}</button>}

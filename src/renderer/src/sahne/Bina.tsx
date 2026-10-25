@@ -12,16 +12,17 @@ const KY = 15
 
 interface Props {
   ad: string
+  logo?: string
   katlar: Kat[]
   canli: CanliDurum
   onKatSec: (id: string) => void
 }
 
-export function Bina({ ad, katlar, canli, onKatSec }: Props): ReactElement {
+export function Bina({ ad, logo, katlar, canli, onKatSec }: Props): ReactElement {
   const { t } = useDil()
   const [uzerinde, setUzerinde] = useState<string | null>(null)
   const lobiH = 56
-  const catiH = 70
+  const catiH = logo ? 170 : 70 // çatı tabelası için yer
   const toplamH = lobiH + katlar.length * KAT_H + catiH
   const genislik = (G + D) * KX + 360
   const yukseklik = toplamH + (G + D) * KY + 40
@@ -30,7 +31,8 @@ export function Bina({ ad, katlar, canli, onKatSec }: Props): ReactElement {
   const p = (x: number, y: number, z: number): { sx: number; sy: number } => ({ sx: (x - y) * KX + ox, sy: (x + y) * KY + tabanY - z })
 
   const aktifSayisi = (katId: string): number =>
-    Object.entries(canli.ajanlar).filter(([k, a]) => k.startsWith(katId + '/') && a.durum !== 'bosta').length + (canli.misafirler[katId]?.length ?? 0)
+    Object.entries(canli.ajanlar).filter(([k, a]) => k.startsWith(katId + '/') && a.durum !== 'bosta').length +
+    (canli.misafirler[katId]?.length ?? 0) + (canli.aktifSohbetler[katId]?.length ?? 0)
 
   const kutu = (z: number, h: number, ust: string, sol: string, sag: string): ReactElement => (
     <>
@@ -89,8 +91,25 @@ export function Bina({ ad, katlar, canli, onKatSec }: Props): ReactElement {
       <text x={tabela.sx} y={tabela.sy - 2} textAnchor="middle" className="bina-tabela">{kisaAd.toLocaleUpperCase()}</text>
       {katlarCiz}
       {kutu(catiZ, 10, '#4a5578', '#2c3554', '#232b47')}
-      <line x1={anten.sx} y1={anten.sy + 26} x2={anten.sx} y2={anten.sy - 20} stroke="#9aa5c4" strokeWidth={2} />
-      <circle cx={anten.sx} cy={anten.sy - 22} r={4} className="anten-isik" />
+      {logo ? (() => {
+        // çatıdaki tabela: iki direk üzerinde şirket logosu
+        const m = p(G / 2, D / 2 + 0.6, catiZ + 10)
+        const tg = 104
+        const ty = 58
+        return (
+          <g className="cati-tabela">
+            <line x1={m.sx - 30} y1={m.sy} x2={m.sx - 30} y2={m.sy - 26} stroke="#6c7799" strokeWidth={3} />
+            <line x1={m.sx + 30} y1={m.sy} x2={m.sx + 30} y2={m.sy - 26} stroke="#6c7799" strokeWidth={3} />
+            <rect x={m.sx - tg / 2} y={m.sy - 26 - ty} width={tg} height={ty} rx={8} fill="#141a2e" stroke="#7c5cff" strokeWidth={2} />
+            <image href={logo} x={m.sx - tg / 2 + 6} y={m.sy - 26 - ty + 6} width={tg - 12} height={ty - 12} preserveAspectRatio="xMidYMid meet" />
+          </g>
+        )
+      })() : (
+        <>
+          <line x1={anten.sx} y1={anten.sy + 26} x2={anten.sx} y2={anten.sy - 20} stroke="#9aa5c4" strokeWidth={2} />
+          <circle cx={anten.sx} cy={anten.sy - 22} r={4} className="anten-isik" />
+        </>
+      )}
     </svg>
   )
 }

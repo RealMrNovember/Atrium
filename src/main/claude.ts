@@ -20,6 +20,11 @@ export interface KosuSecenegi {
   apiAnahtari?: string
   sinyal?: AbortSignal
   etkinlik?: (satir: string) => void
+  /** Claude'un yazdığı her metin parçası (sohbet görünümü için). */
+  metinParcasi?: (metin: string) => void
+  /** Kullanıcının mevcut Claude Code oturumuna devam (oturum kimliği). O zaman oturum kaydı ve otomatik
+   *  hafıza Claude Code'daki gibi açık kalır, istem Atrium işaretiyle işaretlenmez. */
+  devam?: string
 }
 
 export interface KosuSonucu {
@@ -145,16 +150,20 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
   const yasak = s.yazma ? YASAK_ARACLAR : [...YASAK_ARACLAR, 'Write', 'Edit', 'MultiEdit', 'NotebookEdit']
   const args = [
     '-p', '--output-format', 'stream-json', '--verbose',
-    '--model', s.model,
+    ...(s.devam ? ['--resume', s.devam] : ['--model', s.model]),
     '--max-budget-usd', String(s.butceUsd),
     '--permission-mode', s.yazma ? 'acceptEdits' : 'default',
-    '--no-session-persistence', // ajan koşuları kullanıcının Claude Code sohbet geçmişine düşmesin
+    // ajan koşuları kullanıcının Claude Code sohbet geçmişine düşmesin (devam edilen sohbet hariç)
+    ...(s.devam ? [] : ['--no-session-persistence']),
     '--allowedTools', s.araclar.join(','),
     '--disallowedTools', yasak.join(',')
   ]
-  // Claude Code'un yerleşik otomatik hafızası kapalı: ajan ~/.claude altına kendi hafıza dosyalarını
-  // yazmasın, proje hafızası yalnızca Atrium'da dursun.
-  const ortam = temizOrtam({ CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1', ...(s.apiAnahtari ? { ANTHROPIC_API_KEY: s.apiAnahtari } : {}) })
+  // Ajan koşularında Claude Code'un yerleşik otomatik hafızası kapalı: ~/.claude altına kendi hafıza
+  // dosyalarını yazmasın, proje hafızası yalnızca Atrium'da dursun. Kullanıcının kendi sohbetinde açık kalır.
+  const ortam = temizOrtam({
+    ...(s.devam ? {} : { CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1' }),
+    ...(s.apiAnahtari ? { ANTHROPIC_API_KEY: s.apiAnahtari } : {})
+  })
 
   return new Promise((coz) => {
     let bitti = false
@@ -195,7 +204,10 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
       if (olay.type === 'assistant') {
         for (const parca of olay.message?.content ?? []) {
           if (parca.type === 'tool_use') s.etkinlik?.(aracSatiri(parca.name, parca.input ?? {}, s.t))
-          else if (parca.type === 'text' && parca.text?.trim()) s.etkinlik?.(`💬 ${kisalt(parca.text)}`)
+          else if (parca.type === 'text' && parca.text?.trim()) {
+            s.etkinlik?.(`💬 ${kisalt(parca.text)}`)
+            s.metinParcasi?.(parca.text)
+          }
         }
       } else if (olay.type === 'result') {
         // hata durumunda `result` hata metnidir; rapor gibi işlenmesin
@@ -224,6 +236,6 @@ export function claudeKos(s: KosuSecenegi): Promise<KosuSonucu> {
       bitir(sonuc)
     })
     surec.stdin.on('error', () => { /* süreç erken kapandıysa */ })
-    surec.stdin.end(`${ATRIUM_ISARETI}\n${s.istem}`, 'utf-8')
+    surec.stdin.end(s.devam ? s.istem : `${ATRIUM_ISARETI}\n${s.istem}`, 'utf-8')
   })
 }

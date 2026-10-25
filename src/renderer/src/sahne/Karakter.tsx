@@ -91,7 +91,7 @@ export function Karakter({ ajan, canli, konum, secili, misafir, onSec }: Props):
   const { nokta, yuruyor } = konum
   const p = iso(nokta.x, nokta.y)
   const durum = canli?.durum ?? 'bosta'
-  const oturuyor = !yuruyor && canli?.hedef !== 'lider' && !(misafir && durum !== 'calisiyor')
+  const oturuyor = !yuruyor && (canli?.hedef ?? 'masa') === 'masa' && !(misafir && durum !== 'calisiyor')
   const t = tohum(ajan.id + ajan.ad)
   const ten = TEN[t % TEN.length]
   const sac = SAC[(t >> 3) % SAC.length]

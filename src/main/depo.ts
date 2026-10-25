@@ -47,6 +47,7 @@ function varsayilanProfil(): SirketProfili {
     projeKlasoru: '',
     haricTutulan: [],
     ekProjeler: [],
+    katSirasi: [],
     sohbetKlasoru: join(homedir(), '.claude', 'projects'),
     kurulumTamam: false,
     ayarlar: {
@@ -55,7 +56,8 @@ function varsayilanProfil(): SirketProfili {
       kosuSuresiDk: 15,
       esZamanli: 2,
       simulasyon: false,
-      claudeYolu: ''
+      claudeYolu: '',
+      ses: true
     }
   }
 }
@@ -143,9 +145,10 @@ export function katAdlari(klasor: string): string[] {
   }
 }
 
-type KatKaynagi = Pick<SirketProfili, 'projeKlasoru' | 'haricTutulan' | 'ekProjeler'>
+type KatKaynagi = Pick<SirketProfili, 'projeKlasoru' | 'haricTutulan' | 'ekProjeler'> & Partial<Pick<SirketProfili, 'katSirasi'>>
 
-/** Kat olacak projeler (ad + yol): klasördekiler − hariç tutulanlar + dışarıdan eklenenler, ada göre sıralı. */
+/** Kat olacak projeler (ad + yol): klasördekiler − hariç tutulanlar + dışarıdan eklenenler.
+ *  Sıra: kullanıcının kat sırası, listede olmayanlar sona ada göre. */
 export function projeListesi(p: KatKaynagi): { ad: string; yol: string }[] {
   const haric = new Set(p.haricTutulan ?? [])
   const klasordekiler = katAdlari(p.projeKlasoru).filter((ad) => !haric.has(ad)).map((ad) => ({ ad, yol: join(p.projeKlasoru, ad) }))
@@ -158,7 +161,15 @@ export function projeListesi(p: KatKaynagi): { ad: string; yol: string }[] {
       try { return statSync(yol).isDirectory() } catch { return false }
     })
     .map((yol) => ({ ad: basename(yol), yol }))
-  return [...klasordekiler, ...ekler].sort((a, b) => a.ad.localeCompare(b.ad))
+  const sira = new Map((p.katSirasi ?? []).map((yol, i) => [resolve(yol).toLowerCase(), i]))
+  const yer = (yol: string): number => sira.get(resolve(yol).toLowerCase()) ?? Number.MAX_SAFE_INTEGER
+  return [...klasordekiler, ...ekler].sort((a, b) => yer(a.yol) - yer(b.yol) || a.ad.localeCompare(b.ad))
+}
+
+/** Kat sırasını kaydeder (alttan üste proje yolları). */
+export function katSirala(siraliYollar: string[]): Kat[] {
+  profilYaz({ ...profilOku(), katSirasi: siraliYollar })
+  return katlariTara()
 }
 
 export function katlariTara(kaynak: KatKaynagi = profilOku()): Kat[] {

@@ -3,7 +3,7 @@
 // (<oturum>/subagents/agent-*.jsonl) canlıysa katta "misafir ajan" olarak görünür.
 import { closeSync, existsSync, openSync, readFileSync, readSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import type { Kat, MisafirAjan, Sohbet, SohbetMesaji, SohbetOzeti } from '@ortak/tipler'
+import type { AktifSohbet, Kat, MisafirAjan, Sohbet, SohbetMesaji, SohbetOzeti } from '@ortak/tipler'
 import type { Cevirmen } from '@ortak/i18n'
 import { aracSatiri, ATRIUM_ISARETI } from './claude'
 
@@ -55,6 +55,7 @@ function sohbetiOku(kok: string, klasor: string, dosya: string): Omit<Sohbet, 'k
 
   let baslik = ''
   let ilkMetin = ''
+  let cwd = ''
   let ilk = ''
   let son = ''
   let mesaj = 0
@@ -68,6 +69,7 @@ function sohbetiOku(kok: string, klasor: string, dosya: string): Omit<Sohbet, 'k
     if (o.type === 'queue-operation' && ilkKullanici && typeof o.content === 'string' && o.content.startsWith(ATRIUM_ISARETI)) atrium = true
     if ((o.type !== 'user' && o.type !== 'assistant') || o.isSidechain) continue
     if (o.timestamp) { ilk ||= o.timestamp; son = o.timestamp }
+    if (typeof o.cwd === 'string') cwd ||= o.cwd
     const metinler = metinParcalari(o.message?.content)
     if (o.type === 'user') {
       const yazilan = metinler.filter(kullaniciMetni)
@@ -82,7 +84,7 @@ function sohbetiOku(kok: string, klasor: string, dosya: string): Omit<Sohbet, 'k
   let altAjan = 0
   try { altAjan = readdirSync(join(kok, klasor, id, 'subagents')).filter((d) => d.endsWith('.jsonl')).length } catch { /* yok */ }
   const sohbet = atrium || !mesaj ? null : {
-    id, klasor, baslik: baslik || ilkMetin.replace(/\s+/g, ' ').slice(0, 90), ilk, son, mesajSayisi: mesaj, altAjanSayisi: altAjan
+    id, klasor, cwd, baslik: baslik || ilkMetin.replace(/\s+/g, ' ').slice(0, 90), ilk, son, mesajSayisi: mesaj, altAjanSayisi: altAjan
   }
   onbellek.set(anahtar, { mtime: st.mtimeMs, boyut: st.size, sohbet })
   return sohbet
@@ -106,6 +108,12 @@ export function sohbetleriListele(kok: string, katlar: Kat[], filtre?: { katId: 
 export function sohbetOzeti(kok: string, katlar: Kat[]): SohbetOzeti {
   const hepsi = existsSync(kok) ? sohbetleriListele(kok, katlar) : []
   return { toplam: hepsi.length, eslesen: hepsi.filter((s) => s.katId).length }
+}
+
+/** Bir sohbetin bilgisini (cwd dahil) bulur. */
+export function sohbetBul(kok: string, klasor: string, id: string): Omit<Sohbet, 'katId'> | null {
+  if (!GUVENLI_AD.test(klasor) || !GUVENLI_AD.test(id)) return null
+  return sohbetiOku(kok, klasor, `${id}.jsonl`)
 }
 
 export function sohbetMesajlari(kok: string, klasor: string, id: string): SohbetMesaji[] {
@@ -155,6 +163,28 @@ function sonEtkinlik(yol: string, t: Cevirmen): string | undefined {
     if (yazi?.text) return `💬 ${yazi.text.replace(/\s+/g, ' ').slice(0, 60)}`
   }
   return undefined
+}
+
+const AKTIF_SOHBET_MS = 60_000
+
+/** Şu an aktif Claude Code sohbetleri (son dakikada yazılmış), katlara göre. Atrium'un kendi koşuları hariç. */
+export function aktifSohbetleriTara(kok: string, katlar: Kat[], t: Cevirmen): Record<string, AktifSohbet[]> {
+  const sonuc: Record<string, AktifSohbet[]> = {}
+  const simdi = Date.now()
+  for (const klasor of klasorler(kok)) {
+    const katId = katEsle(klasor, katlar)
+    if (!katId) continue
+    let dosyalar: string[] = []
+    try { dosyalar = readdirSync(join(kok, klasor)).filter((d) => d.endsWith('.jsonl') && GUVENLI_AD.test(d)) } catch { continue }
+    for (const d of dosyalar) {
+      const yol = join(kok, klasor, d)
+      try { if (simdi - statSync(yol).mtimeMs > AKTIF_SOHBET_MS) continue } catch { continue }
+      const sohbet = sohbetiOku(kok, klasor, d)
+      if (!sohbet) continue // Atrium'un kendi koşusu ya da boş
+      ;(sonuc[katId] ??= []).push({ id: sohbet.id, klasor, baslik: sohbet.baslik, etkinlik: sonEtkinlik(yol, t), atriumdan: false })
+    }
+  }
+  return sonuc
 }
 
 /** Şu an çalışan alt ajanlar, katlara göre. Yalnız son 15 dakikada yazılmış oturumlara bakar. */

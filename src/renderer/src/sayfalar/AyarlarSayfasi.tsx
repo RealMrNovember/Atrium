@@ -1,14 +1,29 @@
 import { useState, type ReactElement } from 'react'
-import type { SirketAyarlari, SirketProfili } from '@ortak/tipler'
+import type { GuncellemeDurumu, SirketAyarlari, SirketProfili } from '@ortak/tipler'
 import { DILLER, type Dil } from '@ortak/i18n'
 import { SirketLogosu } from '../bilesenler/Kimlik'
 import { ProjeSecici } from '../bilesenler/ProjeSecici'
 import { useDil } from '../dil'
-import { logoOku } from '../yardimci'
+import { GITHUB, logoOku, SURUM } from '../yardimci'
 import { ClaudeAdimi } from './Kurulum'
 
-export function AyarlarSayfasi({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: SirketProfili) => Promise<void> }): ReactElement {
-  const { t } = useDil()
+export function AyarlarSayfasi({ profil, guncelleme, onKaydet }: {
+  profil: SirketProfili; guncelleme: GuncellemeDurumu | null; onKaydet: (p: SirketProfili) => Promise<void>
+}): ReactElement {
+  const { t, dil } = useDil()
+  const [denetleniyor, setDenetleniyor] = useState(false)
+  const guncellemeDurumMetni = (g: GuncellemeDurumu | null): string => {
+    if (!g) return ''
+    switch (g.durum) {
+      case 'denetleniyor': return t('updChecking')
+      case 'guncel': return t('updUpToDate')
+      case 'mevcut': return t('updAvailable', { v: g.yeniSurum ?? '' })
+      case 'indiriliyor': return t('updDownloading', { n: g.yuzde ?? 0 })
+      case 'hazir': return t('updateReady', { v: g.yeniSurum ?? '' })
+      case 'hata': return `${t('updError')} ${g.hata ?? ''}`
+      default: return ''
+    }
+  }
   const [f, setF] = useState<SirketProfili>(profil)
   const [kaydedildi, setKaydedildi] = useState(false)
   const ayar = <K extends keyof SirketAyarlari>(k: K, v: SirketAyarlari[K]): void => setF({ ...f, ayarlar: { ...f.ayarlar, [k]: v } })
@@ -96,10 +111,29 @@ export function AyarlarSayfasi({ profil, onKaydet }: { profil: SirketProfili; on
             <input type="checkbox" checked={f.ayarlar.simulasyon} onChange={(e) => ayar('simulasyon', e.target.checked)} />
             <span>{t('simMode')} <small>{t('simModeHint')}</small></span>
           </label>
+          <label className="onay">
+            <input type="checkbox" checked={f.ayarlar.ses} onChange={(e) => ayar('ses', e.target.checked)} />
+            <span>{t('soundToggle')}</span>
+          </label>
         </div>
         <ul className="guvence">
           <li>{t('safe1')}</li><li>{t('safe2')}</li><li>{t('safe3')}</li><li>{t('safe4')}</li>
         </ul>
+      </section>
+
+      <section className="kart">
+        <h2>{t('updTitle')}</h2>
+        <p>Atrium {SURUM} · <span className="kucuk">{guncellemeDurumMetni(guncelleme)}</span>
+          {guncelleme?.sonDenetim && <span className="kucuk"> · {new Date(guncelleme.sonDenetim).toLocaleString(dil)}</span>}</p>
+        <div className="form-dugmeler">
+          <button className="ikincil" disabled={denetleniyor} onClick={() => { setDenetleniyor(true); void window.sirket.guncellemeDenetle().finally(() => setDenetleniyor(false)) }}>
+            ↻ {t('updCheck')}
+          </button>
+          <span />
+          {guncelleme?.durum === 'hazir' && <button className="birincil" onClick={() => void window.sirket.guncellemeKur()}>{t('updateRestart')}</button>}
+          {guncelleme?.durum === 'mevcut' && <button className="birincil" onClick={() => void window.sirket.disBaglanti(`${GITHUB}/releases/latest`)}>{t('updateDownload')}</button>}
+        </div>
+        <p className="kucuk">{t('updHint')}</p>
       </section>
 
       <div className="kaydet-cubugu">

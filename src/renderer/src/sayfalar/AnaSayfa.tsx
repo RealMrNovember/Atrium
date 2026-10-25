@@ -20,7 +20,7 @@ export function AnaSayfa({ profil, katlar, canli, onKatSec }: Props): ReactEleme
 
   const katAdi = (id: string): string => katlar.find((k) => k.id === id)?.ad ?? id
   const calisan = Object.values(canli.ajanlar).filter((a) => a.durum !== 'bosta').length +
-    Object.values(canli.misafirler).reduce((n, l) => n + l.length, 0)
+    Object.values(canli.misafirler).reduce((n, l) => n + l.length, 0) + Object.values(canli.aktifSohbetler).reduce((n, l) => n + l.length, 0)
   const hafizali = katlar.filter((k) => k.hafizaVar).length
 
   return (
@@ -48,7 +48,7 @@ export function AnaSayfa({ profil, katlar, canli, onKatSec }: Props): ReactEleme
             <span className="kucuk">{t('buildingHint')}</span>
           </div>
           <div className="bina-kaydirma">
-            {katlar.length ? <Bina ad={profil.ad} katlar={katlar} canli={canli} onKatSec={onKatSec} /> : <p className="bos">{t('noProjects')}</p>}
+            {katlar.length ? <Bina ad={profil.ad} logo={profil.logo} katlar={katlar} canli={canli} onKatSec={onKatSec} /> : <p className="bos">{t('noProjects')}</p>}
           </div>
         </section>
 

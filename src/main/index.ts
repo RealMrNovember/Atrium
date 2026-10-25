@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path'
 import type { Ajan, ClaudeDurumu, SirketProfili } from '@ortak/tipler'
 import { claudeDurumuOku, claudeGirisBaslat } from './claude'
 import * as depo from './depo'
+import * as guncelleme from './guncelleme'
 import * as motor from './motor'
 import * as sohbet from './sohbetler'
 
@@ -121,6 +122,22 @@ function kanallar(): void {
   ipcMain.handle('disBaglanti', (_e, url: string) => {
     if (/^https:\/\/[^\s]+$/.test(url)) void shell.openExternal(url)
   })
+  ipcMain.handle('katSirala', (_e, siraliYollar: string[]) => depo.katSirala(siraliYollar))
+  ipcMain.handle('durumTuru', (_e, katId: string) => motor.durumTuru(katId))
+  ipcMain.handle('sohbetDevam', (_e, klasor: string, id: string, mesaj: string, yazma: boolean) => {
+    const { sohbetKlasoru } = depo.profilOku()
+    const bilgi = sohbet.sohbetBul(sohbetKlasoru, klasor, id)
+    if (!bilgi) throw new Error(depo.ceviri()('noChats'))
+    const katlar = depo.katlariTara()
+    const katId = sohbet.katEsle(klasor, katlar)
+    const cwd = bilgi.cwd || katlar.find((k) => k.id === katId)?.yol || ''
+    if (!cwd) throw new Error(depo.ceviri()('noFolderSet'))
+    void motor.sohbetDevam(id, { katId, cwd }, String(mesaj ?? '').slice(0, 20000), !!yazma)
+  })
+  ipcMain.handle('sohbetDurdur', (_e, id: string) => motor.sohbetDurdur(id))
+  ipcMain.handle('guncellemeDurumu', () => guncelleme.guncellemeDurumu())
+  ipcMain.handle('guncellemeDenetle', () => guncelleme.guncellemeDenetle())
+  ipcMain.handle('guncellemeKur', () => guncelleme.guncellemeKur())
 }
 
 /** Claude Code sohbetlerinde açılan alt ajanları 3 saniyede bir tarar. */
@@ -132,6 +149,7 @@ function misafirTaramasi(): void {
     if (Date.now() - katOnbellek.zaman > 60_000) katOnbellek = { zaman: Date.now(), katlar: depo.katlariTara() }
     try {
       motor.misafirleriGuncelle(sohbet.misafirleriTara(p.sohbetKlasoru, katOnbellek.katlar, depo.ceviri()))
+      motor.aktifSohbetleriGuncelle(sohbet.aktifSohbetleriTara(p.sohbetKlasoru, katOnbellek.katlar, depo.ceviri()))
     } catch {
       /* okunamayan kayıt — bir sonraki turda tekrar */
     }
@@ -144,6 +162,7 @@ app.whenReady().then(() => {
   kanallar()
   pencereAc()
   misafirTaramasi()
+  guncelleme.guncellemeBaslat((d) => pencere?.webContents.send('guncelleme', d))
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) pencereAc()
   })

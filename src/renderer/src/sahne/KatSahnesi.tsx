@@ -15,6 +15,7 @@ const ODALAR = odalar()
 const KAPI_GENISLIGI = 1.0
 const ASANSOR: Nokta = { x: 0.45, y: 5 }
 const MISAFIR_RENGI = '#e8875b'
+const CLAUDE_RENGI = '#d97757'
 const AYRILMA_MS = 2600
 
 export const misafirId = (id: string): string => `m-${id}`
@@ -75,7 +76,8 @@ function useMisafirler(misafirler: MisafirAjan[], doluOdalar: number[]): { ajan:
   const kullanilan = new Set([...doluOdalar, ...odaHaritasi.current.values()])
   const sonuc: { ajan: Ajan; m: MisafirAjan; ayriliyor: boolean }[] = []
   const ajanYap = (m: MisafirAjan, oda: number): Ajan => ({
-    id: misafirId(m.id), ad: m.tur, rol: m.aciklama || m.tur, gorevTanimi: m.aciklama, model: '', renk: MISAFIR_RENGI, oda
+    id: misafirId(m.id), ad: m.tur, rol: m.aciklama || m.tur, gorevTanimi: m.aciklama, model: '',
+    renk: m.id.startsWith('sohbet-') ? CLAUDE_RENGI : MISAFIR_RENGI, oda
   })
   for (const m of misafirler) {
     let oda = odaHaritasi.current.get(m.id)
@@ -104,6 +106,13 @@ export function KatSahnesi({ katId, ajanlar, canli, misafirler, seciliAjan, onAj
   const ziyaretciler = ajanlar.filter((a) => !a.lider && canliOf(a)?.hedef === 'lider').sort((a, b) => a.oda - b.oda)
   const hedefler: Record<string, Nokta> = {}
   for (const a of ajanlar) {
+    const c = canliOf(a)
+    // durum turu: lider ziyaret ettiği ajanın masasının yanında durur
+    if (c?.hedef === 'ziyaret' && c.ziyaretOda !== undefined && ODALAR[c.ziyaretOda]) {
+      const k = ODALAR[c.ziyaretOda].koltuk
+      hedefler[a.id] = { x: k.x - 1.0, y: k.y + 0.35 }
+      continue
+    }
     const sira = ziyaretciler.indexOf(a)
     hedefler[a.id] = sira >= 0 ? liderOnu(sira) : ODALAR[a.oda]?.koltuk ?? ODALAR[0].koltuk
   }
@@ -196,9 +205,9 @@ export function KatSahnesi({ katId, ajanlar, canli, misafirler, seciliAjan, onAj
     const sahip = odaSahibi.get(oda.no)
     const misafir = misafirOdasi.get(oda.no)
     const p = iso(oda.x0 + ODA_G - 0.35, oda.y0 + ODA_D - 0.35)
-    const yazi = sahip ? sahip.rol : misafir ? t('guestAgent') : t('emptyRoom')
-    const alt = sahip ? sahip.ad : misafir ? misafir.ajan.ad : ''
-    const cerceve = sahip ? sahip.renk : misafir ? MISAFIR_RENGI : 'rgba(157,139,255,.5)'
+    const yazi = sahip ? sahip.rol : misafir ? (misafir.m.id.startsWith('sohbet-') ? t('claudeChat') : t('guestAgent')) : t('emptyRoom')
+    const alt = sahip ? sahip.ad : misafir ? (misafir.m.id.startsWith('sohbet-') ? misafir.m.aciklama.slice(0, 28) : misafir.ajan.ad) : ''
+    const cerceve = sahip ? sahip.renk : misafir ? misafir.ajan.renk : 'rgba(157,139,255,.5)'
     const g = Math.max(64, Math.min(30, yazi.length) * 6.6 + 16)
     return (
       <g key={`tabela${oda.no}`} className={sahip || misafir ? 'tabela' : 'tabela bos'} transform={`translate(${p.sx.toFixed(1)},${(p.sy - 4).toFixed(1)})`}
