@@ -1,8 +1,11 @@
 import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } from 'electron'
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import type { Ajan, ClaudeDurumu, SirketProfili } from '@ortak/tipler'
-import { claudeDurumuOku, claudeGirisBaslat } from './claude'
+import type { Ajan, ClaudeDurumu, SaglayiciAyari, SaglayiciDurumu, SaglayiciId, SirketProfili } from '@ortak/tipler'
+import { claudeDurumuOku, claudeGirisBaslat, terminaldeCalistir } from './claude'
+import { donanimOku } from './donanim'
+import { cliBul, saglayiciDurumu, uyumluModeller } from './saglayicilar'
+import * as yerel from './yerel'
 import * as depo from './depo'
 import * as guncelleme from './guncelleme'
 import * as motor from './motor'
@@ -14,12 +17,13 @@ const ikon = join(__dirname, '../../build/icon.png')
 
 // --- API anahtarı: işletim sisteminin güvenli deposuyla şifrelenir, arayüze hiç gelmez ---
 
-const anahtarDosyasi = (): string => join(depo.veriKlasoru(), 'anahtar.bin')
+const SAGLAYICI_IDLERI: SaglayiciId[] = ['claude', 'codex', 'gemini', 'ollama', 'openai']
+const anahtarDosyasi = (id: SaglayiciId = 'claude'): string => join(depo.veriKlasoru(), id === 'claude' ? 'anahtar.bin' : `anahtar-${id}.bin`)
 
-function apiAnahtariOku(): string | undefined {
+function apiAnahtariOku(id: SaglayiciId = 'claude'): string | undefined {
   try {
-    if (!existsSync(anahtarDosyasi()) || !safeStorage.isEncryptionAvailable()) return undefined
-    return safeStorage.decryptString(readFileSync(anahtarDosyasi()))
+    if (!existsSync(anahtarDosyasi(id)) || !safeStorage.isEncryptionAvailable()) return undefined
+    return safeStorage.decryptString(readFileSync(anahtarDosyasi(id)))
   } catch {
     return undefined
   }
@@ -27,6 +31,23 @@ function apiAnahtariOku(): string | undefined {
 
 async function claudeDurumu(): Promise<ClaudeDurumu> {
   return claudeDurumuOku(depo.profilOku().ayarlar.claudeYolu, !!apiAnahtariOku())
+}
+
+async function saglayiciDurumlari(): Promise<SaglayiciDurumu[]> {
+  const { ayarlar } = depo.profilOku()
+  const ayar = (id: SaglayiciId): SaglayiciAyari => ayarlar.saglayicilar?.[id] ?? {}
+  return Promise.all(SAGLAYICI_IDLERI.map(async (id): Promise<SaglayiciDurumu> => {
+    if (id === 'claude') {
+      const c = await claudeDurumu()
+      return { id, kurulu: c.kurulu, surum: c.surum, hazir: c.girisli, yontem: c.yontem, anahtar: c.apiAnahtari }
+    }
+    const d = await saglayiciDurumu(id, ayar(id), !!apiAnahtariOku(id))
+    if (id === 'openai' && d.kurulu) {
+      const modeller = await uyumluModeller(ayar(id), apiAnahtariOku(id))
+      return { ...d, hazir: modeller !== null, modeller: modeller ?? undefined }
+    }
+    return d
+  }))
 }
 
 /** Hafıza çıkarılırken kullanılacak sohbet bağlamı: başlıklar ve açılış istekleri. */
@@ -140,6 +161,30 @@ function kanallar(): void {
   ipcMain.handle('guncellemeDenetle', () => guncelleme.guncellemeDenetle())
   ipcMain.handle('guncellemeKur', () => guncelleme.guncellemeKur())
   ipcMain.handle('planLimitleriYenile', () => motor.planLimitleriYenile())
+  ipcMain.handle('saglayiciDurumlari', () => saglayiciDurumlari())
+  ipcMain.handle('saglayiciGiris', (_e, id: SaglayiciId) => {
+    const ayar = depo.profilOku().ayarlar.saglayicilar?.[id]
+    if (id === 'claude') claudeGirisBaslat(depo.profilOku().ayarlar.claudeYolu)
+    else if (id === 'codex') terminaldeCalistir(cliBul('codex', ayar?.yol).komut, ['login'], 'Codex login')
+    else if (id === 'gemini') terminaldeCalistir(cliBul('gemini', ayar?.yol).komut, [], 'Gemini login')
+    else if (id === 'ollama') return yerel.ollamaBaslat(ayar)
+  })
+  ipcMain.handle('saglayiciAnahtari', (_e, id: SaglayiciId, anahtar: string | null) => {
+    if (!SAGLAYICI_IDLERI.includes(id)) return saglayiciDurumlari()
+    const temiz = String(anahtar ?? '').trim()
+    if (!temiz) rmSync(anahtarDosyasi(id), { force: true })
+    else if (safeStorage.isEncryptionAvailable()) writeFileSync(anahtarDosyasi(id), safeStorage.encryptString(temiz))
+    return saglayiciDurumlari()
+  })
+  const ollamaAyari = (): SaglayiciAyari | undefined => depo.profilOku().ayarlar.saglayicilar?.ollama
+  ipcMain.handle('donanim', () => donanimOku())
+  ipcMain.handle('ollamaKur', () => { void yerel.ollamaKur(ollamaAyari()) })
+  ipcMain.handle('ollamaBaslat', () => yerel.ollamaBaslat(ollamaAyari()))
+  ipcMain.handle('modelIndir', (_e, model: string) => { void yerel.modelIndir(String(model), ollamaAyari()) })
+  ipcMain.handle('modelSil', (_e, model: string) => yerel.modelSil(String(model), ollamaAyari()))
+  ipcMain.handle('indirmeIptal', (_e, hedef: string) => yerel.indirmeIptal(String(hedef)))
+  ipcMain.handle('yerelDene', (_e, model: string, mesajlar: { rol: 'sen' | 'model'; metin: string }[]) =>
+    yerel.yerelDene(String(model), Array.isArray(mesajlar) ? mesajlar : [], ollamaAyari()))
 }
 
 /** Claude Code sohbetlerinde açılan alt ajanları 3 saniyede bir tarar. */
@@ -163,6 +208,7 @@ function misafirTaramasi(): void {
 app.whenReady().then(() => {
   depo.depoBaslat(join(app.getPath('userData'), 'data'), app.getAppPath(), app.getLocale())
   motor.motorBaslat((d) => pencere?.webContents.send('canli', d), apiAnahtariOku, sohbetBaglami)
+  yerel.yerelBaslat(depo.veriKlasoru(), (d) => pencere?.webContents.send('indirme', d))
   kanallar()
   pencereAc()
   misafirTaramasi()

@@ -59,7 +59,9 @@ function varsayilanProfil(): SirketProfili {
       esZamanli: 2,
       simulasyon: false,
       claudeYolu: '',
-      ses: true
+      ses: true,
+      varsayilanSaglayici: 'claude',
+      saglayicilar: {}
     }
   }
 }

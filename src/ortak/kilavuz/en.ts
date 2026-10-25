@@ -53,6 +53,23 @@ Each floor keeps a short **project memory**: what the project is, its stack and 
 - Continuing a chat follows the same safety rules: no shell commands, file changes only if you allow them.
 - Chats are read locally only; nothing leaves your computer.
 
+## AI tools
+Atrium is not tied to one AI. Each agent has its own **AI tool**, and different tools can work side by side on the same floor:
+- **Claude Code** — the default; the most capable agent and the only one with plan-usage display and dollar caps.
+- **OpenAI Codex CLI** — install with \`npm i -g @openai/codex\`, then click **Sign in** under Profile & Settings → AI tools.
+- **Gemini CLI** — install with \`npm i -g @google/gemini-cli\`, sign in with Google or save a Gemini API key.
+- **Ollama** — free models that run on your own computer (see Local AI).
+- **OpenAI compatible** — LM Studio, llama.cpp, vLLM, OpenRouter or the OpenAI API: enter the address and, if needed, a key.
+
+To switch an agent, click it and change **AI tool** and **Model**. **Default for new agents** decides what new hires use; when the lead runs on a non-Claude tool, the agents it hires use the same tool and model.
+
+## Local AI
+The **Local AI** page measures your computer (processor, memory, graphics card, free disk) and shows which models will run fast, slowly or not at all.
+1. Click **Download & install Ollama** — Atrium downloads the official engine and installs it for you.
+2. Pick a model marked **Runs fast** or **Recommended for you** and click **Download**.
+3. Try it in the test chat, then give it to an agent: AI tool **Ollama**, Model **your model**.
+Models marked **Can be an agent** can open and read project files with Atrium's safe file tools; others answer from the instructions and project memory only. The page also has a short guide on sizes, memory and tips.
+
 ## Team
 In the **Team** tab you can rename agents, edit their job descriptions, choose a model (Haiku: fast and cheap · Sonnet: balanced · Opus: most capable), give web access, set focus folders, move them to another room or remove them. The lead cannot be removed.
 

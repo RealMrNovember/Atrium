@@ -53,6 +53,23 @@ Jede Etage führt ein kurzes **Projektgedächtnis**: was das Projekt ist, sein S
 - Das Fortsetzen eines Chats folgt denselben Sicherheitsregeln: keine Shell-Befehle, Dateiänderungen nur, wenn du sie erlaubst.
 - Chats werden nur lokal gelesen; nichts verlässt deinen Computer.
 
+## KI-Tools
+Atrium ist nicht an eine einzige KI gebunden. Jeder Agent hat sein eigenes **KI-Tool**, und verschiedene Tools können auf derselben Etage Seite an Seite arbeiten:
+- **Claude Code** — der Standard; der leistungsfähigste Agent und der einzige mit Anzeige der Plan-Nutzung und Dollar-Limits.
+- **OpenAI Codex CLI** — installiere es mit \`npm i -g @openai/codex\` und klicke dann unter Profil & Einstellungen → KI-Tools auf **Anmelden**.
+- **Gemini CLI** — installiere es mit \`npm i -g @google/gemini-cli\`, melde dich mit Google an oder speichere einen Gemini-API-Schlüssel.
+- **Ollama** — kostenlose Modelle, die auf deinem eigenen Computer laufen (siehe Lokale KI).
+- **OpenAI-kompatibel** — LM Studio, llama.cpp, vLLM, OpenRouter oder die OpenAI-API: Gib die Adresse und, falls nötig, einen Schlüssel ein.
+
+Um einen Agenten umzustellen, klicke ihn an und ändere **KI-Tool** und **Modell**. **Standard für neue Agenten** legt fest, was neu eingestellte Agenten nutzen; läuft der Projektleiter auf einem Tool außer Claude, nutzen die Agenten, die er einstellt, dasselbe Tool und Modell.
+
+## Lokale KI
+Die Seite **Lokale KI** misst deinen Computer (Prozessor, Arbeitsspeicher, Grafikkarte, freier Speicher) und zeigt, welche Modelle schnell, langsam oder gar nicht laufen.
+1. Klicke auf **Ollama herunterladen & installieren** — Atrium lädt die offizielle Engine herunter und installiert sie für dich.
+2. Wähle ein Modell mit **Läuft schnell** oder **Für dich empfohlen** und klicke auf **Herunterladen**.
+3. Probier es im Test-Chat aus und gib es dann einem Agenten: KI-Tool **Ollama**, Modell **dein Modell**.
+Modelle mit **Kann Agent sein** können Projektdateien mit Atriums sicheren Datei-Tools öffnen und lesen; andere antworten nur anhand der Anweisungen und des Projektgedächtnisses. Die Seite enthält außerdem eine kurze Anleitung zu Größen, Speicher und Tipps.
+
 ## Team
 Im Tab **Team** kannst du Agenten umbenennen, ihre Stellenbeschreibungen bearbeiten, ein Modell wählen (Haiku: schnell und günstig · Sonnet: ausgewogen · Opus: am leistungsfähigsten), Webzugriff geben, Fokusordner festlegen, sie in einen anderen Raum verschieben oder entfernen. Der Projektleiter kann nicht entfernt werden.
 

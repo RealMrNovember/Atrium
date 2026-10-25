@@ -3,14 +3,15 @@ import type { GuncellemeDurumu, SirketAyarlari, SirketProfili } from '@ortak/tip
 import { DILLER, type Dil } from '@ortak/i18n'
 import { SirketLogosu } from '../bilesenler/Kimlik'
 import { ProjeSecici } from '../bilesenler/ProjeSecici'
+import { AracAyarlari } from '../bilesenler/AracAyarlari'
 import { Markdown } from '../bilesenler/Markdown'
 import { surumNotlari } from '@ortak/yenilikler'
 import { useDil } from '../dil'
 import { GITHUB, logoOku, SURUM } from '../yardimci'
 import { ClaudeAdimi } from './Kurulum'
 
-export function AyarlarSayfasi({ profil, guncelleme, onKaydet }: {
-  profil: SirketProfili; guncelleme: GuncellemeDurumu | null; onKaydet: (p: SirketProfili) => Promise<void>
+export function AyarlarSayfasi({ profil, guncelleme, onKaydet, onYerelYz }: {
+  profil: SirketProfili; guncelleme: GuncellemeDurumu | null; onKaydet: (p: SirketProfili) => Promise<void>; onYerelYz?: () => void
 }): ReactElement {
   const { t, dil } = useDil()
   const [denetleniyor, setDenetleniyor] = useState(false)
@@ -88,6 +89,11 @@ export function AyarlarSayfasi({ profil, guncelleme, onKaydet }: {
             <input value={f.ayarlar.claudeYolu} placeholder={t('auto')} onChange={(e) => ayar('claudeYolu', e.target.value)} />
           </label>
         </div>
+      </section>
+
+      <section className="kart">
+        <h2>{t('aiTitle')}</h2>
+        <AracAyarlari p={f} setP={setF} onYerelYz={onYerelYz} />
       </section>
 
       <section className="kart">

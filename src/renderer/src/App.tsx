@@ -8,6 +8,7 @@ import { DilSaglayici, useDil } from './dil'
 import { AnaSayfa } from './sayfalar/AnaSayfa'
 import { AyarlarSayfasi } from './sayfalar/AyarlarSayfasi'
 import { KatSayfasi } from './sayfalar/KatSayfasi'
+import { YerelYzSayfasi } from './sayfalar/YerelYzSayfasi'
 import { KilavuzSayfasi } from './sayfalar/KilavuzSayfasi'
 import { Kurulum } from './sayfalar/Kurulum'
 import { RaporlarSayfasi } from './sayfalar/RaporlarSayfasi'
@@ -17,7 +18,7 @@ import { CICIBYTE, GITHUB, KAHVE, SURUM, usd } from './yardimci'
 
 export type Sayfa =
   | { tur: 'ana' } | { tur: 'kat'; id: string; sohbet?: string } | { tur: 'raporlar' } | { tur: 'sohbetler' }
-  | { tur: 'ayarlar' } | { tur: 'kilavuz' }
+  | { tur: 'ayarlar' } | { tur: 'kilavuz' } | { tur: 'yerel' }
 
 const BOS_CANLI: CanliDurum = {
   ajanlar: {}, aktifKomutlar: [], bugunHarcanan: 0, hafizaCalisan: [], misafirler: {}, aktifSohbetler: {}, sohbetKosulari: {}
@@ -131,6 +132,7 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
           <button className={sayfa.tur === 'raporlar' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'raporlar' })}>📨 {t('navReports')}</button>
           <button className={sayfa.tur === 'sohbetler' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'sohbetler' })}>💬 {t('navChats')}</button>
           <button className={sayfa.tur === 'ayarlar' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'ayarlar' })}>⚙️ {t('navSettings')}</button>
+          <button className={sayfa.tur === 'yerel' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'yerel' })}>🦙 {t('navLocal')}</button>
           <button className={sayfa.tur === 'kilavuz' ? 'etkin' : ''} onClick={() => setSayfa({ tur: 'kilavuz' })}>📖 {t('navGuide')}</button>
         </nav>
         <div className="kat-baslik">
@@ -185,6 +187,7 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
             {sayfa.tur === 'sohbetler' && <><span>›</span><b>{t('navChats')}</b></>}
             {sayfa.tur === 'ayarlar' && <><span>›</span><b>{t('navSettings')}</b></>}
             {sayfa.tur === 'kilavuz' && <><span>›</span><b>{t('navGuide')}</b></>}
+            {sayfa.tur === 'yerel' && <><span>›</span><b>{t('navLocal')}</b></>}
           </div>
           <div className="ust-sag">
             {abonelik ? (
@@ -210,8 +213,9 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
         {sayfa.tur === 'kat' && <KatSayfasi key={sayfa.id} katId={sayfa.id} acilacakSohbet={sayfa.sohbet} profil={profil} canli={canli} onDegisti={katlariYenile} />}
         {sayfa.tur === 'raporlar' && <RaporlarSayfasi katlar={katlar} onKatSec={katSec} />}
         {sayfa.tur === 'sohbetler' && <SohbetlerSayfasi katlar={katlar} canli={canli} onKatSec={katSec} />}
-        {sayfa.tur === 'ayarlar' && <AyarlarSayfasi profil={profil} guncelleme={guncelleme} onKaydet={onKaydet} />}
+        {sayfa.tur === 'ayarlar' && <AyarlarSayfasi profil={profil} guncelleme={guncelleme} onKaydet={onKaydet} onYerelYz={() => setSayfa({ tur: 'yerel' })} />}
         {sayfa.tur === 'kilavuz' && <KilavuzSayfasi />}
+        {sayfa.tur === 'yerel' && <YerelYzSayfasi />}
       </main>
       {yenilik && (
         <YeniliklerPenceresi surum={yenilik.surum} bekleyen={yenilik.bekleyen}

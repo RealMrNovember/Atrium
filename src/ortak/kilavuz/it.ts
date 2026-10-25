@@ -53,6 +53,23 @@ Ogni piano conserva una breve **memoria del progetto**: cos'è il progetto, il s
 - Continuare una chat segue le stesse regole di sicurezza: nessun comando shell, modifiche ai file solo se le consenti.
 - Le chat vengono lette solo in locale; nulla lascia il tuo computer.
 
+## Strumenti IA
+Atrium non è legato a una sola IA. Ogni agente ha il suo **Strumento IA**, e strumenti diversi possono lavorare fianco a fianco sullo stesso piano:
+- **Claude Code** — il predefinito; l'agente più capace e l'unico con la visualizzazione dell'uso del piano e i limiti in dollari.
+- **OpenAI Codex CLI** — installalo con \`npm i -g @openai/codex\`, poi clicca su **Accedi** in Profilo e impostazioni → Strumenti IA.
+- **Gemini CLI** — installalo con \`npm i -g @google/gemini-cli\`, accedi con Google o salva una chiave API di Gemini.
+- **Ollama** — modelli gratuiti che girano sul tuo computer (vedi IA locale).
+- **Compatibile OpenAI** — LM Studio, llama.cpp, vLLM, OpenRouter o l'API di OpenAI: inserisci l'indirizzo e, se serve, una chiave.
+
+Per cambiare lo strumento di un agente, cliccaci sopra e modifica **Strumento IA** e **Modello**. **Predefinito per i nuovi agenti** decide cosa usano i nuovi assunti; quando il capo progetto usa uno strumento diverso da Claude, gli agenti che assume usano lo stesso strumento e modello.
+
+## IA locale
+La pagina **IA locale** misura il tuo computer (processore, memoria, scheda grafica, disco libero) e mostra quali modelli gireranno veloci, lenti o per niente.
+1. Clicca su **Scarica e installa Ollama** — Atrium scarica il motore ufficiale e lo installa per te.
+2. Scegli un modello contrassegnato **Gira veloce** o **Consigliato per te** e clicca su **Scarica**.
+3. Provalo nella chat di prova, poi dallo a un agente: Strumento IA **Ollama**, Modello **il tuo modello**.
+I modelli contrassegnati **Può fare l’agente** possono aprire e leggere i file del progetto con gli strumenti per file sicuri di Atrium; gli altri rispondono solo in base alle istruzioni e alla memoria del progetto. La pagina ha anche una breve guida su dimensioni, memoria e consigli.
+
 ## Team
 Nella scheda **Team** puoi rinominare gli agenti, modificare le loro descrizioni del ruolo, scegliere un modello (Haiku: veloce ed economico · Sonnet: bilanciato · Opus: il più capace), dare accesso al web, impostare le cartelle di focus, spostarli in un'altra stanza o rimuoverli. Il capo progetto non può essere rimosso.
 

@@ -40,6 +40,8 @@ Atrium macht daraus ein Unternehmen, das du **sehen** kannst:
 - 👥 **Jede Etage hat ein Team.** Einen Projektleiter, einen Entwickler, einen UI/UX-Designer, QA, einen Rechercheur und einen Gedächtnis-Hüter — jeder in seinem eigenen Zimmer, an seinem eigenen Schreibtisch.
 - 🧭 **Du gibst einen Befehl, der Leiter führt das Team.** Der Leiter teilt die Arbeit auf, die Agenten kommen vorbei, um ihre Aufgaben abzuholen, arbeiten an ihren Schreibtischen und gehen zurück, um zu berichten. Du bekommst **einen** zusammengeführten Bericht.
 - 🧠 **Projekte erinnern sich.** Jede Etage führt ein kurzes Projektgedächtnis, das jeder Agent zuerst liest — so liest niemand die ganze Codebasis erneut.
+- 🤝 **Nicht nur Claude.** Jeder Agent kann mit Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama oder einem OpenAI-kompatiblen Server laufen — gemischt auf derselben Etage.
+- 🦙 **Lokale KI, eingebaut.** Atrium misst deinen Computer, zeigt, welche offenen Modelle laufen, lädt Ollama und die Modelle für dich herunter und installiert sie — und jeder Agent kann sie nutzen: kostenlos, offline und privat.
 - 💬 **Deine Claude-Code-Chats ziehen ein.** Atrium liest deine bestehenden Claude-Code-Unterhaltungen und sortiert sie nach Projekt. Sub-Agenten, die Claude in diesen Chats startet, erscheinen **live** als Gäste in einem leeren Zimmer.
 - 🛡️ **Du behältst die Kontrolle.** Standardmäßig schreibgeschützt, Geheimnisse sind tabu, überall gibt es Ausgabenlimits, und nichts wird je veröffentlicht oder gepusht. Das letzte Wort hast du.
 
@@ -107,6 +109,7 @@ Lade das Installationsprogramm für dein System von der [**neuesten Version**](h
 ### Voraussetzungen
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) ist installiert (`npm install -g @anthropic-ai/claude-code`) und angemeldet — oder ein Anthropic-API-Schlüssel, den Atrium verschlüsselt im Schlüsselbund deines Betriebssystems speichert.
+- Optional: [OpenAI Codex CLI](https://github.com/openai/codex), [Gemini CLI](https://github.com/google-gemini/gemini-cli), ein OpenAI-kompatibler Server — oder **ganz ohne Cloud-KI**: Installiere Ollama und lokale Modelle auf der Seite **Lokale KI**.
 - Noch kein Claude? Aktiviere die **Simulation** und erkunde alles kostenlos.
 
 ### Erster Start

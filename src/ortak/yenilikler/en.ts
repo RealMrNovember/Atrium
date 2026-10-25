@@ -4,6 +4,15 @@ export interface SurumNotu { surum: string; tarih: string; baslik: string; madde
 
 export const en: SurumNotu[] = [
   {
+    surum: '1.4.0', tarih: '2026-10-25', baslik: 'Many AIs, one office — plus local AI',
+    maddeler: [
+      "🤝 Agents can now run on Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama or any OpenAI-compatible server — mixed on the same floor.",
+      "🦙 New Local AI page: measures your computer and shows which models run fast, slowly or not at all.",
+      "⬇️ Atrium downloads and installs Ollama and the models for you, then you can try them in a test chat.",
+      "🔗 Give a local model to any agent; models that support tools read project files with safe, project-only tools."
+    ]
+  },
+  {
     surum: '1.3.0', tarih: '2026-10-25', baslik: 'What’s new, right inside Atrium',
     maddeler: [
       '🎁 A “What’s new” window after every update, in your language.',

@@ -2,6 +2,15 @@ import type { SurumNotu } from './en'
 
 export const tr: SurumNotu[] = [
   {
+    surum: '1.4.0', tarih: '2026-10-25', baslik: 'Birçok yapay zeka, tek ofis — üstelik yerel YZ',
+    maddeler: [
+      "🤝 Ajanlar artık Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ya da OpenAI uyumlu herhangi bir sunucuyla çalışabilir — aynı katta karışık.",
+      "🦙 Yeni Yerel YZ sayfası: bilgisayarını ölçer, hangi modellerin hızlı, yavaş ya da hiç çalışmayacağını gösterir.",
+      "⬇️ Atrium Ollama’yı ve modelleri senin için indirip kurar; deneme sohbetinde hemen deneyebilirsin.",
+      "🔗 Yerel modeli istediğin ajana ver; araç destekleyen modeller proje dosyalarını güvenli, proje içi araçlarla okur."
+    ]
+  },
+  {
     surum: '1.3.0', tarih: '2026-10-25', baslik: 'Yenilikler artık Atrium’un içinde',
     maddeler: [
       '🎁 Her güncellemeden sonra kendi dilinde bir “Neler yeni?” penceresi.',

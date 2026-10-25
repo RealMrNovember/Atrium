@@ -40,6 +40,8 @@ Atrium bunu **görebildiğin** bir şirkete dönüştürür:
 - 👥 **Her katın bir ekibi var.** Bir proje lideri, bir geliştirici, bir UI/UX tasarımcısı, QA, bir araştırmacı ve bir hafıza koruyucusu — her biri kendi odasında, kendi masasında.
 - 🧭 **Tek komut verirsin, lider ekibi yönetir.** Lider işi böler, ajanlar görevlerini almaya gelir, masalarında çalışır ve rapor vermek için geri yürür. Sana **tek** bir birleşik rapor gelir.
 - 🧠 **Projeler hatırlar.** Her kat, her ajanın önce okuduğu kısa bir proje hafızası tutar — böylece kimse tüm kod tabanını yeniden okumaz.
+- 🤝 **Yalnız Claude değil.** Her ajan Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ya da OpenAI uyumlu herhangi bir sunucuyla çalışabilir — aynı katta karışık.
+- 🦙 **Yerleşik yerel YZ.** Atrium bilgisayarını ölçer, hangi açık modellerin çalışacağını gösterir, Ollama'yı ve modelleri senin için indirip kurar ve her ajanın kullanmasını sağlar — ücretsiz, internetsiz ve gizli.
 - 💬 **Claude Code sohbetlerin de taşınır.** Atrium mevcut Claude Code konuşmalarını okur ve projeye göre dosyalar. Claude'un bu sohbetlerde başlattığı alt ajanlar boş bir odada misafir olarak **canlı** görünür.
 - 🛡️ **Kontrol sende kalır.** Varsayılan olarak salt okunur, gizli bilgiler erişime kapalı, her yerde harcama limitleri var ve hiçbir şey yayımlanmaz ya da push'lanmaz. Son karar senin.
 
@@ -107,6 +109,7 @@ flowchart LR
 ### Gereksinimler
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) kurulu (`npm install -g @anthropic-ai/claude-code`) ve oturum açılmış olmalı — ya da Atrium'un işletim sistemi anahtar zincirinle şifreli olarak sakladığı bir Anthropic API anahtarı.
+- İsteğe bağlı: [OpenAI Codex CLI](https://github.com/openai/codex), [Gemini CLI](https://github.com/google-gemini/gemini-cli), OpenAI uyumlu bir sunucu — ya da **hiç bulut yapay zekası olmadan**: Ollama'yı ve yerel modelleri **Yerel YZ** sayfasından kur.
 - Henüz Claude yok mu? **Simülasyon**'u aç ve her şeyi ücretsiz keşfet.
 
 ### İlk çalıştırma

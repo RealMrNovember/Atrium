@@ -40,6 +40,8 @@ Atrium trasforma tutto questo in un'azienda che puoi **vedere**:
 - 👥 **Ogni piano ha un team.** Un capo progetto, uno sviluppatore, un designer UI/UX, QA, un ricercatore e un custode della memoria — ognuno nella sua stanza, alla sua scrivania.
 - 🧭 **Dai un solo comando, il capo guida il team.** Il capo suddivide il lavoro, gli agenti vengono a ritirare i loro compiti, lavorano alle scrivanie e tornano a riferire. Ricevi **un solo** report unificato.
 - 🧠 **I progetti ricordano.** Ogni piano mantiene una breve memoria di progetto che ogni agente legge per prima — così nessuno rilegge l'intero codice.
+- 🤝 **Non solo Claude.** Ogni agente può funzionare con Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama o qualsiasi server compatibile con OpenAI — anche insieme sullo stesso piano.
+- 🦙 **IA locale integrata.** Atrium misura il tuo computer, mostra quali modelli aperti funzioneranno, scarica e installa Ollama e i modelli per te, e qualsiasi agente può usarli — gratis, offline e in privato.
 - 💬 **Le tue chat di Claude Code si trasferiscono qui.** Atrium legge le tue conversazioni esistenti di Claude Code e le archivia per progetto. I sub-agenti che Claude avvia in quelle chat compaiono **in tempo reale** come ospiti in una stanza vuota.
 - 🛡️ **Resti tu al comando.** Sola lettura per impostazione predefinita, i segreti sono off-limits, limiti di spesa ovunque e nulla viene mai pubblicato o inviato con push. L'ultima parola spetta a te.
 
@@ -107,6 +109,7 @@ Scarica l'installer per il tuo sistema dall'[**ultima release**](https://github.
 ### Requisiti
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installato (`npm install -g @anthropic-ai/claude-code`) e con accesso effettuato — oppure una chiave API di Anthropic, che Atrium conserva cifrata nel portachiavi del tuo sistema operativo.
+- Facoltativo: [OpenAI Codex CLI](https://github.com/openai/codex), [Gemini CLI](https://github.com/google-gemini/gemini-cli), un server compatibile con OpenAI — oppure **nessuna IA cloud**: installa Ollama e i modelli locali dalla pagina **IA locale**.
 - Non hai ancora Claude? Attiva la **Simulazione** ed esplora tutto gratuitamente.
 
 ### Primo avvio

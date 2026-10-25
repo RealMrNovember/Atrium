@@ -40,6 +40,8 @@ Atrium turns that into a company you can **see**:
 - 👥 **Every floor has a team.** A project lead, a developer, a UI/UX designer, QA, a researcher and a memory keeper — each in their own room, at their own desk.
 - 🧭 **You give one command, the lead runs the team.** The lead splits the work, agents walk in to get their tasks, work at their desks and walk back to report. You get **one** merged report.
 - 🧠 **Projects remember.** Each floor keeps a short project memory that every agent reads first — so nobody re-reads the whole codebase.
+- 🤝 **Not just Claude.** Each agent can run on Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama or any OpenAI-compatible server — mixed on the same floor.
+- 🦙 **Local AI, built in.** Atrium measures your computer, shows which open models will run, downloads and installs Ollama and the models for you, and lets any agent use them — free, offline and private.
 - 💬 **Your Claude Code chats move in.** Atrium reads your existing Claude Code conversations and files them by project. Sub-agents Claude spins up in those chats show up **live** as guests in an empty room.
 - 🛡️ **You stay in charge.** Read-only by default, secrets are off-limits, spending caps everywhere, and nothing is ever published or pushed. The final call is yours.
 
@@ -107,6 +109,7 @@ Download the installer for your system from the [**latest release**](https://git
 ### Requirements
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed (`npm install -g @anthropic-ai/claude-code`) and signed in — or an Anthropic API key, which Atrium stores encrypted with your OS keychain.
+- Optional: [OpenAI Codex CLI](https://github.com/openai/codex), [Gemini CLI](https://github.com/google-gemini/gemini-cli), an OpenAI-compatible server — or **no cloud AI at all**: install Ollama and local models from the **Local AI** page.
 - No Claude yet? Turn on **Simulation** and explore everything for free.
 
 ### First run

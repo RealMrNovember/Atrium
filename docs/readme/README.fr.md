@@ -40,6 +40,8 @@ Atrium en fait une entreprise que tu peux **voir** :
 - 👥 **Chaque étage a une équipe.** Un chef de projet, un développeur, un designer UI/UX, un QA, un chercheur et un gardien de la mémoire — chacun dans sa propre pièce, à son propre bureau.
 - 🧭 **Tu donnes une seule consigne, le chef dirige l'équipe.** Le chef répartit le travail, les agents viennent chercher leurs tâches, travaillent à leurs bureaux et reviennent faire leur rapport. Tu reçois **un seul** rapport fusionné.
 - 🧠 **Les projets se souviennent.** Chaque étage garde une courte mémoire de projet que chaque agent lit en premier — personne ne relit donc toute la base de code.
+- 🤝 **Pas seulement Claude.** Chaque agent peut tourner avec Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ou tout serveur compatible OpenAI — mélangés sur le même étage.
+- 🦙 **IA locale intégrée.** Atrium mesure ton ordinateur, montre quels modèles ouverts vont tourner, télécharge et installe Ollama et les modèles pour toi, et n'importe quel agent peut les utiliser — gratuit, hors ligne et privé.
 - 💬 **Tes chats Claude Code emménagent.** Atrium lit tes conversations Claude Code existantes et les range par projet. Les sous-agents que Claude lance dans ces chats apparaissent **en direct** comme invités dans une pièce vide.
 - 🛡️ **Tu gardes la main.** Lecture seule par défaut, secrets interdits d'accès, plafonds de dépenses partout, et rien n'est jamais publié ni poussé. Le dernier mot est le tien.
 
@@ -107,6 +109,7 @@ Télécharge l'installateur pour ton système depuis la [**dernière version**](
 ### Prérequis
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installé (`npm install -g @anthropic-ai/claude-code`) et connecté — ou une clé d'API Anthropic, qu'Atrium stocke chiffrée dans le trousseau de ton système.
+- En option : [OpenAI Codex CLI](https://github.com/openai/codex), [Gemini CLI](https://github.com/google-gemini/gemini-cli), un serveur compatible OpenAI — ou **aucune IA cloud** : installe Ollama et des modèles locaux depuis la page **IA locale**.
 - Pas encore de Claude ? Active la **Simulation** et explore tout gratuitement.
 
 ### Premier lancement

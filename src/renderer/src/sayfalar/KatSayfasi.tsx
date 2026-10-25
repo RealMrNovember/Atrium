@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactElement } from 'react'
 import type { Ajan, CanliDurum, KatDetayi, MisafirAjan, SirketProfili } from '@ortak/tipler'
 import { ajanAnahtari } from '@ortak/tipler'
 import { Markdown } from '../bilesenler/Markdown'
+import { SaglayiciSecici, saglayiciIkonu } from '../bilesenler/SaglayiciSecici'
 import { SohbetListesi } from '../bilesenler/SohbetListesi'
 import { useDil } from '../dil'
 import { KatSahnesi } from '../sahne/KatSahnesi'
@@ -55,7 +56,9 @@ export function KatSayfasi({ katId, acilacakSohbet, profil, canli, onDegisti }: 
   const bosOda = (oda: number): void => {
     setSeciliAjan(null)
     setTaslakAjan({
-      id: `ajan-${Date.now().toString(36)}`, ad: t('newAgentName'), rol: t('newAgentRole'), oda, model: 'sonnet',
+      id: `ajan-${Date.now().toString(36)}`, ad: t('newAgentName'), rol: t('newAgentRole'), oda,
+      saglayici: profil.ayarlar.varsayilanSaglayici ?? 'claude',
+      model: (profil.ayarlar.varsayilanSaglayici ?? 'claude') === 'claude' ? 'sonnet' : '',
       renk: RENKLER[(oda + 3) % RENKLER.length], gorevTanimi: t('newAgentDuty')
     })
     setSekme('ajan')
@@ -252,7 +255,7 @@ function EkipPaneli({ detay, canli, seciliAjan, taslak, onSec, onYeni, onKaydedi
               <span className="avatar" style={{ background: a.renk }}>{a.ad[0]}</span>
               <span>
                 <b>{a.ad}</b> {a.lider && '👑'} {a.iseAlindi && '🎉'}<br />
-                <span className="kucuk">{a.rol} · {a.model}{a.odak?.length ? ` · 📁 ${a.odak.slice(0, 2).join(', ')}` : ''}</span>
+                <span className="kucuk">{a.rol} · {saglayiciIkonu(a.saglayici)} {a.model || '—'}{a.odak?.length ? ` · 📁 ${a.odak.slice(0, 2).join(', ')}` : ''}</span>
               </span>
               <span className={`durum ${c?.durum ?? 'bosta'}`}>{t(DURUM_ANAHTARI[c?.durum ?? 'bosta'])}</span>
             </button>
@@ -303,14 +306,8 @@ function AjanFormu({ katId, ajan, yeni, canli, doluOdalar, onGeri, onKaydedildi 
       <div className="form">
         <label>{t('fName')}<input value={f.ad} onChange={(e) => setF({ ...f, ad: e.target.value })} /></label>
         <label>{t('fRole')}<input value={f.rol} onChange={(e) => setF({ ...f, rol: e.target.value })} /></label>
+        <SaglayiciSecici saglayici={f.saglayici} model={f.model} onDegis={(saglayici, model) => setF((o) => ({ ...o, saglayici, model }))} />
         <div className="form-satir">
-          <label>{t('fModel')}
-            <select value={f.model} onChange={(e) => setF({ ...f, model: e.target.value })}>
-              <option value="haiku">{t('mHaiku')}</option>
-              <option value="sonnet">{t('mSonnet')}</option>
-              <option value="opus">{t('mOpus')}</option>
-            </select>
-          </label>
           <label>{t('fRoom')}
             <select value={f.oda} onChange={(e) => setF({ ...f, oda: Number(e.target.value) })} disabled={f.lider}>
               {[0, 1, 2, 3, 4, 5, 6, 7].filter((n) => !doluOdalar.includes(n) && (n !== 0 || f.lider)).map((n) => <option key={n} value={n}>{t('roomN', { n: n + 1 })}</option>)}

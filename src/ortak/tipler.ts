@@ -45,6 +45,65 @@ export interface SirketAyarlari {
   claudeYolu: string
   /** Ses efektleri açık mı. */
   ses: boolean
+  /** Yeni ajanların ve lider işe alımlarının varsayılan yapay zeka aracı. */
+  varsayilanSaglayici: SaglayiciId
+  /** Claude dışındaki araçların ayarları (yol, adres). */
+  saglayicilar: Partial<Record<SaglayiciId, SaglayiciAyari>>
+}
+
+/** Ajanları çalıştırabilen yapay zeka araçları. */
+export type SaglayiciId = 'claude' | 'codex' | 'gemini' | 'ollama' | 'openai'
+
+export const SAGLAYICILAR: { id: SaglayiciId; ad: string; ikon: string; yerel?: boolean }[] = [
+  { id: 'claude', ad: 'Claude Code', ikon: '✳️' },
+  { id: 'codex', ad: 'OpenAI Codex CLI', ikon: '🌀' },
+  { id: 'gemini', ad: 'Gemini CLI', ikon: '♊' },
+  { id: 'ollama', ad: 'Ollama', ikon: '🦙', yerel: true },
+  { id: 'openai', ad: 'OpenAI compatible', ikon: '🔌' }
+]
+
+export interface SaglayiciAyari {
+  /** CLI'nin tam yolu (boşsa otomatik bulunur). */
+  yol?: string
+  /** HTTP adresi (Ollama: http://127.0.0.1:11434 · OpenAI uyumlu: …/v1). */
+  url?: string
+}
+
+export interface SaglayiciDurumu {
+  id: SaglayiciId
+  kurulu: boolean
+  surum?: string
+  /** Oturum açık / anahtar var / sunucu çalışıyor. */
+  hazir: boolean
+  yontem?: string
+  /** Kullanılabilir modeller (Ollama'da kurulu olanlar). */
+  modeller?: string[]
+  /** Atrium'a kaydedilmiş bir anahtar var mı. */
+  anahtar?: boolean
+  hata?: string
+}
+
+/** Bilgisayarın yerel yapay zeka için önemli donanımı. */
+export interface Donanim {
+  isletim: string
+  mimari: string
+  islemci: string
+  cekirdek: number
+  ramGb: number
+  bosRamGb: number
+  diskBosGb?: number
+  gpular: { ad: string; vramGb?: number }[]
+  /** Apple Silicon: ekran kartı ana belleği paylaşır. */
+  birlesikBellek: boolean
+}
+
+/** Uygulama içinden Ollama ya da model indirme ilerlemesi. */
+export interface Indirme {
+  /** 'ollama' ya da model adı. */
+  hedef: string
+  durum: 'iniyor' | 'kuruluyor' | 'bitti' | 'hata' | 'iptal'
+  yuzde: number
+  mesaj?: string
 }
 
 export interface ClaudeDurumu {
@@ -84,6 +143,8 @@ export interface Ajan {
   /** Ajanın sistem istemi: kim olduğu, ne yaptığı, nasıl çalıştığı. */
   gorevTanimi: string
   model: string
+  /** Ajanı çalıştıran yapay zeka aracı (yoksa Claude Code). */
+  saglayici?: SaglayiciId
   renk: string
   lider?: boolean
   /** WebSearch / WebFetch kullanabilir mi. */
@@ -297,6 +358,19 @@ export interface SirketApi {
   guncellemeKur(): Promise<void>
   /** Plan limitlerini anlık öğrenmek için çok küçük bir Haiku çağrısı yapar. */
   planLimitleriYenile(): Promise<PlanLimitleri | null>
+  saglayiciDurumlari(): Promise<SaglayiciDurumu[]>
+  saglayiciGiris(id: SaglayiciId): Promise<void>
+  saglayiciAnahtari(id: SaglayiciId, anahtar: string | null): Promise<SaglayiciDurumu[]>
+  donanim(): Promise<Donanim>
+  /** Ollama'yı uygulamanın içinden indirip kurar. */
+  ollamaKur(): Promise<void>
+  ollamaBaslat(): Promise<void>
+  modelIndir(model: string): Promise<void>
+  modelSil(model: string): Promise<void>
+  indirmeIptal(hedef: string): Promise<void>
+  /** Yerel modelle tek mesajlık deneme sohbeti; yanıt metnini döndürür. */
+  yerelDene(model: string, mesajlar: { rol: 'sen' | 'model'; metin: string }[]): Promise<string>
   canliDinle(cb: (d: CanliDurum) => void): () => void
   guncellemeDinle(cb: (d: GuncellemeDurumu) => void): () => void
+  indirmeDinle(cb: (d: Record<string, Indirme>) => void): () => void
 }

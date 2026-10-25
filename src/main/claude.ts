@@ -39,7 +39,7 @@ export interface KosuSonucu {
 
 // Ajan hiçbir koşulda gizli dosya okuyamaz, kabuk komutu çalıştıramaz, kendi alt ajanını açamaz
 // (alt ajan bütçe ve denetimin dışına taşar; iş bölmeyi lider yapar).
-const YASAK_ARACLAR = [
+export const YASAK_ARACLAR = [
   'Bash', 'PowerShell', 'Agent', 'Task',
   'Read(**/.env)', 'Read(**/.env.*)', 'Read(**/*.pem)', 'Read(**/*.key)', 'Read(**/id_rsa*)', 'Read(**/id_ed25519*)',
   'Edit(**/.env*)', 'Write(**/.env*)'
@@ -92,18 +92,23 @@ export async function claudeDurumuOku(ayar?: string, apiAnahtari = false): Promi
 
 /** `claude auth login`'i kullanıcının görebileceği bir terminal penceresinde başlatır. */
 export function claudeGirisBaslat(ayar?: string): void {
-  const { komut } = claudeBul(ayar)
+  terminaldeCalistir(claudeBul(ayar).komut, ['auth', 'login'], 'Claude login')
+}
+
+/** Bir CLI komutunu kullanıcının görebileceği bir terminal penceresinde başlatır (giriş akışları için). */
+export function terminaldeCalistir(komut: string, args: string[], baslik: string): void {
   const tirnakli = komut.includes(' ') ? `"${komut}"` : komut
+  const satir = [tirnakli, ...args].join(' ')
   if (process.platform === 'win32') {
-    spawn('cmd.exe', ['/c', `start "Claude login" cmd /k ${tirnakli} auth login`],
+    spawn('cmd.exe', ['/c', `start "${baslik}" cmd /k ${satir}`],
       { detached: true, windowsHide: false, windowsVerbatimArguments: true }).unref()
   } else if (process.platform === 'darwin') {
-    spawn('osascript', ['-e', `tell application "Terminal" to do script "${tirnakli.replace(/"/g, '\\"')} auth login"`, '-e', 'tell application "Terminal" to activate'], { detached: true }).unref()
+    spawn('osascript', ['-e', `tell application "Terminal" to do script "${satir.replace(/"/g, '\\"')}"`, '-e', 'tell application "Terminal" to activate'], { detached: true }).unref()
   } else {
     for (const terminal of ['x-terminal-emulator', 'gnome-terminal', 'konsole', 'xterm']) {
       try {
-        const args = terminal === 'gnome-terminal' ? ['--', komut, 'auth', 'login'] : ['-e', `${komut} auth login`]
-        spawn(terminal, args, { detached: true }).unref()
+        const targs = terminal === 'gnome-terminal' ? ['--', komut, ...args] : ['-e', satir]
+        spawn(terminal, targs, { detached: true }).unref()
         return
       } catch {
         /* bir sonrakini dene */
@@ -112,18 +117,18 @@ export function claudeGirisBaslat(ayar?: string): void {
   }
 }
 
-function temizOrtam(ekler: Record<string, string> = {}): NodeJS.ProcessEnv {
+export function temizOrtam(ekler: Record<string, string> = {}): NodeJS.ProcessEnv {
   // iç içe oturum algılaması alt süreci engellemesin
   const ortam = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('CLAUDECODE')))
   return { ...ortam, ...ekler }
 }
 
-function kisalt(metin: string, n = 70): string {
+export function kisalt(metin: string, n = 70): string {
   const tek = metin.replace(/\s+/g, ' ').trim()
   return tek.length > n ? tek.slice(0, n - 1) + '…' : tek
 }
 
-function hataMetni(ham: string, t: Cevirmen, tavan?: number): string {
+export function hataMetni(ham: string, t: Cevirmen, tavan?: number): string {
   if (/authenticat|oauth|log ?in|api key|not logged/i.test(ham)) return t('errLogin')
   if (/budget/i.test(ham)) return t('errBudget', { cap: tavan ?? '?' })
   return kisalt(ham, 400)

@@ -65,7 +65,7 @@ select {
 .bolum { max-width: 1160px; margin: 0 auto; padding: 96px 16px 0; }
 .bolum h2 { margin: 0; text-align: center; font-size: clamp(30px, 4.4vw, 44px); letter-spacing: -.025em; line-height: 1.15; }
 .bolum-alt { text-align: center; color: var(--soluk); max-width: 640px; margin: 14px auto 44px; font-size: 18px; }
-.izgara { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.izgara { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .izgara article { padding: 26px; border-radius: 18px; background: linear-gradient(180deg, var(--yuzey), #10152a); border: 1px solid var(--cizgi); transition: transform .2s, border-color .2s; }
 .izgara article:hover { transform: translateY(-3px); border-color: rgba(124, 92, 255, .55); }
 .izgara span { font-size: 30px; }

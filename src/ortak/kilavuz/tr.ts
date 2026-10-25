@@ -53,6 +53,23 @@ Her kat kısa bir **proje hafızası** tutar: projenin ne olduğu, teknolojisi v
 - Sohbete devam ederken aynı güvenlik kuralları geçerlidir: kabuk komutu yok, dosya değişikliği yalnız izin verirsen.
 - Sohbetler yalnızca yerelde okunur; hiçbir şey bilgisayarından çıkmaz.
 
+## Yapay zeka araçları
+Atrium tek bir yapay zekaya bağlı değil. Her ajanın kendi **yapay zeka aracı** var ve farklı araçlar aynı katta yan yana çalışabilir:
+- **Claude Code** — varsayılan; en yetenekli ajan, plan kullanımı göstergesi ve dolar tavanları yalnız onda.
+- **OpenAI Codex CLI** — \`npm i -g @openai/codex\` ile kur, sonra Profil & Ayarlar → Yapay zeka araçları'nda **Giriş yap**'a tıkla.
+- **Gemini CLI** — \`npm i -g @google/gemini-cli\` ile kur; Google ile giriş yap ya da bir Gemini API anahtarı kaydet.
+- **Ollama** — kendi bilgisayarında çalışan ücretsiz modeller (Yerel YZ'ye bak).
+- **OpenAI uyumlu** — LM Studio, llama.cpp, vLLM, OpenRouter ya da OpenAI API: adresi ve gerekiyorsa anahtarı gir.
+
+Bir ajanı değiştirmek için ona tıkla, **Yapay zeka aracı** ve **Model**'i seç. **Yeni ajanlar için varsayılan**, işe alınanların ne kullanacağını belirler; lider Claude dışı bir araçla çalışıyorsa işe aldığı ajanlar da aynı araç ve modeli kullanır.
+
+## Yerel YZ
+**Yerel YZ** sayfası bilgisayarını ölçer (işlemci, bellek, ekran kartı, boş disk) ve hangi modellerin hızlı, yavaş çalışacağını ya da hiç sığmayacağını gösterir.
+1. **Ollama'yı indir ve kur**'a tıkla — Atrium resmi motoru indirip senin için kurar.
+2. **Hızlı çalışır** ya da **Sana önerilen** işaretli bir model seçip **İndir**'e tıkla.
+3. Deneme sohbetinde dene, sonra bir ajana ver: Yapay zeka aracı **Ollama**, Model **senin modelin**.
+**Ajan olabilir** işaretli modeller Atrium'un güvenli dosya araçlarıyla proje dosyalarını açıp okuyabilir; diğerleri yalnız talimat ve proje hafızasından yanıt verir. Sayfada boyutlar, bellek ve ipuçları üzerine kısa bir rehber de var.
+
 ## Ekip
 **Ekip** sekmesinde ajanların adını değiştirebilir, görev tanımlarını düzenleyebilir, model seçebilir (Haiku: hızlı ve ucuz · Sonnet: dengeli · Opus: en güçlü), web erişimi verebilir, odak klasörlerini belirleyebilir, başka odaya taşıyabilir ya da çıkarabilirsin. Lider çıkarılamaz.
 

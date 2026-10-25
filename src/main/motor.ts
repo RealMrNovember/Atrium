@@ -3,11 +3,12 @@
 import { randomUUID } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import type {
-  Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, MisafirAjan, PlanLimiti, PlanLimitleri, SirketProfili
+  Ajan, AjanCanli, AktifSohbet, CanliDurum, Gorev, Kat, Komut, MisafirAjan, PlanLimiti, PlanLimitleri, SaglayiciId, SirketProfili
 } from '@ortak/tipler'
 import { ajanAnahtari } from '@ortak/tipler'
 import { dilAdiIngilizce, type Cevirmen } from '@ortak/i18n'
 import { claudeKos, type KosuSonucu } from './claude'
+import { kos } from './saglayicilar'
 import * as depo from './depo'
 import { simKos } from './simulasyon'
 
@@ -24,12 +25,13 @@ const sohbetIptalleri = new Map<string, AbortController>()
 const iptaller = new Map<string, AbortController>()
 let yayinci: (d: CanliDurum) => void = () => {}
 let yayinBekliyor = false
-let apiAnahtari: () => string | undefined = () => undefined
+/** Sağlayıcının Atrium'da saklanan anahtarı (varsayılan: Claude). */
+let apiAnahtari: (id?: SaglayiciId) => string | undefined = () => undefined
 let sohbetBaglami: (katId: string) => string = () => ''
 
 export function motorBaslat(
   yayinla: (d: CanliDurum) => void,
-  anahtar: () => string | undefined,
+  anahtar: (id?: SaglayiciId) => string | undefined,
   baglam: (katId: string) => string
 ): void {
   yayinci = yayinla
@@ -147,14 +149,17 @@ async function ajaniKostur(k: AjanKosusu): Promise<KosuSonucu> {
   const { ayarlar } = depo.profilOku()
   const t = depo.ceviri()
   const tavan = ayarlar.gunlukTavanUsd
-  if (!ayarlar.simulasyon && depo.bugunHarcanan() + k.butceUsd > tavan + 1e-9) {
+  const saglayici = k.ajan.saglayici ?? 'claude'
+  // yalnız Claude koşusu para harcar; diğer araçlar abonelik ya da yereldir
+  if (!ayarlar.simulasyon && saglayici === 'claude' && depo.bugunHarcanan() + k.butceUsd > tavan + 1e-9) {
     return { metin: '', maliyetUsd: 0, maliyetTahmini: false,
       hata: t('errDailyCap', { spent: depo.bugunHarcanan().toFixed(2), run: k.butceUsd, cap: tavan }) }
   }
   const etkinlik = (satir: string): void => ajanGuncelle(k.kat.id, k.ajan.id, { etkinlik: satir }, satir)
   const sonuc = ayarlar.simulasyon
     ? await simKos(k.tur, k.istem, k.ajan, t, etkinlik, k.sinyal)
-    : await claudeKos({
+    : await kos({
+        saglayici, ayar: ayarlar.saglayicilar?.[saglayici] ?? {}, anahtar: apiAnahtari(saglayici),
         cwd: k.kat.yol, istem: k.istem, model: k.ajan.model, butceUsd: k.butceUsd, araclar: k.araclar,
         yazma: k.yazma, sureMs: ayarlar.kosuSuresiDk * 60_000, claudeYolu: ayarlar.claudeYolu,
         apiAnahtari: apiAnahtari(), t, sinyal: k.sinyal, etkinlik, limitler: limitleriIsle
@@ -347,7 +352,7 @@ interface HamPlan {
 
 export interface Plan { plan: string; gorevler: Gorev[]; yeniAjanlar: Ajan[]; tur: boolean }
 
-export function planiAyristir(metin: string, ekip: Ajan[], komutMetni: string, t: Cevirmen, bosOdalar: number[]): Plan {
+export function planiAyristir(metin: string, ekip: Ajan[], komutMetni: string, t: Cevirmen, bosOdalar: number[], lider?: Ajan): Plan {
   let ham: HamPlan = {}
   const bas = metin.indexOf('{')
   const son = metin.lastIndexOf('}')
@@ -371,7 +376,10 @@ export function planiAyristir(metin: string, ekip: Ajan[], komutMetni: string, t
     idHaritasi.set(h.id ?? kisa, id)
     yeniAjanlar.push({
       id, ad: (h.name || h.role).slice(0, 24), rol: h.role.slice(0, 40), oda, renk,
-      model: ['haiku', 'sonnet', 'opus'].includes(h.model ?? '') ? h.model! : 'sonnet',
+      // lider Claude dışı bir araçla çalışıyorsa işe aldıkları da aynı araç ve modelle çalışır
+      ...(lider?.saglayici && lider.saglayici !== 'claude'
+        ? { saglayici: lider.saglayici, model: lider.model }
+        : { model: ['haiku', 'sonnet', 'opus'].includes(h.model ?? '') ? h.model! : 'sonnet' }),
       web: !!h.web, gorevTanimi: (h.duty || h.role).slice(0, 1200), iseAlindi: new Date().toISOString()
     })
   }
@@ -457,7 +465,7 @@ async function yurut(baslangic: Komut, kat: Kat, ilkEkip: Ajan[], lider: Ajan, s
       ekleMaliyet(plan.maliyetUsd)
       if (sinyal.aborted) throw new Error(t('errCancelled'))
       if (plan.hata && !plan.metin) throw new Error(t('errPlan', { e: plan.hata }))
-      planSonucu = planiAyristir(plan.metin, ekipUyeleri.length ? ekipUyeleri : ekip, komut.metin, t, bosOdalar)
+      planSonucu = planiAyristir(plan.metin, ekipUyeleri.length ? ekipUyeleri : ekip, komut.metin, t, bosOdalar, lider)
     }
 
     if (planSonucu.tur) {

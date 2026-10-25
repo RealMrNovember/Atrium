@@ -2,6 +2,15 @@ import type { SurumNotu } from './en'
 
 export const fr: SurumNotu[] = [
   {
+    surum: '1.4.0', tarih: '2026-10-25', baslik: 'Plusieurs IA, un seul bureau — et l’IA locale',
+    maddeler: [
+      "🤝 Les agents fonctionnent désormais avec Claude Code, OpenAI Codex CLI, Gemini CLI, Ollama ou tout serveur compatible OpenAI — mélangés sur le même étage.",
+      "🦙 Nouvelle page IA locale : elle mesure ton ordinateur et montre quels modèles tournent vite, lentement ou pas du tout.",
+      "⬇️ Atrium télécharge et installe Ollama et les modèles pour toi ; tu peux ensuite les essayer dans un chat de test.",
+      "🔗 Confie un modèle local à n’importe quel agent ; les modèles qui gèrent les outils lisent les fichiers du projet avec des outils sûrs, limités au projet."
+    ]
+  },
+  {
     surum: '1.3.0', tarih: '2026-10-25', baslik: 'Les nouveautés, directement dans Atrium',
     maddeler: [
       '🎁 Une fenêtre « Nouveautés » après chaque mise à jour, dans ta langue.',

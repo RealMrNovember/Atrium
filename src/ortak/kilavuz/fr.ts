@@ -53,6 +53,23 @@ Chaque étage garde une courte **mémoire du projet** : ce qu'est le projet, sa 
 - Continuer une discussion suit les mêmes règles de sécurité : pas de commandes shell, modifications de fichiers seulement si tu les autorises.
 - Les discussions sont lues uniquement en local ; rien ne quitte ton ordinateur.
 
+## Outils d’IA
+Atrium n'est pas lié à une seule IA. Chaque agent a son propre **Outil d’IA**, et différents outils peuvent travailler côte à côte sur le même étage :
+- **Claude Code** — l'outil par défaut ; l'agent le plus performant et le seul avec l'affichage de l'utilisation du forfait et les plafonds en dollars.
+- **OpenAI Codex CLI** — installe-le avec \`npm i -g @openai/codex\`, puis clique sur **Se connecter** dans Profil et réglages → Outils d’IA.
+- **Gemini CLI** — installe-le avec \`npm i -g @google/gemini-cli\`, connecte-toi avec Google ou enregistre une clé API Gemini.
+- **Ollama** — des modèles gratuits qui tournent sur ton propre ordinateur (voir IA locale).
+- **Compatible OpenAI** — LM Studio, llama.cpp, vLLM, OpenRouter ou l'API OpenAI : saisis l'adresse et, si besoin, une clé.
+
+Pour changer l'outil d'un agent, clique dessus et modifie **Outil d’IA** et **Modèle**. **Par défaut pour les nouveaux agents** détermine ce qu'utilisent les nouvelles recrues ; quand le chef de projet tourne sur un outil autre que Claude, les agents qu'il embauche utilisent le même outil et le même modèle.
+
+## IA locale
+La page **IA locale** mesure ton ordinateur (processeur, mémoire, carte graphique, disque libre) et montre quels modèles tourneront vite, lentement ou pas du tout.
+1. Clique sur **Télécharger et installer Ollama** — Atrium télécharge le moteur officiel et l'installe pour toi.
+2. Choisis un modèle marqué **Tourne vite** ou **Recommandé pour toi** et clique sur **Télécharger**.
+3. Essaie-le dans le chat de test, puis confie-le à un agent : Outil d’IA **Ollama**, Modèle **ton modèle**.
+Les modèles marqués **Peut être un agent** peuvent ouvrir et lire les fichiers du projet avec les outils de fichiers sûrs d'Atrium ; les autres répondent uniquement à partir des instructions et de la mémoire du projet. La page contient aussi un petit guide sur les tailles, la mémoire et des astuces.
+
 ## Équipe
 Dans l'onglet **Équipe**, tu peux renommer les agents, modifier leurs fiches de poste, choisir un modèle (Haiku : rapide et économique · Sonnet : équilibré · Opus : le plus performant), donner l'accès au web, définir des dossiers de focus, les déplacer dans une autre pièce ou les supprimer. Le chef de projet ne peut pas être supprimé.
 

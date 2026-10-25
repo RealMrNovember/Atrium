@@ -482,3 +482,56 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .yenilikler-indirme { display: grid; gap: 6px; margin: 4px 0 12px; }
 .yenilikler-indirme .cubuk { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
 .yenilikler-indirme .cubuk span { display: block; height: 100%; background: var(--vurgu, #f5b942); transition: width .4s; }
+
+/* --- yapay zeka araçları (ayarlar) --- */
+.arac-ayarlari { display: grid; gap: 12px; }
+.arac-ayarlari > label, .arac-satir label { display: grid; gap: 4px; }
+.arac-satir { display: grid; gap: 8px; padding: 12px; border-radius: 10px; background: var(--yuzey-2); border: 1px solid var(--cizgi); }
+.arac-baslik { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.arac-baslik > span:empty { flex: 1; }
+.uyari-metin { color: #f6c27a; padding-top: 8px; }
+
+/* --- yerel yapay zeka --- */
+.yerel-sayfasi { display: grid; gap: 16px; max-width: 1200px; }
+.yerel-giris p { margin: 0; color: var(--soluk); line-height: 1.55; }
+.yerel-ust { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 1250px) { .yerel-ust { grid-template-columns: 1fr; } }
+.donanim { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0 0 12px; }
+.donanim dt { color: var(--soluk); font-size: 13px; }
+.donanim dd { margin: 0; }
+.yerel-karar { margin: 0; padding: 10px 12px; border-radius: 10px; background: rgba(124, 92, 255, .1); border: 1px solid rgba(124, 92, 255, .25); }
+.yerel-ilerleme, .model-indirme { display: grid; gap: 6px; }
+.model-indirme { grid-template-columns: 90px auto auto; align-items: center; }
+.yerel-ilerleme .cubuk, .model-indirme .cubuk { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+.yerel-ilerleme .cubuk span, .model-indirme .cubuk span { display: block; height: 100%; background: var(--vurgu); transition: width .4s; }
+.yerel-ilerleme button { justify-self: start; }
+.kurulu-modeller { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 6px; }
+.kurulu-modeller li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: var(--yuzey-2); }
+.kurulu-modeller li span { flex: 1; }
+.yerel-katalog-ust { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.yerel-katalog-ust h2 { margin: 0; }
+.secenekler { display: flex; gap: 6px; flex-wrap: wrap; }
+.cip { padding: 5px 12px; border-radius: 20px; background: var(--yuzey-2); border: 1px solid var(--cizgi); font-size: 13px; }
+.cip.secili { background: var(--vurgu); border-color: var(--vurgu); color: #fff; }
+.model-kartlari { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+.model-karti { display: grid; gap: 8px; align-content: start; padding: 14px; border-radius: 12px; background: var(--yuzey-2); border: 1px solid var(--cizgi); }
+.model-karti.hizli { border-color: rgba(63, 191, 127, .35); }
+.model-karti.sigmaz, .model-karti.disk { opacity: .6; }
+.model-karti p { margin: 0; font-size: 13px; color: var(--soluk); line-height: 1.5; }
+.model-ust { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.model-etiketler { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.model-alt { display: flex; align-items: center; gap: 8px; }
+.model-alt > span:empty { flex: 1; }
+.model-alt code { font-size: 12px; padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,.25); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+.etiket.kotu { background: rgba(240, 80, 110, .14); color: #ff8aa0; }
+.etiket.oneri { background: rgba(124, 92, 255, .18); color: #c7b8ff; }
+.rehber-izgara { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px 20px; }
+.rehber-izgara h3 { margin: 8px 0 6px; font-size: 15px; }
+.rehber-izgara ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--soluk); font-size: 13px; line-height: 1.5; }
+.deneme-mesajlar { display: grid; gap: 8px; max-height: 360px; overflow-y: auto; margin-bottom: 10px; }
+.deneme-mesaj { padding: 10px 12px; border-radius: 10px; white-space: pre-wrap; line-height: 1.5; max-width: 85%; }
+.deneme-mesaj.sen { justify-self: end; background: rgba(124, 92, 255, .18); }
+.deneme-mesaj.model { justify-self: start; background: var(--yuzey-2); }
+.deneme-mesaj.bekliyor { color: var(--soluk); font-style: italic; }
+.deneme-sohbeti .komut-satiri { display: flex; gap: 8px; }
+.deneme-sohbeti .komut-satiri input { flex: 1; }
