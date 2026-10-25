@@ -2,6 +2,13 @@ import type { SurumNotu } from './en'
 
 export const tr: SurumNotu[] = [
   {
+    surum: '1.4.2', tarih: '2026-10-25', baslik: "Daha hızlı güncellemeler",
+    maddeler: [
+      "🔄 Atrium artık açılır açılmaz ve sonra her 10 dakikada bir yeni sürüm olup olmadığına bakıyor.",
+      "🛠️ Küçük güvenilirlik düzeltmeleri."
+    ]
+  },
+  {
     surum: '1.4.1', tarih: '2026-10-25', baslik: "Yerel YZ’de sansürsüz modeller",
     maddeler: [
       "🔓 Yerel YZ kataloğunda yeni “Sansürsüz” filtresi: yedi topluluk modeli (Dolphin, Llama 2 Uncensored, Wizard Vicuna), ne anlama geldiğini anlatan açık bir notla.",

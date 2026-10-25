@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Atrium — Your AI agent office</title>
-  <meta name="description" content="Atrium turns all your projects into a building and your Claude agents into a team. One command, one report, fewer tokens. Free for Windows, macOS and Linux." />
+  <meta name="description" content="Atrium turns all your projects into a building and your AI agents into a team — Claude, Codex, Gemini or free local models. One command, one report, fewer tokens. Free for Windows, macOS and Linux." />
   <meta property="og:title" content="Atrium — Your AI agent office" />
   <meta property="og:description" content="Every project is a floor, every agent has a room. Free desktop app by CiciByte Technology, Inc." />
   <meta property="og:image" content="https://atrium.cicibyte.com/assets/social-preview.png" />
@@ -15,16 +15,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=1.4.2" />
 </head>
 <body>
   <header class="ust">
     <a class="marka" href="#"><img src="assets/mark.svg" width="30" height="30" alt="" /> Atrium</a>
     <nav>
       <a href="#features" data-t="navFeatures">Features</a>
-      <a href="#tokens" data-t="navTokens">Token savings</a>
+      <a href="#ai" data-t="navAi">AI tools</a>
+      <a href="#local" data-t="navLocal">Local AI</a>
       <a href="#how" data-t="navHow">How it works</a>
-      <a href="#support" data-t="navSupport">Support</a>
+      <a href="#new" data-t="navNew">What's new</a>
+      <a href="#faq" data-t="navFaq">FAQ</a>
     </nav>
     <div class="ust-sag">
       <select id="dil" aria-label="Language">
@@ -45,7 +47,7 @@
       <img class="kahraman-ikon" src="assets/icon.png" width="96" height="96" alt="Atrium" />
       <p class="rozet-ust" data-t="badge">Free · Windows · macOS · Linux · 6 languages</p>
       <h1 data-t="heroTitle">Your AI agent office.</h1>
-      <p class="alt-baslik" data-t="heroSub">Every project is a floor, every agent has a room. Give one command to a project lead — watch your Claude team walk to their desks, work, and come back with one clear report.</p>
+      <p class="alt-baslik" data-t="heroSub">Every project is a floor, every agent has a room. Give one command to a project lead — watch your AI team walk to their desks, work, and come back with one clear report.</p>
       <div class="dugmeler">
         <a class="dugme birincil" href="https://github.com/RealMrNovember/Atrium/releases/latest" target="_blank" rel="noopener" data-t="download">Download Atrium</a>
         <a class="dugme" href="https://github.com/RealMrNovember/Atrium" target="_blank" rel="noopener" data-t="viewGithub">View on GitHub</a>
@@ -58,17 +60,48 @@
 
     <section id="features" class="bolum">
       <h2 data-t="featuresTitle">A company you can see</h2>
-      <p class="bolum-alt" data-t="featuresSub">Atrium turns scattered Claude Code sessions into a calm, visual office.</p>
+      <p class="bolum-alt" data-t="featuresSub">Atrium turns scattered AI sessions into a calm, visual office.</p>
       <div class="izgara">
         <article><span>🏢</span><h3 data-t="f1t">Projects become a building</h3><p data-t="f1p">Point Atrium at your projects folder. Every subfolder becomes a floor with lit windows when agents are at work.</p></article>
         <article><span>👥</span><h3 data-t="f2t">A team on every floor</h3><p data-t="f2p">Project lead, developer, UI/UX designer, QA, researcher and memory keeper — each in their own room, at their own desk.</p></article>
         <article><span>🧭</span><h3 data-t="f3t">One command, one report</h3><p data-t="f3p">The lead splits the work, agents walk in for their tasks and walk back to report. You read one merged report.</p></article>
         <article><span>🎉</span><h3 data-t="f4t">The lead can hire</h3><p data-t="f4p">Need an SEO specialist? The lead hires one, and the new agent walks out of the elevator into an empty room.</p></article>
         <article><span>💬</span><h3 data-t="f5t">Your Claude Code chats move in</h3><p data-t="f5p">Atrium files your past conversations by project. Sub-agents Claude starts in a chat appear live as guests on that floor.</p></article>
-        <article><span>🛡️</span><h3 data-t="f6t">You stay in charge</h3><p data-t="f6p">Read-only by default, secrets off-limits, no shell, spending caps everywhere. Nothing is pushed or published.</p></article>
+        <article><span>🛡️</span><h3 data-t="f6t">You stay in charge</h3><p data-t="f6p">Read-only by default, secrets off-limits, spending caps everywhere. Nothing is pushed or published.</p></article>
         <article><span>🤝</span><h3 data-t="f7t">Not just Claude</h3><p data-t="f7p">Run agents on Claude Code, OpenAI Codex, Gemini, Ollama or any OpenAI-compatible server — mixed on the same floor.</p></article>
         <article><span>🦙</span><h3 data-t="f8t">Local AI, one click</h3><p data-t="f8p">Atrium measures your PC, shows which open models will run, then downloads Ollama and the models for you. Free, offline, private.</p></article>
       </div>
+    </section>
+
+    <section id="ai" class="bolum">
+      <h2 data-t="aiTitle">Works with your AI</h2>
+      <p class="bolum-alt" data-t="aiSub">Pick the AI per agent. Your lead can be Claude while the developer runs a local coder model and the researcher uses Gemini.</p>
+      <div class="saglayicilar">
+        <div><span>✳️</span><b>Claude Code</b><p data-t="p1d">The strongest agents, with plan-usage meter and dollar caps.</p></div>
+        <div><span>🌀</span><b>OpenAI Codex</b><p data-t="p2d">Agents on your ChatGPT plan — sign in from Atrium.</p></div>
+        <div><span>♊</span><b>Gemini CLI</b><p data-t="p3d">Agents on your Google account or a Gemini API key.</p></div>
+        <div><span>🦙</span><b>Ollama</b><p data-t="p4d">Free local models — Atrium installs everything for you.</p></div>
+        <div><span>🔌</span><b data-t="p5n">OpenAI compatible</b><p data-t="p5d">LM Studio, llama.cpp, vLLM, OpenRouter or the OpenAI API.</p></div>
+      </div>
+      <div class="ikili">
+        <figure class="cerceve"><img src="assets/team-mixed.png" alt="" loading="lazy" /><figcaption data-t="aiImg1">One team, many AIs — every agent shows its tool and model.</figcaption></figure>
+        <figure class="cerceve"><img src="assets/agent-ai-tool.png" alt="" loading="lazy" /><figcaption data-t="aiImg2">Switch an agent's AI tool and model in two clicks.</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="local" class="bolum">
+      <h2 data-t="locTitle">Local AI, without the terminal</h2>
+      <p class="bolum-alt" data-t="locSub">Run agents on open models that live on your own computer — no account, no subscription, nothing leaves the machine.</p>
+      <div class="yerel">
+        <ol class="yerel-adimlar">
+          <li><span>1</span><div><b data-t="l1t">Measure</b><p data-t="l1p">Atrium reads your processor, memory, graphics card and free disk, and tells you which model sizes run well.</p></div></li>
+          <li><span>2</span><div><b data-t="l2t">Install the engine</b><p data-t="l2p">One click downloads the official Ollama release and installs it for you.</p></div></li>
+          <li><span>3</span><div><b data-t="l3t">Download a model</b><p data-t="l3p">37 open models — general, coding, reasoning, vision and more — each marked fast, slow or too big for your machine, with a recommendation.</p></div></li>
+          <li><span>4</span><div><b data-t="l4t">Try it, then hire it</b><p data-t="l4p">Chat with the model on the page, then give it to any agent. Capable models read project files through Atrium's safe, project-only tools.</p></div></li>
+        </ol>
+        <figure class="cerceve"><img src="assets/local-ai.png" alt="" loading="lazy" /><figcaption data-t="locImg1">Your computer, measured — engine status and your models.</figcaption></figure>
+      </div>
+      <figure class="cerceve genis"><img src="assets/local-catalog.png" alt="" loading="lazy" /><figcaption data-t="locImg2">A model catalog that knows your hardware — one-click download.</figcaption></figure>
     </section>
 
     <section id="tokens" class="bolum vurgu-bolum">
@@ -103,9 +136,16 @@
       </div>
     </section>
 
+    <section id="new" class="bolum">
+      <h2 data-t="newTitle">What's new</h2>
+      <p class="bolum-alt" data-t="newSub">Atrium updates itself. Here are the latest releases.</p>
+      <div id="yenilikler" class="yenilikler"></div>
+      <p class="ortala"><a class="dugme kucuk-dugme" href="https://github.com/RealMrNovember/Atrium/releases" target="_blank" rel="noopener" data-t="newAll">All releases on GitHub</a></p>
+    </section>
+
     <section class="bolum indir-bolum">
       <h2 data-t="getTitle">Get Atrium</h2>
-      <p class="bolum-alt" data-t="getSub">Free, including for commercial use. Needs Claude Code (or an Anthropic API key) — or try everything in Simulation mode.</p>
+      <p class="bolum-alt" data-t="getSub">Free, including for commercial use. Works with Claude Code, Codex, Gemini or free local models — or try everything in Simulation mode.</p>
       <div class="platformlar">
         <a href="https://github.com/RealMrNovember/Atrium/releases/latest" target="_blank" rel="noopener"><b>Windows</b><span>.exe</span></a>
         <a href="https://github.com/RealMrNovember/Atrium/releases/latest" target="_blank" rel="noopener"><b>macOS</b><span>.dmg</span></a>
@@ -113,14 +153,25 @@
       </div>
     </section>
 
+    <section id="faq" class="bolum">
+      <h2 data-t="faqTitle">Questions</h2>
+      <div class="sss">
+        <details><summary data-t="q1">Does Atrium send my code or chats anywhere?</summary><p data-t="a1">No. Your code, chats and project memory stay on your computer. Agents run through the AI tool you choose — with a local model nothing leaves the machine. Atrium itself only checks for updates and release notes.</p></details>
+        <details><summary data-t="q2">Can I use Atrium without Claude?</summary><p data-t="a2">Yes. Any agent can run on OpenAI Codex, Gemini CLI, an OpenAI-compatible server or a local model through Ollama, which Atrium installs for you.</p></details>
+        <details><summary data-t="q3">Do I need a powerful computer for local AI?</summary><p data-t="a3">No. Small models run on almost any recent computer, even without a graphics card. The Local AI page measures your machine and recommends a model.</p></details>
+        <details><summary data-t="q4">How much does it cost?</summary><p data-t="a4">Atrium is free. Agents use your own Claude, ChatGPT or Google plan — or cost nothing with local models. For Claude you set per-run and daily caps.</p></details>
+        <details><summary data-t="q5">Is it safe to let agents work on my projects?</summary><p data-t="a5">Agents are read-only by default, never open secret files, never commit, push or publish, and treat web pages and file contents as data — not instructions.</p></details>
+      </div>
+    </section>
+
     <section id="support" class="bolum">
       <h2 data-t="supportTitle">Support Atrium</h2>
-      <p class="bolum-alt" data-t="supportSub">Atrium is free and will stay free. If it saves you time, here is how you can help.</p>
+      <p class="bolum-alt" data-t="supportSub">If Atrium saves you time, here is how you can help.</p>
       <div class="destek">
         <a href="https://github.com/RealMrNovember/Atrium" target="_blank" rel="noopener"><span>⭐</span><b data-t="s1t">Star on GitHub</b><p data-t="s1p">The simplest way to help more people find Atrium.</p></a>
         <a href="https://github.com/RealMrNovember/Atrium/issues/new/choose" target="_blank" rel="noopener"><span>🐛</span><b data-t="s2t">Report & suggest</b><p data-t="s2p">Found a bug or have an idea? Open an issue.</p></a>
         <a href="https://github.com/RealMrNovember/Atrium/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener"><span>🤝</span><b data-t="s3t">Contribute</b><p data-t="s3p">Fixes, features and translations are welcome.</p></a>
-        <a class="kahve" href="https://buymeacoffee.com/mikeross" target="_blank" rel="noopener"><span>☕</span><b data-t="s4t">Donate</b><p data-t="s4p">GitHub Sponsors and Buy Me a Coffee — coming soon.</p></a>
+        <a class="kahve" href="https://buymeacoffee.com/mikeross" target="_blank" rel="noopener"><span>☕</span><b data-t="s4t">Buy me a coffee</b><p data-t="s4p">Buy me a coffee — it keeps the lights on in the building.</p></a>
       </div>
     </section>
   </main>
@@ -130,7 +181,7 @@
     <div><span data-t="madeBy">Made by</span> <a href="https://cicibyte.com" target="_blank" rel="noopener">CiciByte Technology, Inc.</a> · <a href="https://github.com/RealMrNovember/Atrium" target="_blank" rel="noopener">GitHub</a></div>
   </footer>
 
-  <script src="i18n.js"></script>
-  <script src="app.js"></script>
+  <script src="i18n.js?v=1.4.2"></script>
+  <script src="app.js?v=1.4.2"></script>
 </body>
 </html>

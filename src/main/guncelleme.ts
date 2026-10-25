@@ -4,7 +4,8 @@ import { app } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import type { GuncellemeDurumu } from '@ortak/tipler'
 
-const DENETLEME_ARALIGI_MS = 4 * 60 * 60 * 1000
+// açılışta hemen, sonra 10 dakikada bir (GitHub sürüm akışı; inme/kurulum sürerken atlanır)
+const DENETLEME_ARALIGI_MS = 10 * 60 * 1000
 const kendiniGuncelleyebilir = process.platform !== 'darwin'
 
 let durum: GuncellemeDurumu = { durum: 'yok', mevcutSurum: app.getVersion() }
@@ -71,7 +72,7 @@ export function guncellemeBaslat(yayinla: (d: GuncellemeDurumu) => void): void {
   autoUpdater.on('download-progress', (p) => ayarla({ durum: 'indiriliyor', yuzde: Math.round(p.percent) }))
   autoUpdater.on('update-downloaded', (bilgi) => ayarla({ durum: 'hazir', yeniSurum: bilgi.version, yuzde: 100 }))
   autoUpdater.on('error', (e) => ayarla({ durum: 'hata', hata: String(e?.message ?? e).slice(0, 200) }))
-  setTimeout(() => void guncellemeDenetle(), 10_000)
+  setTimeout(() => void guncellemeDenetle(), 3_000)
   setInterval(() => void guncellemeDenetle(), DENETLEME_ARALIGI_MS)
 }
 

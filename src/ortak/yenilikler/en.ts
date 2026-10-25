@@ -4,6 +4,13 @@ export interface SurumNotu { surum: string; tarih: string; baslik: string; madde
 
 export const en: SurumNotu[] = [
   {
+    surum: '1.4.2', tarih: '2026-10-25', baslik: "Faster updates",
+    maddeler: [
+      "🔄 Atrium now checks for a new version as soon as it opens and every 10 minutes after that.",
+      "🛠️ Small reliability fixes."
+    ]
+  },
+  {
     surum: '1.4.1', tarih: '2026-10-25', baslik: "Uncensored models in Local AI",
     maddeler: [
       "🔓 New “Uncensored” filter in the Local AI catalog with seven community models (Dolphin, Llama 2 Uncensored, Wizard Vicuna), each with a clear note on what that means.",

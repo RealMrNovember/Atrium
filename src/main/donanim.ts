@@ -50,7 +50,14 @@ function linuxAmd(): { ad: string; vramGb?: number }[] {
   return sonuc
 }
 
+/** README/site ekran görüntüleri için temsilî masaüstü (yalnız ATRIUM_DEMO_DONANIM=1 ile). */
+const DEMO: Donanim = {
+  isletim: 'win32 10.0.26100', mimari: 'x64', islemci: 'AMD Ryzen 7 7700 8-Core Processor', cekirdek: 16,
+  ramGb: 32, bosRamGb: 21.4, diskBosGb: 412, gpular: [{ ad: 'NVIDIA GeForce RTX 4070', vramGb: 12 }], birlesikBellek: false
+}
+
 export async function donanimOku(): Promise<Donanim> {
+  if (process.env.ATRIUM_DEMO_DONANIM === '1') return DEMO
   const islemci = cpus()
   const apple = platform() === 'darwin' && arch() === 'arm64'
   let gpular: { ad: string; vramGb?: number }[] = await nvidia()

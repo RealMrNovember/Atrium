@@ -2,6 +2,13 @@ import type { SurumNotu } from './en'
 
 export const fr: SurumNotu[] = [
   {
+    surum: '1.4.2', tarih: '2026-10-25', baslik: "Mises à jour plus rapides",
+    maddeler: [
+      "🔄 Atrium vérifie désormais la présence d’une nouvelle version dès son ouverture, puis toutes les 10 minutes.",
+      "🛠️ Petites corrections de fiabilité."
+    ]
+  },
+  {
     surum: '1.4.1', tarih: '2026-10-25', baslik: "Modèles non censurés dans IA locale",
     maddeler: [
       "🔓 Nouveau filtre « Non censuré » dans le catalogue IA locale avec sept modèles communautaires (Dolphin, Llama 2 Uncensored, Wizard Vicuna), avec une note claire sur ce que cela implique.",

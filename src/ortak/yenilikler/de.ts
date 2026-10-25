@@ -2,6 +2,13 @@ import type { SurumNotu } from './en'
 
 export const de: SurumNotu[] = [
   {
+    surum: '1.4.2', tarih: '2026-10-25', baslik: "Schnellere Updates",
+    maddeler: [
+      "🔄 Atrium sucht jetzt direkt beim Start und danach alle 10 Minuten nach einer neuen Version.",
+      "🛠️ Kleine Verbesserungen der Zuverlässigkeit."
+    ]
+  },
+  {
     surum: '1.4.1', tarih: '2026-10-25', baslik: "Unzensierte Modelle in Lokale KI",
     maddeler: [
       "🔓 Neuer Filter „Unzensiert“ im Katalog von Lokale KI mit sieben Community-Modellen (Dolphin, Llama 2 Uncensored, Wizard Vicuna), jeweils mit einem klaren Hinweis, was das bedeutet.",

@@ -22,6 +22,36 @@
     })
     if (s.pageTitle) document.title = s.pageTitle
     secici.value = dil
+    yenilikleriGoster(dil)
+  }
+
+  // Son üç sürüm, uygulamanın kendi sürüm notlarından (yenilikler.json)
+  var notlar = null
+  function yenilikleriGoster(dil) {
+    var kutu = document.getElementById('yenilikler')
+    if (!kutu) return
+    if (!notlar) {
+      fetch('yenilikler.json', { cache: 'no-cache' }).then(function (y) { return y.json() })
+        .then(function (v) { notlar = v; yenilikleriGoster(document.documentElement.lang) })
+        .catch(function () { kutu.parentNode.style.display = 'none' })
+      return
+    }
+    var liste = (notlar[dil] || notlar.en || []).slice(0, 3)
+    kutu.textContent = ''
+    liste.forEach(function (n, i) {
+      var kart = document.createElement('article')
+      if (i === 0) kart.className = 'son'
+      var ust = document.createElement('div')
+      var surum = document.createElement('span'); surum.className = 'surum'; surum.textContent = 'v' + n.surum
+      var tarih = document.createElement('span'); tarih.className = 'tarih'
+      try { tarih.textContent = new Date(n.tarih).toLocaleDateString(dil, { year: 'numeric', month: 'long', day: 'numeric' }) } catch (e) { tarih.textContent = n.tarih }
+      ust.appendChild(surum); ust.appendChild(tarih)
+      var baslik = document.createElement('h3'); baslik.textContent = n.baslik
+      var ul = document.createElement('ul')
+      n.maddeler.forEach(function (m) { var li = document.createElement('li'); li.textContent = m; ul.appendChild(li) })
+      kart.appendChild(ust); kart.appendChild(baslik); kart.appendChild(ul)
+      kutu.appendChild(kart)
+    })
   }
 
   var tarayici = (navigator.language || 'en').slice(0, 2).toLowerCase()
