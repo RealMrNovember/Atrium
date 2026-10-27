@@ -2,6 +2,12 @@ import type { SurumNotu } from './en'
 
 export const it: SurumNotu[] = [
   {
+    surum: '1.6.1', tarih: '2026-10-27', baslik: "Correzione dello scorrimento",
+    maddeler: [
+      "Le pagine IA locale e Assistenza ora scorrono correttamente anche nelle finestre piccole."
+    ]
+  },
+  {
     surum: '1.6.0', tarih: '2026-10-26', baslik: "Ogni modifica la approvi tu",
     maddeler: [
       "✅ Anteprima delle modifiche: quando le modifiche ai file sono consentite, gli agenti lavorano su una copia del tuo progetto. Controlla ogni file e ogni riga, applica tutto o solo una parte, scarta — e annulla dopo averle applicate.",

@@ -2,6 +2,12 @@ import type { SurumNotu } from './en'
 
 export const tr: SurumNotu[] = [
   {
+    surum: '1.6.1', tarih: '2026-10-27', baslik: "Kaydırma düzeltmesi",
+    maddeler: [
+      "Yerel YZ ve Destek sayfaları artık küçük pencerede de yukarı aşağı kaydırılabiliyor."
+    ]
+  },
+  {
     surum: '1.6.0', tarih: '2026-10-26', baslik: "Her değişikliği sen onaylarsın",
     maddeler: [
       "✅ Değişiklik önizlemesi: dosya değişikliğine izin verildiğinde ajanlar projenin bir kopyasında çalışır. Her dosyayı ve satırı incele, hepsini ya da bir kısmını uygula, vazgeç — uyguladıktan sonra geri al.",

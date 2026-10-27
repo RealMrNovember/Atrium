@@ -2,6 +2,12 @@ import type { SurumNotu } from './en'
 
 export const de: SurumNotu[] = [
   {
+    surum: '1.6.1', tarih: '2026-10-27', baslik: "Scroll-Korrektur",
+    maddeler: [
+      "Die Seiten „Lokale KI“ und „Support“ lassen sich jetzt auch in kleinen Fenstern scrollen."
+    ]
+  },
+  {
     surum: '1.6.0', tarih: '2026-10-26', baslik: "Du gibst jede Änderung frei",
     maddeler: [
       "✅ Änderungsvorschau: Wenn Dateiänderungen erlaubt sind, arbeiten die Agenten an einer Kopie deines Projekts. Prüfe jede Datei und jede Zeile, übernimm alles oder einen Teil, verwirf — und mach es nach dem Übernehmen rückgängig.",

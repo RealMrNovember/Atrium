@@ -4,6 +4,12 @@ export interface SurumNotu { surum: string; tarih: string; baslik: string; madde
 
 export const en: SurumNotu[] = [
   {
+    surum: '1.6.1', tarih: '2026-10-27', baslik: "Scrolling fix",
+    maddeler: [
+      "The Local AI and Support pages now scroll properly in small windows."
+    ]
+  },
+  {
     surum: '1.6.0', tarih: '2026-10-26', baslik: "You approve every change",
     maddeler: [
       "✅ Change preview: with file changes allowed, agents work on a copy of your project. Review every file and line, apply all or some, discard — and undo after applying.",

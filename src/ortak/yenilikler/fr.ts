@@ -2,6 +2,12 @@ import type { SurumNotu } from './en'
 
 export const fr: SurumNotu[] = [
   {
+    surum: '1.6.1', tarih: '2026-10-27', baslik: "Correctif de défilement",
+    maddeler: [
+      "Les pages IA locale et Assistance défilent désormais correctement dans les petites fenêtres."
+    ]
+  },
+  {
     surum: '1.6.0', tarih: '2026-10-26', baslik: "Tu valides chaque modification",
     maddeler: [
       "✅ Aperçu des modifications : quand les modifications de fichiers sont autorisées, les agents travaillent sur une copie de ton projet. Vérifie chaque fichier et chaque ligne, applique tout ou une partie, rejette — et annule après avoir appliqué.",

@@ -492,7 +492,7 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .uyari-metin { color: #f6c27a; padding-top: 8px; }
 
 /* --- yerel yapay zeka --- */
-.yerel-sayfasi { display: grid; gap: 16px; max-width: 1200px; }
+.yerel-sayfasi { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: grid; gap: 16px; max-width: 1200px; align-content: start; }
 .yerel-giris p { margin: 0; color: var(--soluk); line-height: 1.55; }
 .yerel-ust { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 1250px) { .yerel-ust { grid-template-columns: 1fr; } }
@@ -546,7 +546,7 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .kilit-kart .klasor-satir input { flex: 1; }
 
 /* --- destek ve hesap --- */
-.destek-sayfasi { display: grid; gap: 16px; max-width: 1200px; }
+.destek-sayfasi { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: grid; gap: 16px; max-width: 1200px; align-content: start; }
 .destek-giris p { margin: 0; color: var(--soluk); }
 .destek-ust, .destek-alt { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
 @media (max-width: 1250px) { .destek-ust, .destek-alt { grid-template-columns: 1fr; } }
