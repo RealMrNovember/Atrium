@@ -2,6 +2,12 @@ import type { SurumNotu } from './en'
 
 export const de: SurumNotu[] = [
   {
+    surum: '1.6.2', tarih: '2026-11-03', baslik: "Ohne Projekt starten",
+    maddeler: [
+      "Bei der Einrichtung musst du kein Projekt mehr wählen: Wähle „Später hinzufügen“ und füge Projekte jederzeit unter Profil & Einstellungen oder mit dem ＋ neben „Etagen“ hinzu."
+    ]
+  },
+  {
     surum: '1.6.1', tarih: '2026-10-27', baslik: "Scroll-Korrektur",
     maddeler: [
       "Die Seiten „Lokale KI“ und „Support“ lassen sich jetzt auch in kleinen Fenstern scrollen."

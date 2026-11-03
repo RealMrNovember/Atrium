@@ -36,7 +36,7 @@ export const fr: Record<Anahtar, string> = {
   noReports: "Aucun rapport pour l'instant.",
   tasksProgress: '{done}/{total} tâches',
   workingCount: '{n} au travail',
-  noProjects: 'Aucun projet trouvé. Choisis ton dossier de projets dans Profil et réglages.',
+  noProjects: "Aucun projet pour l’instant. Ajoute un dossier de projet existant ou démarre un nouveau projet.",
 
   // agent / command / task states
   stIdle: 'En attente',
@@ -614,5 +614,8 @@ export const fr: Record<Anahtar, string> = {
   updDownloading: "Téléchargement de la mise à jour… {n} %",
   updError: "Échec de la recherche de mises à jour :",
   updCheck: "Rechercher des mises à jour",
-  updHint: "Atrium recherche automatiquement les mises à jour au démarrage, puis toutes les quelques heures. Sur macOS, la mise à jour ouvre la page de téléchargement."
+  updHint: "Atrium recherche automatiquement les mises à jour au démarrage, puis toutes les quelques heures. Sur macOS, la mise à jour ouvre la page de téléchargement.",
+  addProjectNow: "＋ Ajouter un projet",
+  wzSkipProjects: "Ajouter plus tard",
+  wzSkipHint: "Pas encore prêt ? Choisis « Ajouter plus tard » : tu pourras ajouter ou créer des projets à tout moment depuis Profil et réglages ou avec le ＋ à côté des étages."
 }

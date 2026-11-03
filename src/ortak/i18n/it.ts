@@ -36,7 +36,7 @@ export const it: Record<Anahtar, string> = {
   noReports: 'Ancora nessun report.',
   tasksProgress: '{done}/{total} attività',
   workingCount: '{n} al lavoro',
-  noProjects: 'Nessun progetto trovato. Scegli la cartella dei progetti in Profilo e impostazioni.',
+  noProjects: "Ancora nessun progetto. Aggiungi una cartella di progetto esistente o avvia un nuovo progetto.",
 
   // agent / command / task states
   stIdle: 'In attesa',
@@ -614,5 +614,8 @@ export const it: Record<Anahtar, string> = {
   updDownloading: "Download dell'aggiornamento… {n}%",
   updError: "Controllo aggiornamenti non riuscito:",
   updCheck: "Controlla aggiornamenti",
-  updHint: "Atrium controlla automaticamente gli aggiornamenti all'avvio e ogni poche ore. Su macOS l'aggiornamento apre la pagina di download."
+  updHint: "Atrium controlla automaticamente gli aggiornamenti all'avvio e ogni poche ore. Su macOS l'aggiornamento apre la pagina di download.",
+  addProjectNow: "＋ Aggiungi un progetto",
+  wzSkipProjects: "Aggiungi più tardi",
+  wzSkipHint: "Non sei ancora pronto? Scegli “Aggiungi più tardi”: potrai aggiungere o creare progetti in qualsiasi momento da Profilo e impostazioni o con il ＋ accanto ai piani."
 }

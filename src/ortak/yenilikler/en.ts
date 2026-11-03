@@ -4,6 +4,12 @@ export interface SurumNotu { surum: string; tarih: string; baslik: string; madde
 
 export const en: SurumNotu[] = [
   {
+    surum: '1.6.2', tarih: '2026-11-03', baslik: "Start without a project",
+    maddeler: [
+      "You no longer have to pick a project during setup: choose “Add later” and add or create projects anytime from Profile & Settings or the ＋ next to Floors."
+    ]
+  },
+  {
     surum: '1.6.1', tarih: '2026-10-27', baslik: "Scrolling fix",
     maddeler: [
       "The Local AI and Support pages now scroll properly in small windows."

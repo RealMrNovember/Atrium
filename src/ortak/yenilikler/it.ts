@@ -2,6 +2,12 @@ import type { SurumNotu } from './en'
 
 export const it: SurumNotu[] = [
   {
+    surum: '1.6.2', tarih: '2026-11-03', baslik: "Inizia senza progetto",
+    maddeler: [
+      "Durante la configurazione non devi più scegliere un progetto: scegli “Aggiungi più tardi” e aggiungi o crea progetti in qualsiasi momento da Profilo e impostazioni o con il ＋ accanto ai piani."
+    ]
+  },
+  {
     surum: '1.6.1', tarih: '2026-10-27', baslik: "Correzione dello scorrimento",
     maddeler: [
       "Le pagine IA locale e Assistenza ora scorrono correttamente anche nelle finestre piccole."

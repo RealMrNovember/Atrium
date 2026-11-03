@@ -681,3 +681,4 @@ small, .kucuk { color: var(--soluk); font-size: 12px; }
 .degisen-satir > .kucuk, .degisen-satir > .etiket { flex: none; white-space: nowrap; }
 .fark > div { white-space: pre; min-height: 1.45em; padding: 0 4px; }
 .fark .f-ekle, .fark .f-sil { display: block; min-width: 0; }
+.bos-proje { display: grid; gap: 12px; justify-items: center; max-width: 440px; margin: 40px auto; }

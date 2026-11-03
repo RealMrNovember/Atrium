@@ -10,9 +10,11 @@ interface Props {
   katlar: Kat[]
   canli: CanliDurum
   onKatSec: (id: string, sohbet?: string) => void
+  /** Proje yokken: projelerin eklendiği Profil & Ayarlar'a gider. */
+  onProjeEkle: () => void
 }
 
-export function AnaSayfa({ profil, katlar, canli, onKatSec }: Props): ReactElement {
+export function AnaSayfa({ profil, katlar, canli, onKatSec, onProjeEkle }: Props): ReactElement {
   const { t, dil } = useDil()
   const [raporlar, setRaporlar] = useState<Komut[]>([])
   const aktifSayisi = canli.aktifKomutlar.length
@@ -48,7 +50,12 @@ export function AnaSayfa({ profil, katlar, canli, onKatSec }: Props): ReactEleme
             <span className="kucuk">{t('buildingHint')}</span>
           </div>
           <div className="bina-kaydirma">
-            {katlar.length ? <Bina ad={profil.ad} logo={profil.logo} katlar={katlar} canli={canli} onKatSec={onKatSec} /> : <p className="bos">{t('noProjects')}</p>}
+            {katlar.length ? <Bina ad={profil.ad} logo={profil.logo} katlar={katlar} canli={canli} onKatSec={onKatSec} /> : (
+              <div className="bos-kutu bos-proje">
+                <p className="bos">{t('noProjects')}</p>
+                <button className="birincil" onClick={onProjeEkle}>{t('addProjectNow')}</button>
+              </div>
+            )}
           </div>
         </section>
 

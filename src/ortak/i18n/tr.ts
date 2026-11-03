@@ -34,7 +34,7 @@ export const tr: Record<Anahtar, string> = {
   noReports: 'Henüz rapor yok.',
   tasksProgress: '{done}/{total} görev',
   workingCount: '{n} çalışıyor',
-  noProjects: "Proje bulunamadı. Proje klasörünü Profil & Ayarlar'dan seç.",
+  noProjects: "Henüz proje yok. Var olan bir proje klasörünü ekle ya da sıfırdan yeni bir proje başlat.",
 
   stIdle: 'Hazırda bekliyor',
   stWalking: 'Yürüyor',
@@ -600,5 +600,8 @@ export const tr: Record<Anahtar, string> = {
   updDownloading: "Güncelleme indiriliyor… %{n}",
   updError: "Güncelleme denetlenemedi:",
   updCheck: "Güncellemeleri denetle",
-  updHint: "Atrium açılışta ve birkaç saatte bir güncellemeleri kendiliğinden denetler. macOS’ta güncelleme indirme sayfasını açar."
+  updHint: "Atrium açılışta ve birkaç saatte bir güncellemeleri kendiliğinden denetler. macOS’ta güncelleme indirme sayfasını açar.",
+  addProjectNow: "＋ Proje ekle",
+  wzSkipProjects: "Daha sonra ekleyeceğim",
+  wzSkipHint: "Henüz hazır değil misin? “Daha sonra ekleyeceğim”i seç — projeleri istediğin zaman Profil & Ayarlar’dan ya da Katlar’ın yanındaki ＋ ile ekleyebilir veya oluşturabilirsin."
 }

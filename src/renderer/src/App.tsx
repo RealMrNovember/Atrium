@@ -230,7 +230,7 @@ function Sirket({ profil, onKaydet }: { profil: SirketProfili; onKaydet: (p: Sir
           </div>
         </header>
 
-        {sayfa.tur === 'ana' && <AnaSayfa profil={profil} katlar={katlar} canli={canli} onKatSec={katSec} />}
+        {sayfa.tur === 'ana' && <AnaSayfa profil={profil} katlar={katlar} canli={canli} onKatSec={katSec} onProjeEkle={() => setSayfa({ tur: 'ayarlar' })} />}
         {sayfa.tur === 'kat' && <KatSayfasi key={sayfa.id} katId={sayfa.id} acilacakSohbet={sayfa.sohbet} profil={profil} canli={canli} onDegisti={katlariYenile}
           onHataBildir={(konu, metin) => setSayfa({ tur: 'destek', taslak: { tur: 'hata', konu, metin } })} />}
         {sayfa.tur === 'raporlar' && <RaporlarSayfasi katlar={katlar} onKatSec={katSec} />}

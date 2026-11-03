@@ -2,6 +2,12 @@ import type { SurumNotu } from './en'
 
 export const tr: SurumNotu[] = [
   {
+    surum: '1.6.2', tarih: '2026-11-03', baslik: "Projesiz başla",
+    maddeler: [
+      "Kurulumda proje seçmek artık zorunlu değil: “Daha sonra ekleyeceğim”i seç, projeleri istediğin zaman Profil & Ayarlar’dan ya da Katlar’ın yanındaki ＋ ile ekle veya oluştur."
+    ]
+  },
+  {
     surum: '1.6.1', tarih: '2026-10-27', baslik: "Kaydırma düzeltmesi",
     maddeler: [
       "Yerel YZ ve Destek sayfaları artık küçük pencerede de yukarı aşağı kaydırılabiliyor."

@@ -35,7 +35,7 @@ export const en = {
   noReports: 'No reports yet.',
   tasksProgress: '{done}/{total} tasks',
   workingCount: '{n} working',
-  noProjects: 'No projects found. Choose your project folder in Profile & Settings.',
+  noProjects: "No projects yet. Add an existing project folder or start a new project from scratch.",
 
   // agent / command / task states
   stIdle: 'On standby',
@@ -613,7 +613,10 @@ export const en = {
   updDownloading: "Downloading update… {n}%",
   updError: "Update check failed:",
   updCheck: "Check for updates",
-  updHint: "Atrium checks for updates automatically when it starts and every few hours. On macOS the update opens the download page."
+  updHint: "Atrium checks for updates automatically when it starts and every few hours. On macOS the update opens the download page.",
+  addProjectNow: "＋ Add a project",
+  wzSkipProjects: "Add later",
+  wzSkipHint: "Not ready yet? Choose “Add later” — you can add or create projects anytime from Profile & Settings or the ＋ next to Floors."
 } as const
 
 export type Anahtar = keyof typeof en

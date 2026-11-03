@@ -97,6 +97,7 @@ function Sihirbaz({ p, setP, onBitti }: { p: SirketProfili; setP: (p: SirketProf
             <div className="form">
               <p className="kucuk">{t('wzProjectsHint')}</p>
               <ProjeSecici p={p} setP={setP} />
+              <p className="kucuk">{t('wzSkipHint')}</p>
             </div>
           )}
           {adim === 3 && (
@@ -114,6 +115,9 @@ function Sihirbaz({ p, setP, onBitti }: { p: SirketProfili; setP: (p: SirketProf
         </div>
         <div className="kurulum-dugmeler">
           {adim > 0 ? <button className="ikincil" onClick={() => setAdim(adim - 1)}>{t('back')}</button> : <span />}
+          {adim === 2 && (
+            <button className="ikincil" onClick={() => { setP({ ...p, projeKlasoru: '', ekProjeler: [], haricTutulan: [] }); setAdim(3) }}>{t('wzSkipProjects')}</button>
+          )}
           {adim < ADIM_SAYISI - 1
             ? <button className="birincil" disabled={!ilerleyebilir} onClick={() => setAdim(adim + 1)}>{t('next')}</button>
             : <button className="birincil buyuk" onClick={() => void bitir()}>{t('finish')} →</button>}
